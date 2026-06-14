@@ -1,0 +1,12 @@
+services:
+  book-store-server:
+    container_name: book-store-server
+    image: book-store-server:latest
+    build:
+      context: ..
+      dockerfile: java-server/Dockerfile
+    env_file:
+      - ../environments/dev.env
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

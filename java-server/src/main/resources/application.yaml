@@ -1,0 +1,32 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: book-store
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:h2:mem:${H2_DB_NAME:dev-db}
+    driver-class-name: org.h2.Driver
+    username: ${H2_USERNAME:sa}
+    password: ${H2_PASSWORD:}
+
+  h2:
+    console:
+      enabled: true
+      path: ${H2_CONSOLE_PATH:/h2-console}
+
+  flyway:
+    locations: classpath:db/migrations, classpath:db/testdata
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
