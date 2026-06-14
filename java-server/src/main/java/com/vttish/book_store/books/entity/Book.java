@@ -16,9 +16,9 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Book extends BaseEntity {
-
     private String name;
     private String genre;
+    private String previewUrl;
 
     @Enumerated(EnumType.STRING)
     private AgeGroup ageGroup;
