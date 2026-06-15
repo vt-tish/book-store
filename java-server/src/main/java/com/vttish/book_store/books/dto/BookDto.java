@@ -7,7 +7,7 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public record CreateBookDto(
+public record BookDto(
         @NotBlank(message = "Name is required")
         @Size(max = 255, message = "Max book name length is 255 characters")
         String name,
