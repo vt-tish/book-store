@@ -5,6 +5,7 @@ import com.vttish.bookstore.books.dto.BookDetailsDto;
 import com.vttish.bookstore.books.dto.BookDto;
 import com.vttish.bookstore.books.service.BookService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,12 +20,9 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/v1/books")
 @Validated
+@RequiredArgsConstructor
 public class BookController {
     private final BookService bookService;
-
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
-    }
 
     @PostMapping
     public ResponseEntity<BookDetailsDto> create(@Valid @RequestBody BookDto bookDto) {
