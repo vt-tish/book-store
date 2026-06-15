@@ -1,4 +1,4 @@
-package com.vttish.book_store.books.dto;
+package com.vttish.bookstore.books.dto;
 
 import java.math.BigDecimal;
 import java.util.UUID;

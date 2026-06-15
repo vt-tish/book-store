@@ -1,4 +1,4 @@
-package com.vttish.book_store.common.exception;
+package com.vttish.bookstore.common.exception;
 
 public class NotFoundException extends RuntimeException{
     public NotFoundException(String message) {

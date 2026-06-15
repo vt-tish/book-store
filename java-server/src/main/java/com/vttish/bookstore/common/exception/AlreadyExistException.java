@@ -1,4 +1,4 @@
-package com.vttish.book_store.common.exception;
+package com.vttish.bookstore.common.exception;
 
 public class AlreadyExistException extends RuntimeException {
     public AlreadyExistException(String message) {

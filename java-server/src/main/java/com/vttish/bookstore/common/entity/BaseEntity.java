@@ -1,4 +1,4 @@
-package com.vttish.book_store.common.entity;
+package com.vttish.bookstore.common.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

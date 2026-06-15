@@ -1,9 +1,9 @@
-package com.vttish.book_store.books.mapper;
+package com.vttish.bookstore.books.mapper;
 
-import com.vttish.book_store.books.dto.BookCardDto;
-import com.vttish.book_store.books.dto.BookDetailsDto;
-import com.vttish.book_store.books.dto.BookDto;
-import com.vttish.book_store.books.entity.Book;
+import com.vttish.bookstore.books.dto.BookCardDto;
+import com.vttish.bookstore.books.dto.BookDetailsDto;
+import com.vttish.bookstore.books.dto.BookDto;
+import com.vttish.bookstore.books.entity.Book;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;

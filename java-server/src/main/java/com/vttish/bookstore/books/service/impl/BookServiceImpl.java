@@ -1,13 +1,13 @@
-package com.vttish.book_store.books.service.impl;
+package com.vttish.bookstore.books.service.impl;
 
-import com.vttish.book_store.books.dto.BookCardDto;
-import com.vttish.book_store.books.dto.BookDetailsDto;
-import com.vttish.book_store.books.dto.BookDto;
-import com.vttish.book_store.books.entity.Book;
-import com.vttish.book_store.books.mapper.BookMapper;
-import com.vttish.book_store.books.repository.BookRepository;
-import com.vttish.book_store.books.service.BookService;
-import com.vttish.book_store.common.exception.NotFoundException;
+import com.vttish.bookstore.books.dto.BookCardDto;
+import com.vttish.bookstore.books.dto.BookDetailsDto;
+import com.vttish.bookstore.books.dto.BookDto;
+import com.vttish.bookstore.books.entity.Book;
+import com.vttish.bookstore.books.mapper.BookMapper;
+import com.vttish.bookstore.books.repository.BookRepository;
+import com.vttish.bookstore.books.service.BookService;
+import com.vttish.bookstore.common.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

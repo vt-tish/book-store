@@ -1,8 +1,8 @@
-package com.vttish.book_store.books.service;
+package com.vttish.bookstore.books.service;
 
-import com.vttish.book_store.books.dto.BookCardDto;
-import com.vttish.book_store.books.dto.BookDetailsDto;
-import com.vttish.book_store.books.dto.BookDto;
+import com.vttish.bookstore.books.dto.BookCardDto;
+import com.vttish.bookstore.books.dto.BookDetailsDto;
+import com.vttish.bookstore.books.dto.BookDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

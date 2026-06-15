@@ -1,4 +1,4 @@
-package com.vttish.book_store.books.entity.enums;
+package com.vttish.bookstore.books.entity.enums;
 
 public enum AgeGroup {
     CHILD,

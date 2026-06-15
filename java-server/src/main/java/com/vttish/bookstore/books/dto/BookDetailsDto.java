@@ -1,7 +1,7 @@
-package com.vttish.book_store.books.dto;
+package com.vttish.bookstore.books.dto;
 
-import com.vttish.book_store.books.entity.enums.AgeGroup;
-import com.vttish.book_store.books.entity.enums.Language;
+import com.vttish.bookstore.books.entity.enums.AgeGroup;
+import com.vttish.bookstore.books.entity.enums.Language;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

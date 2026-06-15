@@ -1,4 +1,4 @@
-package com.vttish.book_store;
+package com.vttish.bookstore;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

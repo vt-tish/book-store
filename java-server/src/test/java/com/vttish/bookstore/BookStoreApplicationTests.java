@@ -1,4 +1,4 @@
-package com.vttish.book_store;
+package com.vttish.bookstore;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

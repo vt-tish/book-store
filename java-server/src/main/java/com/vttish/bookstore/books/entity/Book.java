@@ -1,8 +1,8 @@
-package com.vttish.book_store.books.entity;
+package com.vttish.bookstore.books.entity;
 
-import com.vttish.book_store.books.entity.enums.AgeGroup;
-import com.vttish.book_store.books.entity.enums.Language;
-import com.vttish.book_store.common.entity.BaseEntity;
+import com.vttish.bookstore.books.entity.enums.AgeGroup;
+import com.vttish.bookstore.books.entity.enums.Language;
+import com.vttish.bookstore.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
