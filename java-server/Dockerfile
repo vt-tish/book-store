@@ -8,7 +8,14 @@ COPY java-server/.mvn .mvn
 COPY java-server/src/ ./src
 
 RUN chmod +x mvnw
-RUN ./mvnw package -DskipTests
+
+RUN --mount=type=cache,target=/root/.m2/repository \
+    ./mvnw compile -DskipTests
+
+COPY java-server/src/ ./src
+
+RUN --mount=type=cache,target=/root/.m2/repository \
+    ./mvnw package -DskipTests
 
 FROM eclipse-temurin:17-jre-jammy
 
