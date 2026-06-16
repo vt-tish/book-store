@@ -1,6 +1,5 @@
 package com.vttish.bookstore.cart.service.impl;
 
-import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.service.BookPriceProvider;
 import com.vttish.bookstore.cart.dto.AddCartItemDto;
 import com.vttish.bookstore.cart.dto.CartDto;
@@ -54,7 +53,7 @@ public class CartServiceImpl implements CartService {
         }
 
         BigDecimal currentPrice = bookPriceProvider.getPriceById(addCartItemDto.bookId()).orElseThrow(
-                () -> new NotFoundException(Book.class, addCartItemDto.bookId())
+                () -> new NotFoundException(String.format("Book price is not found by id %s", addCartItemDto.bookId()))
         );
 
         CartItem item = cart.getItems().stream()
