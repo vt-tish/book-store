@@ -4,6 +4,7 @@ import com.vttish.bookstore.cart.dto.CartDto;
 import com.vttish.bookstore.cart.dto.CartItemDto;
 import com.vttish.bookstore.cart.entity.Cart;
 import com.vttish.bookstore.cart.entity.CartItem;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -11,12 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Component
 public class CartMapper {
-    private CartMapper() {
-        throw new UnsupportedOperationException();
-    }
-
-    public static CartDto toCartDto(Cart cart, Map<UUID, BigDecimal> prices) {
+    public CartDto toCartDto(Cart cart, Map<UUID, BigDecimal> prices) {
         if (cart == null) {
             return CartDto.empty();
         }
@@ -25,6 +23,7 @@ public class CartMapper {
         BigDecimal totalPrice = BigDecimal.ZERO;
 
         for (CartItem item : cart.getItems()) {
+            boolean isAvailable = prices.containsKey(item.getBookId());
             BigDecimal price = prices.getOrDefault(item.getBookId(), item.getPricePerUnit());
             Integer quantity = item.getQuantity();
             boolean hasChanged = price.compareTo(item.getPricePerUnit()) != 0;
@@ -36,10 +35,13 @@ public class CartMapper {
                     quantity,
                     price,
                     hasChanged ? item.getPricePerUnit() : null,
-                    subtotalPrice
+                    subtotalPrice,
+                    isAvailable
             ));
 
-            totalPrice = totalPrice.add(subtotalPrice);
+            if (isAvailable) {
+                totalPrice = totalPrice.add(subtotalPrice);
+            }
         }
 
         return new CartDto(itemDtos, totalPrice);

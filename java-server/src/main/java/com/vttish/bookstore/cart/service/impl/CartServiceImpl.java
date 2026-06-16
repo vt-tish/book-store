@@ -1,31 +1,34 @@
 package com.vttish.bookstore.cart.service.impl;
 
 import com.vttish.bookstore.books.entity.Book;
-import com.vttish.bookstore.books.service.BookService;
+import com.vttish.bookstore.books.service.BookPriceProvider;
 import com.vttish.bookstore.cart.dto.AddCartItemDto;
 import com.vttish.bookstore.cart.dto.CartDto;
-import com.vttish.bookstore.cart.dto.UpdateCartDto;
+import com.vttish.bookstore.cart.dto.UpdateCartItemDto;
 import com.vttish.bookstore.cart.entity.Cart;
 import com.vttish.bookstore.cart.entity.CartItem;
 import com.vttish.bookstore.cart.mapper.CartMapper;
 import com.vttish.bookstore.cart.repository.CartRepository;
+import com.vttish.bookstore.cart.service.CartInitializer;
 import com.vttish.bookstore.cart.service.CartService;
-import com.vttish.bookstore.common.exception.EmptyPayloadException;
+import com.vttish.bookstore.common.exception.CreationConflictException;
 import com.vttish.bookstore.common.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
-    private final BookService bookService;
+    private final BookPriceProvider bookPriceProvider;
+    private final CartInitializer cartInitializer;
+    private final CartMapper cartMapper;
 
     @Override
     public CartDto get(UUID ownerId) {
@@ -35,74 +38,94 @@ public class CartServiceImpl implements CartService {
             return CartDto.empty();
         }
 
-        List<UUID> bookIds = cart.getItems().stream()
-                .map(CartItem::getBookId)
-                .distinct()
-                .toList();
-
-        Map<UUID, BigDecimal> prices = bookService.getPricesByIds(bookIds);
-
-        if (bookIds.size() != prices.size()) {
-            throw new NotFoundException("One or more books are not found by ids");
-        }
-
-        return CartMapper.toCartDto(cart, prices);
+        return cartMapper.toCartDto(cart, fetchPrices(cart));
     }
 
     @Override
     @Transactional
-    public CartDto update(UUID ownerId, UpdateCartDto updateCartDto) {
-        if (updateCartDto.areUpdatableFieldsEmpty()) {
-            throw new EmptyPayloadException("No fields were provided to update");
+    public CartDto addItem(UUID ownerId, AddCartItemDto addCartItemDto) {
+        Cart cart;
+
+        try {
+            cart = cartInitializer.getOrCreate(ownerId);
+        } catch (DataIntegrityViolationException ex) {
+            cart = cartRepository.findByOwnerId(ownerId)
+                    .orElseThrow(() -> new CreationConflictException("Cart is not found after conflict", ex));
         }
 
-        Cart cart = cartRepository.findByOwnerId(ownerId).orElseGet(() ->
-                cartRepository.save(new Cart(ownerId))
+        BigDecimal currentPrice = bookPriceProvider.getPriceById(addCartItemDto.bookId()).orElseThrow(
+                () -> new NotFoundException(Book.class, addCartItemDto.bookId())
         );
 
-        List<UUID> exclude = updateCartDto.excludeBookIds();
-        if (exclude != null && !exclude.isEmpty()) {
-            cart.getItems().removeIf(cartItem -> exclude.contains(cartItem.getBookId()));
+        CartItem item = cart.getItems().stream()
+                .filter(cartItem -> cartItem.getBookId().equals(addCartItemDto.bookId()))
+                .findFirst()
+                .orElse(null);
+
+        if (item != null) {
+            item.setQuantity(addCartItemDto.quantity());
+        } else {
+            cart.addItem(new CartItem(addCartItemDto.bookId(), currentPrice, addCartItemDto.quantity()));
         }
 
-        List<AddCartItemDto> addItems = updateCartDto.cartItems();
-        boolean hasAdditions = addItems != null && !addItems.isEmpty();
+        cart = cartRepository.save(cart);
+        return cartMapper.toCartDto(cart, fetchPrices(cart));
+    }
 
-        Set<UUID> bookIds = cart.getItems().stream()
+    @Override
+    @Transactional
+    public CartDto updateItem(UUID ownerId, UUID bookId, UpdateCartItemDto updateCartItemDto) {
+        Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
+
+        if (cart == null) {
+            throw new NotFoundException(CartItem.class, bookId);
+        }
+
+        CartItem item = cart.getItems().stream()
+                .filter(cartItem -> cartItem.getBookId().equals(bookId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(CartItem.class, bookId));
+
+        item.setQuantity(updateCartItemDto.quantity());
+
+        cart = cartRepository.save(cart);
+        return cartMapper.toCartDto(cart, fetchPrices(cart));
+    }
+
+    @Override
+    @Transactional
+    public CartDto removeItem(UUID ownerId, UUID bookId) {
+        Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
+
+        if (cart == null) {
+            return CartDto.empty();
+        }
+
+        if (cart.getItems().removeIf(cartItem -> cartItem.getBookId().equals(bookId))) {
+            cart = cartRepository.save(cart);
+        }
+
+        return cartMapper.toCartDto(cart, fetchPrices(cart));
+    }
+
+    @Override
+    @Transactional
+    public void clear(UUID ownerId) {
+        Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
+
+        if (cart == null) {
+            return;
+        }
+
+        cart.getItems().clear();
+        cartRepository.save(cart);
+    }
+
+    private Map<UUID, BigDecimal> fetchPrices(Cart cart) {
+        List<UUID> bookIds = cart.getItems().stream()
                 .map(CartItem::getBookId)
-                .collect(Collectors.toSet());
+                .toList();
 
-        if (hasAdditions) {
-            addItems.forEach(item -> bookIds.add(item.bookId()));
-        }
-
-        Map<UUID, BigDecimal> prices = bookService.getPricesByIds(new ArrayList<>(bookIds));
-
-        if (hasAdditions) {
-            for (AddCartItemDto addItem : addItems) {
-                UUID id = addItem.bookId();
-
-                if (!prices.containsKey(id)) {
-                    throw new NotFoundException(Book.class, id);
-                }
-
-                CartItem item = cart.getItems().stream()
-                        .filter(cartItem -> cartItem.getBookId().equals(id))
-                        .findFirst()
-                        .orElse(null);
-
-                if (item != null) {
-                    item.setQuantity(addItem.quantity());
-                } else {
-                    cart.addItem(new CartItem(
-                            id,
-                            prices.get(id),
-                            addItem.quantity()
-                    ));
-                }
-            }
-        }
-
-        return CartMapper.toCartDto(cartRepository.save(cart), prices);
+        return bookPriceProvider.getPricesByIds(bookIds);
     }
 }

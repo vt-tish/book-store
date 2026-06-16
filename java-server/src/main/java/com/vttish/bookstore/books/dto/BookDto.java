@@ -16,6 +16,7 @@ public record BookDto(
         @Size(max = 100, message = "Max genre name length is 100 characters")
         String genre,
 
+        // TODO: Add custom URL validation annotation
         @Size(max = 2048, message = "Max preview URL length is 2048 characters")
         @Pattern(regexp = "^(http|https)://.*$", message = "Preview URL must be a valid HTTP/HTTPS link")
         String previewUrl,

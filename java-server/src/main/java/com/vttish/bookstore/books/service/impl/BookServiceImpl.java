@@ -3,7 +3,6 @@ package com.vttish.bookstore.books.service.impl;
 import com.vttish.bookstore.books.dto.BookCardDto;
 import com.vttish.bookstore.books.dto.BookDetailsDto;
 import com.vttish.bookstore.books.dto.BookDto;
-import com.vttish.bookstore.books.dto.BookPriceView;
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.mapper.BookMapper;
 import com.vttish.bookstore.books.repository.BookRepository;
@@ -15,11 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -37,11 +32,13 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Page<BookCardDto> getAll(Pageable pageable) {
-        return bookRepository.findAll(pageable).map(mapper::toBookCardDto);
+        return bookRepository.findAllByIsArchivedFalse(pageable).map(mapper::toBookCardDto);
     }
 
     private Book getEntityById(UUID id) {
-        return bookRepository.findById(id).orElseThrow(() -> new NotFoundException(Book.class, id));
+        return bookRepository.findByIdAndIsArchivedFalse(id).orElseThrow(
+                () -> new NotFoundException(Book.class, id)
+        );
     }
 
     @Override
@@ -61,22 +58,14 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public void delete(UUID id) {
-        if (!bookRepository.existsById(id)) {
-            throw new NotFoundException(Book.class, id);
+        Book book = getEntityById(id);
+
+        // TODO: check whether entity is used in orders
+        if (true) {
+            book.setArchived(true);
+            bookRepository.save(book);
+        } else {
+            bookRepository.deleteById(id);
         }
-
-        bookRepository.deleteById(id);
-    }
-
-    @Override
-    public Map<UUID, BigDecimal> getPricesByIds(List<UUID> bookIds) {
-        if (bookIds == null || bookIds.isEmpty()) {
-            return Map.of();
-        }
-
-        List<BookPriceView> prices = bookRepository.findByIdIn(bookIds);
-
-        return prices.stream()
-                .collect(Collectors.toMap(BookPriceView::getId, BookPriceView::getPrice));
     }
 }

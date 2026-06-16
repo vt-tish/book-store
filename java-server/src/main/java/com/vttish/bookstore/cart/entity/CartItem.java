@@ -10,6 +10,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "bookId")
 public class CartItem {
     private UUID bookId;
     private BigDecimal pricePerUnit;

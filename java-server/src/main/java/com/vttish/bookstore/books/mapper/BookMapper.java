@@ -5,6 +5,7 @@ import com.vttish.bookstore.books.dto.BookDetailsDto;
 import com.vttish.bookstore.books.dto.BookDto;
 import com.vttish.bookstore.books.entity.Book;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 

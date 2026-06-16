@@ -8,5 +8,6 @@ public record CartItemDto(
         Integer quantity,
         BigDecimal pricePerUnit,
         BigDecimal oldPricePerUnit,
-        BigDecimal subtotalPrice
+        BigDecimal subtotalPrice,
+        boolean isAvailable
 ) {}

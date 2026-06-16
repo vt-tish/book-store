@@ -1,5 +1,5 @@
 CREATE TABLE books (
-    id               UUID           PRIMARY KEY,
+    id               UUID           NOT NULL PRIMARY KEY,
     name             VARCHAR(255)   NOT NULL,
     genre            VARCHAR(255)   NOT NULL,
     preview_url      VARCHAR(2048),
@@ -11,6 +11,7 @@ CREATE TABLE books (
     characteristics  TEXT,
     description      TEXT,
     language         VARCHAR(20)    NOT NULL,
+    is_archived      BOOL           NOT NULL,
     created_at       TIMESTAMP      NOT NULL,
-    updated_at       TIMESTAMP
+    updated_at       TIMESTAMP      NOT NULL
 );
