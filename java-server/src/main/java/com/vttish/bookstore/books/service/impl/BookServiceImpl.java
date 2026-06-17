@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,17 +44,19 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Optional<BigDecimal> getPriceById(UUID id) {
-        return bookRepository.findPriceByIdAndIsArchivedFalse(id);
+    public CartBookView getAvailableByIdView(UUID id) {
+        return bookRepository.findByIdAndIsArchivedFalse(id).orElseThrow(() ->
+                new NotFoundException(Book.class, id)
+        );
     }
 
     @Override
-    public Map<UUID, BigDecimal> getPricesByIds(List<UUID> bookIds) {
-        if (bookIds == null || bookIds.isEmpty()) {
+    public Map<UUID, BigDecimal> getPricesByIds(Set<UUID> ids) {
+        if (ids == null || ids.isEmpty()) {
             return Map.of();
         }
 
-        List<BookPriceView> prices = bookRepository.findByIdInAndIsArchivedFalse(bookIds);
+        Set<BookPriceView> prices = bookRepository.findByIdInAndIsArchivedFalse(ids);
 
         return prices.stream()
                 .collect(Collectors.toMap(BookPriceView::getId, BookPriceView::getPrice));

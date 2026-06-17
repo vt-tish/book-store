@@ -1,5 +1,6 @@
 package com.vttish.bookstore.cart.service.impl;
 
+import com.vttish.bookstore.books.dto.CartBookView;
 import com.vttish.bookstore.books.service.BookService;
 import com.vttish.bookstore.cart.dto.AddCartItemDto;
 import com.vttish.bookstore.cart.dto.CartDto;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -52,9 +54,7 @@ public class CartServiceImpl implements CartService {
                     .orElseThrow(() -> new CreationConflictException("Cart is not found after conflict", ex));
         }
 
-        BigDecimal currentPrice = bookService.getPriceById(addCartItemDto.bookId()).orElseThrow(
-                () -> new NotFoundException(String.format("Book price is not found by id %s", addCartItemDto.bookId()))
-        );
+        CartBookView book = bookService.getAvailableByIdView(addCartItemDto.bookId());
 
         CartItem item = cart.getItems().stream()
                 .filter(cartItem -> cartItem.getBookId().equals(addCartItemDto.bookId()))
@@ -64,7 +64,7 @@ public class CartServiceImpl implements CartService {
         if (item != null) {
             item.setQuantity(addCartItemDto.quantity());
         } else {
-            cart.addItem(new CartItem(addCartItemDto.bookId(), currentPrice, addCartItemDto.quantity()));
+            cart.addItem(new CartItem(addCartItemDto.bookId(), book.getName(), addCartItemDto.quantity()));
         }
 
         cart = cartRepository.save(cart);
@@ -121,9 +121,9 @@ public class CartServiceImpl implements CartService {
     }
 
     private Map<UUID, BigDecimal> fetchPrices(Cart cart) {
-        List<UUID> bookIds = cart.getItems().stream()
+        Set<UUID> bookIds = cart.getItems().stream()
                 .map(CartItem::getBookId)
-                .toList();
+                .collect(Collectors.toSet());
 
         return bookService.getPricesByIds(bookIds);
     }

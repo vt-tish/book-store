@@ -5,9 +5,9 @@ import java.util.UUID;
 
 public record CartItemDto(
         UUID bookId,
+        String bookName,
         Integer quantity,
         BigDecimal pricePerUnit,
-        BigDecimal oldPricePerUnit,
         BigDecimal subtotalPrice,
         boolean isAvailable
 ) {}

@@ -1,17 +1,11 @@
 package com.vttish.bookstore.books.service;
 
-import com.vttish.bookstore.books.dto.AdminBookCardDto;
-import com.vttish.bookstore.books.dto.AdminBookDetailsDto;
-import com.vttish.bookstore.books.dto.BookCardDto;
-import com.vttish.bookstore.books.dto.BookDetailsDto;
+import com.vttish.bookstore.books.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public interface BookService {
     Page<BookCardDto> getAvailable(Pageable pageable);
@@ -19,6 +13,6 @@ public interface BookService {
     BookDetailsDto getById(UUID id);
     AdminBookDetailsDto getByIdAdmin(UUID id);
 
-    Optional<BigDecimal> getPriceById(UUID id);
-    Map<UUID, BigDecimal> getPricesByIds(List<UUID> bookIds);
+    CartBookView getAvailableByIdView(UUID id);
+    Map<UUID, BigDecimal> getPricesByIds(Set<UUID> ids);
 }

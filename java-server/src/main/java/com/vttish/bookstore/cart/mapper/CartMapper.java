@@ -23,25 +23,25 @@ public class CartMapper {
         BigDecimal totalPrice = BigDecimal.ZERO;
 
         for (CartItem item : cart.getItems()) {
-            boolean isAvailable = prices.containsKey(item.getBookId());
-            BigDecimal price = prices.getOrDefault(item.getBookId(), item.getPricePerUnit());
             Integer quantity = item.getQuantity();
-            boolean hasChanged = price.compareTo(item.getPricePerUnit()) != 0;
+            boolean isAvailable = prices.containsKey(item.getBookId());
+            BigDecimal pricePerUnit = null;
+            BigDecimal subtotalPrice = null;
 
-            BigDecimal subtotalPrice = price.multiply(BigDecimal.valueOf(quantity));
+            if (isAvailable) {
+                pricePerUnit = prices.get(item.getBookId());
+                subtotalPrice = pricePerUnit.multiply(BigDecimal.valueOf(quantity));
+                totalPrice = totalPrice.add(subtotalPrice);
+            }
 
             itemDtos.add(new CartItemDto(
                     item.getBookId(),
+                    item.getBookName(),
                     quantity,
-                    price,
-                    hasChanged ? item.getPricePerUnit() : null,
+                    pricePerUnit,
                     subtotalPrice,
                     isAvailable
             ));
-
-            if (isAvailable) {
-                totalPrice = totalPrice.add(subtotalPrice);
-            }
         }
 
         return new CartDto(itemDtos, totalPrice);

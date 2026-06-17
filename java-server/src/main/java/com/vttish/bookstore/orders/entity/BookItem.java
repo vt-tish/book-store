@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@Entity
+// @Entity
 @Table(name = "book_items")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

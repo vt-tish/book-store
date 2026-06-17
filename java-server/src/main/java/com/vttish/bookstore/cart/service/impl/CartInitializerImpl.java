@@ -15,7 +15,7 @@ import java.util.UUID;
 public class CartInitializerImpl implements CartInitializer {
     private final CartRepository cartRepository;
 
-    // Creates new transaction to get or create Cart to omit database rollback issues
+    // Creates new transaction to get or create Cart to omit transaction poisoning
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Cart getOrCreate(UUID ownerId) {

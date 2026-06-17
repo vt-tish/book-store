@@ -13,7 +13,7 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "bookId")
 public class CartItem {
     private UUID bookId;
-    private BigDecimal pricePerUnit;
+    private String bookName;
 
     @Setter
     private Integer quantity;
