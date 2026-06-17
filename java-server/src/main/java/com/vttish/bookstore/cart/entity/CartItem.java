@@ -13,6 +13,8 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "bookId")
 public class CartItem {
     private UUID bookId;
+
+    @Setter
     private String bookName;
 
     @Setter

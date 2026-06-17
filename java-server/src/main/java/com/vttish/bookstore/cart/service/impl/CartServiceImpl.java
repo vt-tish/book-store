@@ -18,12 +18,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
@@ -39,11 +38,12 @@ public class CartServiceImpl implements CartService {
             return CartDto.empty();
         }
 
-        return cartMapper.toCartDto(cart, fetchPrices(cart));
+        Map<UUID, CartBookView> books = fetchBooks(cart);
+        syncCartItemNames(cart, books);
+        return cartMapper.toCartDto(cartRepository.save(cart), books);
     }
 
     @Override
-    @Transactional
     public CartDto addItem(UUID ownerId, AddCartItemDto addCartItemDto) {
         Cart cart;
 
@@ -54,25 +54,23 @@ public class CartServiceImpl implements CartService {
                     .orElseThrow(() -> new EntityCreationConflictException("Cart is not found after conflict", ex));
         }
 
-        CartBookView book = bookQueryService.getBookDetailsForCart(addCartItemDto.bookId());
-
         CartItem item = cart.getItems().stream()
                 .filter(cartItem -> cartItem.getBookId().equals(addCartItemDto.bookId()))
                 .findFirst()
                 .orElse(null);
 
         if (item != null) {
-            item.setQuantity(addCartItemDto.quantity());
+            item.setQuantity(item.getQuantity() + addCartItemDto.quantity());
         } else {
-            cart.addItem(new CartItem(addCartItemDto.bookId(), book.getName(), addCartItemDto.quantity()));
+            cart.addItem(new CartItem(addCartItemDto.bookId(), null, addCartItemDto.quantity()));
         }
 
-        cart = cartRepository.save(cart);
-        return cartMapper.toCartDto(cart, fetchPrices(cart));
+        Map<UUID, CartBookView> books = fetchBooks(cart);
+        syncCartItemNames(cart, books);
+        return cartMapper.toCartDto(cartRepository.save(cart), books);
     }
 
     @Override
-    @Transactional
     public CartDto updateItem(UUID ownerId, UUID bookId, UpdateCartItemDto updateCartItemDto) {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 
@@ -87,12 +85,12 @@ public class CartServiceImpl implements CartService {
 
         item.setQuantity(updateCartItemDto.quantity());
 
-        cart = cartRepository.save(cart);
-        return cartMapper.toCartDto(cart, fetchPrices(cart));
+        Map<UUID, CartBookView> books = fetchBooks(cart);
+        syncCartItemNames(cart, books);
+        return cartMapper.toCartDto(cartRepository.save(cart), books);
     }
 
     @Override
-    @Transactional
     public CartDto removeItem(UUID ownerId, UUID bookId) {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 
@@ -104,11 +102,12 @@ public class CartServiceImpl implements CartService {
             cart = cartRepository.save(cart);
         }
 
-        return cartMapper.toCartDto(cart, fetchPrices(cart));
+        Map<UUID, CartBookView> books = fetchBooks(cart);
+        syncCartItemNames(cart, books);
+        return cartMapper.toCartDto(cartRepository.save(cart), books);
     }
 
     @Override
-    @Transactional
     public void clear(UUID ownerId) {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 
@@ -120,11 +119,25 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cart);
     }
 
-    private Map<UUID, BigDecimal> fetchPrices(Cart cart) {
+    private Map<UUID, CartBookView> fetchBooks(Cart cart) {
+        if (cart.getItems().isEmpty()) {
+            return Map.of();
+        }
+
         Set<UUID> bookIds = cart.getItems().stream()
                 .map(CartItem::getBookId)
                 .collect(Collectors.toSet());
 
-        return bookQueryService.getPricesByIds(bookIds);
+        return bookQueryService.getBooksForCart(bookIds);
+    }
+
+    private void syncCartItemNames(Cart cart, Map<UUID, CartBookView> books) {
+        for (CartItem item : cart.getItems()) {
+            CartBookView book = books.get(item.getBookId());
+
+            if (book != null && !item.getBookName().equals(book.getName())) {
+                item.setBookName(book.getName());
+            }
+        }
     }
 }

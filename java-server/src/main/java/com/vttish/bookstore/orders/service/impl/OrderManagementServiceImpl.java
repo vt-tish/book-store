@@ -20,17 +20,23 @@ public class OrderManagementServiceImpl implements OrderManagementService {
 
     @Override
     public void accept(UUID employeeId, UUID id) {
-        getEntityById(id).accept(employeeId);
+        Order order = getEntityById(id);
+        order.accept(employeeId);
+        orderRepository.save(order);
     }
 
     @Override
     public void cancel(UUID employeeId, UUID id) {
-        getEntityById(id).cancel(employeeId);
+        Order order = getEntityById(id);
+        order.cancel(employeeId);
+        orderRepository.save(order);
     }
 
     @Override
     public void complete(UUID employeeId, UUID id) {
-        getEntityById(id).complete(employeeId);
+        Order order = getEntityById(id);
+        order.complete(employeeId);
+        orderRepository.save(order);
     }
 
     private Order getEntityById(UUID id) {

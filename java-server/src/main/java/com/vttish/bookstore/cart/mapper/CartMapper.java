@@ -1,5 +1,6 @@
 package com.vttish.bookstore.cart.mapper;
 
+import com.vttish.bookstore.books.dto.CartBookView;
 import com.vttish.bookstore.cart.dto.CartDto;
 import com.vttish.bookstore.cart.dto.CartItemDto;
 import com.vttish.bookstore.cart.entity.Cart;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 @Component
 public class CartMapper {
-    public CartDto toCartDto(Cart cart, Map<UUID, BigDecimal> prices) {
+    public CartDto toCartDto(Cart cart, Map<UUID, CartBookView> books) {
         if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
             return CartDto.empty();
         }
@@ -24,12 +25,12 @@ public class CartMapper {
 
         for (CartItem item : cart.getItems()) {
             Integer quantity = item.getQuantity();
-            boolean isAvailable = prices.containsKey(item.getBookId());
+            boolean isAvailable = books.containsKey(item.getBookId());
             BigDecimal pricePerUnit = null;
             BigDecimal subtotalPrice = null;
 
             if (isAvailable) {
-                pricePerUnit = prices.get(item.getBookId());
+                pricePerUnit = books.get(item.getBookId()).getPrice();
                 subtotalPrice = pricePerUnit.multiply(BigDecimal.valueOf(quantity));
                 totalPrice = totalPrice.add(subtotalPrice);
             }

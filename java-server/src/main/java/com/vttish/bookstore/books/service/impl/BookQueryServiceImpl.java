@@ -44,22 +44,15 @@ public class BookQueryServiceImpl implements BookQueryService {
     }
 
     @Override
-    public CartBookView getBookDetailsForCart(UUID id) {
-        return bookRepository.findByIdAndIsArchivedFalse(id).orElseThrow(() ->
-                new EntityNotFoundException(Book.class, id)
-        );
-    }
-
-    @Override
-    public Map<UUID, BigDecimal> getPricesByIds(Set<UUID> ids) {
+    public Map<UUID, CartBookView> getBooksForCart(Set<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
             return Map.of();
         }
 
-        Set<BookPriceView> prices = bookRepository.findByIdInAndIsArchivedFalse(ids, BookPriceView.class);
+        Set<CartBookView> prices = bookRepository.findByIdInAndIsArchivedFalse(ids, CartBookView.class);
 
         return prices.stream()
-                .collect(Collectors.toMap(BookPriceView::getId, BookPriceView::getPrice));
+                .collect(Collectors.toMap(CartBookView::getId, view -> view));
     }
 
     @Override

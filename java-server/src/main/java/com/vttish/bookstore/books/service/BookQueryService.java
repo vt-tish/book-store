@@ -4,7 +4,6 @@ import com.vttish.bookstore.books.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 public interface BookQueryService {
@@ -13,7 +12,6 @@ public interface BookQueryService {
     BookDetailsDto getById(UUID id);
     AdminBookDetailsDto getByIdAdmin(UUID id);
 
-    CartBookView getBookDetailsForCart(UUID id);
-    Map<UUID, BigDecimal> getPricesByIds(Set<UUID> ids);
+    Map<UUID, CartBookView> getBooksForCart(Set<UUID> ids);
     Map<UUID, OrderBookView> getBooksForOrder(Set<UUID> ids);
 }
