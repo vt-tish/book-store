@@ -1,6 +1,6 @@
 package com.vttish.bookstore.cart.service.impl;
 
-import com.vttish.bookstore.books.service.BookPriceProvider;
+import com.vttish.bookstore.books.service.BookService;
 import com.vttish.bookstore.cart.dto.AddCartItemDto;
 import com.vttish.bookstore.cart.dto.CartDto;
 import com.vttish.bookstore.cart.dto.UpdateCartItemDto;
@@ -25,7 +25,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
-    private final BookPriceProvider bookPriceProvider;
+    private final BookService bookService;
     private final CartInitializer cartInitializer;
     private final CartMapper cartMapper;
 
@@ -52,7 +52,7 @@ public class CartServiceImpl implements CartService {
                     .orElseThrow(() -> new CreationConflictException("Cart is not found after conflict", ex));
         }
 
-        BigDecimal currentPrice = bookPriceProvider.getPriceById(addCartItemDto.bookId()).orElseThrow(
+        BigDecimal currentPrice = bookService.getPriceById(addCartItemDto.bookId()).orElseThrow(
                 () -> new NotFoundException(String.format("Book price is not found by id %s", addCartItemDto.bookId()))
         );
 
@@ -125,6 +125,6 @@ public class CartServiceImpl implements CartService {
                 .map(CartItem::getBookId)
                 .toList();
 
-        return bookPriceProvider.getPricesByIds(bookIds);
+        return bookService.getPricesByIds(bookIds);
     }
 }

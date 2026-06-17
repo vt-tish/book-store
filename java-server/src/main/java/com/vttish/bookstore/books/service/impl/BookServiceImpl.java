@@ -1,8 +1,6 @@
 package com.vttish.bookstore.books.service.impl;
 
-import com.vttish.bookstore.books.dto.BookCardDto;
-import com.vttish.bookstore.books.dto.BookDetailsDto;
-import com.vttish.bookstore.books.dto.BookDto;
+import com.vttish.bookstore.books.dto.*;
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.mapper.BookMapper;
 import com.vttish.bookstore.books.repository.BookRepository;
@@ -14,7 +12,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,21 +27,13 @@ public class BookServiceImpl implements BookService {
     private final BookMapper mapper;
 
     @Override
-    @Transactional
-    public BookDetailsDto create(BookDto bookDto) {
-        Book book = mapper.toBook(bookDto);
-        return mapper.toBookDetailsDto(bookRepository.save(book));
-    }
-
-    @Override
-    public Page<BookCardDto> getAll(Pageable pageable) {
+    public Page<BookCardDto> getAvailable(Pageable pageable) {
         return bookRepository.findAllByIsArchivedFalse(pageable).map(mapper::toBookCardDto);
     }
 
-    private Book getEntityById(UUID id) {
-        return bookRepository.findByIdAndIsArchivedFalse(id).orElseThrow(
-                () -> new NotFoundException(Book.class, id)
-        );
+    @Override
+    public Page<AdminBookCardDto> getAll(Pageable pageable) {
+        return bookRepository.findAll(pageable).map(mapper::toAdminBookCardDto);
     }
 
     @Override
@@ -47,25 +42,30 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @Transactional
-    public BookDetailsDto update(UUID id, BookDto bookDto) {
-        Book book = getEntityById(id);
-
-        mapper.update(bookDto, book);
-        return mapper.toBookDetailsDto(bookRepository.save(book));
+    public AdminBookDetailsDto getByIdAdmin(UUID id) {
+        return mapper.toAminBookDetailsDto(getEntityById(id));
     }
 
     @Override
-    @Transactional
-    public void delete(UUID id) {
-        Book book = getEntityById(id);
+    public Optional<BigDecimal> getPriceById(UUID id) {
+        return bookRepository.findPriceByIdAndIsArchivedFalse(id);
+    }
 
-        // TODO: check whether entity is used in orders
-        if (true) {
-            book.setArchived(true);
-            bookRepository.save(book);
-        } else {
-            bookRepository.deleteById(id);
+    @Override
+    public Map<UUID, BigDecimal> getPricesByIds(List<UUID> bookIds) {
+        if (bookIds == null || bookIds.isEmpty()) {
+            return Map.of();
         }
+
+        List<BookPriceView> prices = bookRepository.findByIdInAndIsArchivedFalse(bookIds);
+
+        return prices.stream()
+                .collect(Collectors.toMap(BookPriceView::getId, BookPriceView::getPrice));
+    }
+
+    private Book getEntityById(UUID id) {
+        return bookRepository.findById(id).orElseThrow(
+                () -> new NotFoundException(Book.class, id)
+        );
     }
 }

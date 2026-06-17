@@ -5,9 +5,10 @@ import com.vttish.bookstore.books.entity.enums.Language;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record BookDetailsDto(
+public record AdminBookDetailsDto(
         UUID id,
         String name,
         String genre,
@@ -20,5 +21,7 @@ public record BookDetailsDto(
         String characteristics,
         String description,
         Language language,
-        boolean isAvailable
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
+        boolean isArchived
 ) {}
