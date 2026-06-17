@@ -8,10 +8,9 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +30,7 @@ public class Order extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
 
-    private LocalDateTime closedAt;
+    private Instant closedAt;
 
     public Order(UUID clientId, BigDecimal totalPrice) {
         this.clientId = clientId;
@@ -62,7 +61,7 @@ public class Order extends BaseEntity {
         }
 
         status = OrderStatus.CANCELLED;
-        closedAt = LocalDateTime.now();
+        closedAt = Instant.now();
     }
 
     public void complete(UUID employeeId) {
@@ -75,6 +74,6 @@ public class Order extends BaseEntity {
         }
 
         status = OrderStatus.COMPLETED;
-        closedAt = LocalDateTime.now();
+        closedAt = Instant.now();
     }
 }

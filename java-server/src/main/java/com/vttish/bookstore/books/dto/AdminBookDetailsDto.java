@@ -4,8 +4,8 @@ import com.vttish.bookstore.books.entity.enums.AgeGroup;
 import com.vttish.bookstore.books.entity.enums.Language;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record AdminBookDetailsDto(
@@ -21,7 +21,7 @@ public record AdminBookDetailsDto(
         String characteristics,
         String description,
         Language language,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
+        Instant createdAt,
+        Instant updatedAt,
         boolean isArchived
 ) {}
