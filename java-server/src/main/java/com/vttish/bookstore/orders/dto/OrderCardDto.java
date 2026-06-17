@@ -14,5 +14,5 @@ public record OrderCardDto(
         Integer totalItems,
         OrderStatus status,
         LocalDateTime createdAt,
-        LocalDateTime completedAt
+        LocalDateTime closedAt
 ) {}

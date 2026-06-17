@@ -1,7 +1,7 @@
 package com.vttish.bookstore.cart.service.impl;
 
 import com.vttish.bookstore.books.dto.CartBookView;
-import com.vttish.bookstore.books.service.BookService;
+import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.cart.dto.AddCartItemDto;
 import com.vttish.bookstore.cart.dto.CartDto;
 import com.vttish.bookstore.cart.dto.UpdateCartItemDto;
@@ -11,8 +11,8 @@ import com.vttish.bookstore.cart.mapper.CartMapper;
 import com.vttish.bookstore.cart.repository.CartRepository;
 import com.vttish.bookstore.cart.service.CartInitializer;
 import com.vttish.bookstore.cart.service.CartService;
-import com.vttish.bookstore.common.exception.CreationConflictException;
-import com.vttish.bookstore.common.exception.NotFoundException;
+import com.vttish.bookstore.common.exception.EntityCreationConflictException;
+import com.vttish.bookstore.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
-    private final BookService bookService;
+    private final BookQueryService bookQueryService;
     private final CartInitializer cartInitializer;
     private final CartMapper cartMapper;
 
@@ -51,10 +51,10 @@ public class CartServiceImpl implements CartService {
             cart = cartInitializer.getOrCreate(ownerId);
         } catch (DataIntegrityViolationException ex) {
             cart = cartRepository.findByOwnerId(ownerId)
-                    .orElseThrow(() -> new CreationConflictException("Cart is not found after conflict", ex));
+                    .orElseThrow(() -> new EntityCreationConflictException("Cart is not found after conflict", ex));
         }
 
-        CartBookView book = bookService.getAvailableByIdView(addCartItemDto.bookId());
+        CartBookView book = bookQueryService.getBookDetailsForCart(addCartItemDto.bookId());
 
         CartItem item = cart.getItems().stream()
                 .filter(cartItem -> cartItem.getBookId().equals(addCartItemDto.bookId()))
@@ -77,13 +77,13 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 
         if (cart == null) {
-            throw new NotFoundException(CartItem.class, bookId);
+            throw new EntityNotFoundException(CartItem.class, bookId);
         }
 
         CartItem item = cart.getItems().stream()
                 .filter(cartItem -> cartItem.getBookId().equals(bookId))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException(CartItem.class, bookId));
+                .orElseThrow(() -> new EntityNotFoundException(CartItem.class, bookId));
 
         item.setQuantity(updateCartItemDto.quantity());
 
@@ -125,6 +125,6 @@ public class CartServiceImpl implements CartService {
                 .map(CartItem::getBookId)
                 .collect(Collectors.toSet());
 
-        return bookService.getPricesByIds(bookIds);
+        return bookQueryService.getPricesByIds(bookIds);
     }
 }

@@ -6,7 +6,9 @@ import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.mapper.BookMapper;
 import com.vttish.bookstore.books.repository.BookRepository;
 import com.vttish.bookstore.books.service.BookManagementService;
-import com.vttish.bookstore.common.exception.NotFoundException;
+import com.vttish.bookstore.common.exception.BadRequestException;
+import com.vttish.bookstore.common.exception.EntityNotFoundException;
+import com.vttish.bookstore.orders.service.OrderQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +19,9 @@ import java.util.UUID;
 @Transactional
 @RequiredArgsConstructor
 public class BookManagementServiceImpl implements BookManagementService {
-    private BookRepository bookRepository;
-    private BookMapper mapper;
+    private final BookRepository bookRepository;
+    private final OrderQueryService orderQueryService;
+    private final BookMapper mapper;
 
     @Override
     public AdminBookDetailsDto create(BookDto bookDto) {
@@ -36,14 +39,13 @@ public class BookManagementServiceImpl implements BookManagementService {
 
     @Override
     public void delete(UUID id) {
-        Book book = getEntityById(id);
-
-        if (true) {
-            book.setArchived(true);
-            bookRepository.save(book);
-        } else {
-            bookRepository.deleteById(id);
+        if (!orderQueryService.hasBookBeenOrdered(id)) {
+            throw new BadRequestException(
+                    String.format("Book with id %s is associated with orders, archive book instead", id)
+            );
         }
+
+        bookRepository.deleteById(id);
     }
 
     @Override
@@ -72,7 +74,7 @@ public class BookManagementServiceImpl implements BookManagementService {
 
     private Book getEntityById(UUID id) {
         return bookRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(Book.class, id)
+                () -> new EntityNotFoundException(Book.class, id)
         );
     }
 }

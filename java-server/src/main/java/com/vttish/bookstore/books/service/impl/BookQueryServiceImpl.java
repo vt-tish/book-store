@@ -4,8 +4,8 @@ import com.vttish.bookstore.books.dto.*;
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.mapper.BookMapper;
 import com.vttish.bookstore.books.repository.BookRepository;
-import com.vttish.bookstore.books.service.BookService;
-import com.vttish.bookstore.common.exception.NotFoundException;
+import com.vttish.bookstore.books.service.BookQueryService;
+import com.vttish.bookstore.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class BookServiceImpl implements BookService {
+public class BookQueryServiceImpl implements BookQueryService {
     private final BookRepository bookRepository;
     private final BookMapper mapper;
 
@@ -44,9 +44,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public CartBookView getAvailableByIdView(UUID id) {
+    public CartBookView getBookDetailsForCart(UUID id) {
         return bookRepository.findByIdAndIsArchivedFalse(id).orElseThrow(() ->
-                new NotFoundException(Book.class, id)
+                new EntityNotFoundException(Book.class, id)
         );
     }
 
@@ -56,15 +56,27 @@ public class BookServiceImpl implements BookService {
             return Map.of();
         }
 
-        Set<BookPriceView> prices = bookRepository.findByIdInAndIsArchivedFalse(ids);
+        Set<BookPriceView> prices = bookRepository.findByIdInAndIsArchivedFalse(ids, BookPriceView.class);
 
         return prices.stream()
                 .collect(Collectors.toMap(BookPriceView::getId, BookPriceView::getPrice));
     }
 
+    @Override
+    public Map<UUID, OrderBookView> getBooksForOrder(Set<UUID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Map.of();
+        }
+
+        Set<OrderBookView> bookViews = bookRepository.findByIdInAndIsArchivedFalse(ids, OrderBookView.class);
+
+        return bookViews.stream()
+                .collect(Collectors.toMap(OrderBookView::getId, view -> view));
+    }
+
     private Book getEntityById(UUID id) {
         return bookRepository.findById(id).orElseThrow(
-                () -> new NotFoundException(Book.class, id)
+                () -> new EntityNotFoundException(Book.class, id)
         );
     }
 }

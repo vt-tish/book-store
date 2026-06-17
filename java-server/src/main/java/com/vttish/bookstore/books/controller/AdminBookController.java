@@ -2,10 +2,9 @@ package com.vttish.bookstore.books.controller;
 
 import com.vttish.bookstore.books.dto.AdminBookCardDto;
 import com.vttish.bookstore.books.dto.AdminBookDetailsDto;
-import com.vttish.bookstore.books.dto.BookDetailsDto;
 import com.vttish.bookstore.books.dto.BookDto;
 import com.vttish.bookstore.books.service.BookManagementService;
-import com.vttish.bookstore.books.service.BookService;
+import com.vttish.bookstore.books.service.BookQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AdminBookController {
     private final BookManagementService bookManagementService;
-    private final BookService bookService;
+    private final BookQueryService bookQueryService;
 
     @PostMapping
     public ResponseEntity<AdminBookDetailsDto> create(@Valid @RequestBody BookDto bookDto) {
@@ -42,12 +41,12 @@ public class AdminBookController {
 
     @GetMapping
     public Page<AdminBookCardDto> getAll(Pageable pageable) {
-        return bookService.getAll(pageable);
+        return bookQueryService.getAll(pageable);
     }
 
     @GetMapping("{id}")
     public AdminBookDetailsDto getById(@PathVariable UUID id) {
-        return bookService.getByIdAdmin(id);
+        return bookQueryService.getByIdAdmin(id);
     }
 
     @PutMapping("/{id}")

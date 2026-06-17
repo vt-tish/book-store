@@ -7,12 +7,13 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.util.*;
 
-public interface BookService {
+public interface BookQueryService {
     Page<BookCardDto> getAvailable(Pageable pageable);
     Page<AdminBookCardDto> getAll(Pageable pageable);
     BookDetailsDto getById(UUID id);
     AdminBookDetailsDto getByIdAdmin(UUID id);
 
-    CartBookView getAvailableByIdView(UUID id);
+    CartBookView getBookDetailsForCart(UUID id);
     Map<UUID, BigDecimal> getPricesByIds(Set<UUID> ids);
+    Map<UUID, OrderBookView> getBooksForOrder(Set<UUID> ids);
 }

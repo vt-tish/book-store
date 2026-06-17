@@ -14,6 +14,6 @@ public record OrderDetailsDto(
         BigDecimal totalPrice,
         OrderStatus status,
         LocalDateTime createdAt,
-        LocalDateTime completedAt,
+        LocalDateTime closedAt,
         List<BookItemDto> bookItems
 ) {}

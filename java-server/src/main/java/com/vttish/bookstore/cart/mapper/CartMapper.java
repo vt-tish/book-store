@@ -15,7 +15,7 @@ import java.util.UUID;
 @Component
 public class CartMapper {
     public CartDto toCartDto(Cart cart, Map<UUID, BigDecimal> prices) {
-        if (cart == null) {
+        if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
             return CartDto.empty();
         }
 
