@@ -27,7 +27,7 @@ public class OrderController {
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .path("{id}")
+                .path("/{id}")
                 .buildAndExpand(createdOrder.id())
                 .toUri();
 
@@ -39,7 +39,7 @@ public class OrderController {
         return orderQueryService.getByClientId(clientId, pageable);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public OrderDetailsDto get(@PathVariable UUID id, UUID clientId) {
         return orderQueryService.getByIdAndClientId(id, clientId);
     }

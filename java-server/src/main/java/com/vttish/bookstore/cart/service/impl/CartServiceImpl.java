@@ -39,8 +39,12 @@ public class CartServiceImpl implements CartService {
         }
 
         Map<UUID, CartBookView> books = fetchBooks(cart);
-        syncCartItemNames(cart, books);
-        return cartMapper.toCartDto(cartRepository.save(cart), books);
+
+        if (syncCartItemNames(cart, books)) {
+            cart = cartRepository.save(cart);
+        }
+
+        return cartMapper.toCartDto(cart, books);
     }
 
     @Override
@@ -50,8 +54,9 @@ public class CartServiceImpl implements CartService {
         try {
             cart = cartInitializer.getOrCreate(ownerId);
         } catch (DataIntegrityViolationException ex) {
-            cart = cartRepository.findByOwnerId(ownerId)
-                    .orElseThrow(() -> new EntityCreationConflictException("Cart is not found after conflict", ex));
+            cart = cartRepository.findByOwnerId(ownerId).orElseThrow(
+                    () -> new EntityCreationConflictException("Cart is not found after conflict", ex)
+            );
         }
 
         CartItem item = cart.getItems().stream()
@@ -98,9 +103,7 @@ public class CartServiceImpl implements CartService {
             return CartDto.empty();
         }
 
-        if (cart.getItems().removeIf(cartItem -> cartItem.getBookId().equals(bookId))) {
-            cart = cartRepository.save(cart);
-        }
+        cart.getItems().removeIf(cartItem -> cartItem.getBookId().equals(bookId));
 
         Map<UUID, CartBookView> books = fetchBooks(cart);
         syncCartItemNames(cart, books);
@@ -131,13 +134,18 @@ public class CartServiceImpl implements CartService {
         return bookQueryService.getBooksForCart(bookIds);
     }
 
-    private void syncCartItemNames(Cart cart, Map<UUID, CartBookView> books) {
+    private boolean syncCartItemNames(Cart cart, Map<UUID, CartBookView> books) {
+        boolean hasChanged = false;
+
         for (CartItem item : cart.getItems()) {
             CartBookView book = books.get(item.getBookId());
 
-            if (book != null && !item.getBookName().equals(book.getName())) {
+            if (book != null && !book.getName().equals(item.getBookName())) {
                 item.setBookName(book.getName());
+                hasChanged = true;
             }
         }
+
+        return hasChanged;
     }
 }

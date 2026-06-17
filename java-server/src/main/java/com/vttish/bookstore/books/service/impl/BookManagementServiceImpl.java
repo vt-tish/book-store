@@ -39,7 +39,7 @@ public class BookManagementServiceImpl implements BookManagementService {
 
     @Override
     public void delete(UUID id) {
-        if (!orderQueryService.hasBookBeenOrdered(id)) {
+        if (orderQueryService.hasBookBeenOrdered(id)) {
             throw new BadRequestException(
                     String.format("Book with id %s is associated with orders, archive book instead", id)
             );

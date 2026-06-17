@@ -5,12 +5,11 @@ import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.cart.dto.CartDto;
 import com.vttish.bookstore.cart.dto.CartItemDto;
 import com.vttish.bookstore.cart.service.CartService;
+import com.vttish.bookstore.common.exception.BadRequestException;
 import com.vttish.bookstore.common.exception.EmptyEntityException;
-import com.vttish.bookstore.common.exception.EntityNotFoundException;
 import com.vttish.bookstore.orders.dto.OrderDetailsDto;
 import com.vttish.bookstore.orders.entity.BookItem;
 import com.vttish.bookstore.orders.entity.Order;
-import com.vttish.bookstore.orders.entity.enums.OrderStatus;
 import com.vttish.bookstore.orders.mapper.OrderMapper;
 import com.vttish.bookstore.orders.repository.OrderRepository;
 import com.vttish.bookstore.orders.service.OrderSubmissionService;
@@ -42,7 +41,9 @@ public class OrderSubmissionServiceImpl implements OrderSubmissionService {
 
         cartDto.cartItems().forEach(cartItem -> {
             if (!cartItem.isAvailable()) {
-                throw new EntityNotFoundException("Book is not available");
+                throw new BadRequestException(
+                        String.format("Book '%s' is unavailable", cartItem.bookName())
+                );
             }
         });
 

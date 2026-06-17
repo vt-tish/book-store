@@ -57,7 +57,7 @@ public class Order extends BaseEntity {
             throw new IllegalEntityStateException("Cannot cancel order with status " + status);
         }
 
-        if (!this.employeeId.equals(employeeId)) {
+        if (this.employeeId == null || !this.employeeId.equals(employeeId)) {
             throw new IllegalEntityAccessException("Order only can be canceled by employee who accepted it");
         }
 
@@ -70,7 +70,7 @@ public class Order extends BaseEntity {
             throw new IllegalEntityStateException("Cannot complete order with status " + status);
         }
 
-        if (!this.employeeId.equals(employeeId)) {
+        if (this.employeeId == null || !this.employeeId.equals(employeeId)) {
             throw new IllegalEntityAccessException("Order can only be completed by the employee who accepted it");
         }
 

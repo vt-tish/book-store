@@ -13,7 +13,6 @@ import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
     Page<Order> findAllByClientId(UUID clientId, Pageable pageable);
-    Page<Order> findAllByEmployeeId(UUID employeeId, Pageable pageable);
     Optional<Order> findByIdAndClientId(UUID id, UUID clientId);
 
     @Query("SELECT o FROM Order o " +
@@ -21,7 +20,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
             "(:status IS NULL OR o.status = :status)")
     Page<Order> findByFilters(
             @Param("employeeId") UUID employeeId,
-            @Param("employeeId") OrderStatus status,
+            @Param("status") OrderStatus status,
             Pageable pageable
     );
 
