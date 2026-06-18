@@ -21,6 +21,8 @@ spring:
     console:
       enabled: true
       path: ${H2_CONSOLE_PATH:/h2-console}
+      settings:
+        web-allow-others: true
 
   flyway:
     locations: classpath:db/migrations, classpath:db/testdata
