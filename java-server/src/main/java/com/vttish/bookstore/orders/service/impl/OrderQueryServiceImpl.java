@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class OrderQueryServiceImpl implements OrderQueryService {
     private final OrderRepository orderRepository;
     private final OrderMapper mapper;

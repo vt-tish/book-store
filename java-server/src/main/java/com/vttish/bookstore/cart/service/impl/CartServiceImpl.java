@@ -22,7 +22,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
@@ -31,6 +30,7 @@ public class CartServiceImpl implements CartService {
     private final CartMapper cartMapper;
 
     @Override
+    @Transactional
     public CartDto get(UUID ownerId) {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 
@@ -48,6 +48,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public CartDto addItem(UUID ownerId, AddCartItemDto addCartItemDto) {
         Cart cart;
 
@@ -76,6 +77,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public CartDto updateItem(UUID ownerId, UUID bookId, UpdateCartItemDto updateCartItemDto) {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 
@@ -96,6 +98,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public CartDto removeItem(UUID ownerId, UUID bookId) {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 
@@ -111,6 +114,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public void clear(UUID ownerId) {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 

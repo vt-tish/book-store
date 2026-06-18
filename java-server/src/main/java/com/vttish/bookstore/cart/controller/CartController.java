@@ -7,6 +7,7 @@ import com.vttish.bookstore.cart.service.CartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,14 +34,16 @@ public class CartController {
     public CartDto updateItemQuantity(
             @PathVariable UUID bookId,
             @Valid @RequestBody UpdateCartItemDto updateCartItemDto,
-            UUID ownerId) { // TODO: Add ownerId retrieving
+            UUID ownerId
+    ) { // TODO: Add ownerId retrieving
         return cartService.updateItem(ownerId, bookId, updateCartItemDto);
     }
 
     @DeleteMapping("/items/{bookId}")
     public CartDto removeItem(
             @PathVariable UUID bookId,
-            UUID ownerId) { // TODO: Add ownerId retrieving
+            UUID ownerId
+    ) { // TODO: Add ownerId retrieving
         return cartService.removeItem(ownerId, bookId);
     }
 

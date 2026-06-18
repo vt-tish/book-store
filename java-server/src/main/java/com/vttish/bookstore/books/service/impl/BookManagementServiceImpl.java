@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class BookManagementServiceImpl implements BookManagementService {
     private final BookRepository bookRepository;
@@ -24,12 +23,14 @@ public class BookManagementServiceImpl implements BookManagementService {
     private final BookMapper mapper;
 
     @Override
+    @Transactional
     public AdminBookDetailsDto create(BookDto bookDto) {
         Book book = mapper.toBook(bookDto);
         return mapper.toAminBookDetailsDto(bookRepository.save(book));
     }
 
     @Override
+    @Transactional
     public AdminBookDetailsDto update(UUID id, BookDto bookDto) {
         Book book = getEntityById(id);
 
@@ -38,6 +39,7 @@ public class BookManagementServiceImpl implements BookManagementService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
         if (orderQueryService.hasBookBeenOrdered(id)) {
             throw new BadRequestException(
@@ -49,6 +51,7 @@ public class BookManagementServiceImpl implements BookManagementService {
     }
 
     @Override
+    @Transactional
     public void archive(UUID id) {
         Book book = getEntityById(id);
 
@@ -61,6 +64,7 @@ public class BookManagementServiceImpl implements BookManagementService {
     }
 
     @Override
+    @Transactional
     public void unarchive(UUID id) {
         Book book = getEntityById(id);
 

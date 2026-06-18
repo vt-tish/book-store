@@ -13,12 +13,12 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class OrderManagementServiceImpl implements OrderManagementService {
     private final OrderRepository orderRepository;
     private final OrderMapper mapper;
 
     @Override
+    @Transactional
     public void accept(UUID employeeId, UUID id) {
         Order order = getEntityById(id);
         order.accept(employeeId);
@@ -26,6 +26,7 @@ public class OrderManagementServiceImpl implements OrderManagementService {
     }
 
     @Override
+    @Transactional
     public void cancel(UUID employeeId, UUID id) {
         Order order = getEntityById(id);
         order.cancel(employeeId);
@@ -33,6 +34,7 @@ public class OrderManagementServiceImpl implements OrderManagementService {
     }
 
     @Override
+    @Transactional
     public void complete(UUID employeeId, UUID id) {
         Order order = getEntityById(id);
         order.complete(employeeId);
