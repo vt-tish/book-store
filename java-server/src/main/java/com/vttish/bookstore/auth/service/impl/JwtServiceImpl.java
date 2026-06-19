@@ -8,7 +8,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -20,29 +19,25 @@ import java.util.function.Function;
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    @Value("${application.security.jwt.secret-key}")
+    @Value("${application.security.jwt.access-token.secret-key}")
     private String secretKey;
 
-    @Value("${application.security.jwt.access-token-expiration}")
-    private Long jwtExpiration;
+    @Value("${application.security.jwt.access-token.expiration-ms}")
+    private Long accessTokenExpirationMs;
 
     @Override
     public String generateAccessToken(User user) {
-        List<String> roles = user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-
         return Jwts.builder()
                 .setSubject(user.getId().toString())
-                .claim("roles", roles)
+                .claim("roles", List.of(user.getRole()))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     @Override
-    public String generateRefreshToken() {
+    public String generateOpaqueToken() {
         return UUID.randomUUID().toString();
     }
 

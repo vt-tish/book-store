@@ -5,8 +5,13 @@ spring:
     name: book-store
     security:
       jwt:
-        secret-key: ${JWT_SECRET}
-        access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
+        refresh-token:
+          expiration-ms: ${JWT_REFRESH_TOKEN_EXPIRATION_MS}
+          grace-period-ms: ${JWT_REFRESH_TOKEN_GRACE_PERIOD_MS}
+          cleanup-cron: ${JWT_CLEANUP_CRON}
+        access-token:
+          expiration-ms: ${JWT_ACCESS_TOKEN_EXPIRATION_MS}
+          secret-key: ${JWT_SECRET}
 
 ---
 

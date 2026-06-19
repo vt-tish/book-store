@@ -10,6 +10,5 @@ public record LoginDto(
         String email,
 
         @NotBlank(message = "Password is required")
-        // TODO: @Password(minLength, includeCharTypes, message)
         String password
 ) {}

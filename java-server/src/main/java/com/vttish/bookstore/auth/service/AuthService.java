@@ -8,6 +8,6 @@ import com.vttish.bookstore.auth.dto.TokensDto;
 public interface AuthService {
     TokensDto register(RegisterDto registerDto);
     TokensDto login(LoginDto loginDto);
-    AuthResponseDto refresh();
+    TokensDto refresh(String token);
     void logout(String token);
 }

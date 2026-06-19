@@ -3,17 +3,19 @@ package com.vttish.bookstore.auth.filter;
 import com.vttish.bookstore.auth.entity.User;
 import com.vttish.bookstore.auth.repository.UserRepository;
 import com.vttish.bookstore.auth.service.JwtService;
-import com.vttish.bookstore.common.exception.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -47,15 +49,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userRepository.findById(userId).orElseThrow(() ->
-                    new EntityNotFoundException("User is not found")
-            );
+            Optional<User> optionalUser = userRepository.findById(userId);
 
+            if (optionalUser.isEmpty()) {
+                SecurityContextHolder.clearContext();
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            User user = optionalUser.get();
             if (jwtService.isTokenValid(jwt, user)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        user,
+                        user.getId(),
                         null,
-                        user.getAuthorities()
+                        List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);

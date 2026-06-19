@@ -1,0 +1,14 @@
+CREATE TABLE refresh_tokens (
+    id UUID NOT NULL PRIMARY KEY,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    child_token VARCHAR(255),
+    family_id UUID NOT NULL,
+    user_id UUID NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    consumed_at TIMESTAMP WITH TIME ZONE,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL
+
+    CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
