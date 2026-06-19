@@ -5,6 +5,7 @@ import com.vttish.bookstore.books.dto.AdminBookDetailsDto;
 import com.vttish.bookstore.books.dto.BookDto;
 import com.vttish.bookstore.books.service.BookManagementService;
 import com.vttish.bookstore.books.service.BookQueryService;
+import com.vttish.bookstore.common.constant.ApiRoutingConstants;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,7 +20,7 @@ import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/admin/books")
+@RequestMapping(ApiRoutingConstants.API_V1 + "/admin/books")
 @Validated
 @RequiredArgsConstructor
 public class AdminBookController {

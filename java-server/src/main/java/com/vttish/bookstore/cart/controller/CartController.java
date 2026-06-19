@@ -4,17 +4,17 @@ import com.vttish.bookstore.cart.dto.AddCartItemDto;
 import com.vttish.bookstore.cart.dto.CartDto;
 import com.vttish.bookstore.cart.dto.UpdateCartItemDto;
 import com.vttish.bookstore.cart.service.CartService;
+import com.vttish.bookstore.common.constant.ApiRoutingConstants;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/cart")
+@RequestMapping(ApiRoutingConstants.API_V1 + "/cart")
 @Validated
 @RequiredArgsConstructor
 public class CartController {

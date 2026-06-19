@@ -1,5 +1,6 @@
 package com.vttish.bookstore.orders.controller;
 
+import com.vttish.bookstore.common.constant.ApiRoutingConstants;
 import com.vttish.bookstore.orders.dto.OrderCardDto;
 import com.vttish.bookstore.orders.dto.OrderDetailsDto;
 import com.vttish.bookstore.orders.entity.enums.OrderStatus;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/admin/orders")
+@RequestMapping(ApiRoutingConstants.API_V1 + "/admin/orders")
 @RequiredArgsConstructor
 public class AdminOrderController {
     private final OrderManagementService orderManagementService;

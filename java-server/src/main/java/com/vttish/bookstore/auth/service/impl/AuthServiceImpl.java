@@ -30,10 +30,10 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    @Value("${application.security.jwt.refresh-token.expiration-ms}")
+    @Value("${book-store.security.jwt.refresh-token.expiration-ms}")
     private Long refreshTokenExpirationMs;
 
-    @Value("${application.security.jwt.refresh-token.grace-period-ms}")
+    @Value("${book-store.security.jwt.refresh-token.grace-period-ms}")
     private Long gracePeriodMs;
 
     @Override

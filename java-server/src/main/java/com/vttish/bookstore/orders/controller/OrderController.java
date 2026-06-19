@@ -1,5 +1,6 @@
 package com.vttish.bookstore.orders.controller;
 
+import com.vttish.bookstore.common.constant.ApiRoutingConstants;
 import com.vttish.bookstore.orders.dto.OrderCardDto;
 import com.vttish.bookstore.orders.dto.OrderDetailsDto;
 import com.vttish.bookstore.orders.service.OrderQueryService;
@@ -15,7 +16,7 @@ import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/orders")
+@RequestMapping(ApiRoutingConstants.API_V1 + "/orders")
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderQueryService orderQueryService;

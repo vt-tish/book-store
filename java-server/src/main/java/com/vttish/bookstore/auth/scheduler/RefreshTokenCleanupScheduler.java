@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RefreshTokenCleanupScheduler {
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @Scheduled(cron = "${application.jwt.cleanup-cron}")
+    @Scheduled(cron = "${book-store.security.jwt.refresh-token.cleanup-cron}")
     @Transactional
     public int cleanUpOldTokens() {
         return refreshTokenRepository.deleteAllExpired();

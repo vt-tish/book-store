@@ -1,0 +1,14 @@
+spring:
+  profiles:
+    active: dev
+
+book-store:
+  security:
+    jwt:
+      refresh-token:
+        expiration-ms: ${JWT_REFRESH_TOKEN_EXPIRATION_MS:604800000}
+        grace-period-ms: ${JWT_REFRESH_TOKEN_GRACE_PERIOD_MS:15000}
+        cleanup-cron: ${JWT_CLEANUP_CRON:0 0 3 * * *}
+      access-token:
+        expiration-ms: ${JWT_ACCESS_TOKEN_EXPIRATION_MS:900000}
+        secret-key: ${JWT_SECRET:YmVsaWV2ZWR0ZW50Y292ZXJvbGRlc3RvY2N1cm5vZGRlZGNpdGl6ZW50b29rc29sYXI=}

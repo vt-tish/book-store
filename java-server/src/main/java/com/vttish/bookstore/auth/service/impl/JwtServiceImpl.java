@@ -19,10 +19,10 @@ import java.util.function.Function;
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    @Value("${application.security.jwt.access-token.secret-key}")
+    @Value("${book-store.security.jwt.access-token.secret-key}")
     private String secretKey;
 
-    @Value("${application.security.jwt.access-token.expiration-ms}")
+    @Value("${book-store.security.jwt.access-token.expiration-ms}")
     private Long accessTokenExpirationMs;
 
     @Override
