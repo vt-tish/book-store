@@ -1,14 +1,34 @@
 spring:
   profiles:
     active: dev
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
 book-store:
+  frontend:
+    verify-url: ${FRONTEND_VERIFY_URL:http://localhost:8080/verify}
+    reset-password-url: ${FRONTEND_RESET_PASSWORD_URL:http://localhost:8080/reset-password}
   security:
+    token:
+      cooldown-period-ms: ${TOKEN_COOLDOWN_PERIOD_MS:180000}
+      reset-password-expiration-ms: ${TOKEN_RESET_PASSWORD_EXPIRATION_MS:900000}
+      verify-expiration-ms: ${TOKEN_VERIFY_EXPIRATION_MS:86400000}
     jwt:
       refresh-token:
         expiration-ms: ${JWT_REFRESH_TOKEN_EXPIRATION_MS:604800000}
         grace-period-ms: ${JWT_REFRESH_TOKEN_GRACE_PERIOD_MS:15000}
-        cleanup-cron: ${JWT_CLEANUP_CRON:0 0 3 * * *}
       access-token:
         expiration-ms: ${JWT_ACCESS_TOKEN_EXPIRATION_MS:900000}
         secret-key: ${JWT_SECRET:YmVsaWV2ZWR0ZW50Y292ZXJvbGRlc3RvY2N1cm5vZGRlZGNpdGl6ZW50b29rc29sYXI=}
+  scheduler:
+    cleanup-cron: ${CLEANUP_CRON:0 0 0 * * *}

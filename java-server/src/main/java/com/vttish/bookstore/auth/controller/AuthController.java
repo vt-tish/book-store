@@ -1,13 +1,11 @@
 package com.vttish.bookstore.auth.controller;
 
-import com.vttish.bookstore.auth.dto.AuthResponseDto;
-import com.vttish.bookstore.auth.dto.LoginDto;
-import com.vttish.bookstore.auth.dto.RegisterDto;
-import com.vttish.bookstore.auth.dto.TokensDto;
+import com.vttish.bookstore.auth.dto.*;
 import com.vttish.bookstore.auth.service.AuthService;
 import com.vttish.bookstore.auth.service.CookieService;
 import com.vttish.bookstore.common.constant.ApiRoutingConstants;
 import com.vttish.bookstore.common.constant.CookieConstants;
+import com.vttish.bookstore.common.dto.ResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,23 +21,38 @@ public class AuthController {
     private final AuthService authService;
     private final CookieService cookieService;
 
-    private static final String REFRESH_TOKEN_COOKIE_PATH = ApiRoutingConstants.API_V1 + "/auth/refresh";
+    private static final String AUTH_COOKIE_PATH = ApiRoutingConstants.API_V1 + "/auth";
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDto> register(@Valid @RequestBody RegisterDto registerDto) {
-        TokensDto tokens = authService.register(registerDto);
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseDto register(@Valid @RequestBody RegisterDto registerDto) {
+        authService.register(registerDto);
+        return new ResponseDto("Successfully registered, verification link sent to the email");
+    }
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .headers(cookieService.createRefreshTokenCookie(tokens.refreshToken(), REFRESH_TOKEN_COOKIE_PATH))
+    @PostMapping("/verify")
+    public ResponseEntity<AuthResponseDto> verify(
+            @Valid @RequestBody VerifyRequestDto verifyRequestDto
+    ) {
+        TokensDto tokens = authService.verify(verifyRequestDto);
+        return ResponseEntity.ok()
+                .headers(cookieService.createRefreshTokenCookie(tokens.refreshToken(), AUTH_COOKIE_PATH))
                 .body(new AuthResponseDto(tokens.accessToken()));
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseDto resendVerification(
+            @Valid @RequestBody ResendVerificationRequestDto resendVerificationRequestDto
+    ) {
+        authService.resendVerification(resendVerificationRequestDto);
+        return new ResponseDto("Verification link resent to the email");
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginDto loginDto) {
         TokensDto tokens = authService.login(loginDto);
-
         return ResponseEntity.ok()
-                .headers(cookieService.createRefreshTokenCookie(tokens.refreshToken(), REFRESH_TOKEN_COOKIE_PATH))
+                .headers(cookieService.createRefreshTokenCookie(tokens.refreshToken(), AUTH_COOKIE_PATH))
                 .body(new AuthResponseDto(tokens.accessToken()));
     }
 
@@ -48,9 +61,8 @@ public class AuthController {
             @CookieValue(CookieConstants.REFRESH_TOKEN) String refreshToken
     ) {
         authService.logout(refreshToken);
-
         return ResponseEntity.noContent()
-                .headers(cookieService.clearRefreshTokenCookie(REFRESH_TOKEN_COOKIE_PATH))
+                .headers(cookieService.clearRefreshTokenCookie(AUTH_COOKIE_PATH))
                 .build();
     }
 
@@ -59,9 +71,24 @@ public class AuthController {
             @CookieValue(CookieConstants.REFRESH_TOKEN) String refreshToken
     ) {
         TokensDto tokens = authService.refresh(refreshToken);
-
         return ResponseEntity.ok()
-                .headers(cookieService.createRefreshTokenCookie(tokens.refreshToken(), REFRESH_TOKEN_COOKIE_PATH))
+                .headers(cookieService.createRefreshTokenCookie(tokens.refreshToken(), AUTH_COOKIE_PATH))
                 .body(new AuthResponseDto(tokens.accessToken()));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseDto forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto
+    ) {
+        authService.forgotPassword(forgotPasswordRequestDto);
+        return new ResponseDto("Reset password link sent to the email");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseDto resetPassword(
+            @Valid @RequestBody ResetPasswordRequestDto resetPasswordRequestDto
+    ) {
+        authService.resetPassword(resetPasswordRequestDto);
+        return new ResponseDto("Password is reset successfully");
     }
 }

@@ -1,13 +1,11 @@
 package com.vttish.bookstore.auth.entity;
 
 import com.vttish.bookstore.auth.entity.enums.RefreshTokenStatus;
-import com.vttish.bookstore.common.entity.BaseEntity;
 import com.vttish.bookstore.common.exception.IllegalEntityStateException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -16,8 +14,7 @@ import java.util.UUID;
 @Table(name = "refresh_tokens")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RefreshToken extends BaseEntity {
-    private String token;
+public class RefreshToken extends BaseToken {
     private String childToken;
     private UUID familyId;
 
@@ -28,22 +25,16 @@ public class RefreshToken extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private RefreshTokenStatus status = RefreshTokenStatus.ACTIVE;
 
-    private Instant expiresAt;
     private Instant consumedAt;
 
     public RefreshToken(UUID familyId, String token, User user, Instant expiresAt) {
+        super(token, expiresAt);
         this.familyId = familyId;
-        this.token = token;
         this.user = user;
-        this.expiresAt = expiresAt;
     }
 
     public RefreshToken(String token, User user, Instant expiresAt) {
         this(UUID.randomUUID(), token, user, expiresAt);
-    }
-
-    public boolean isExpired() {
-        return expiresAt.isBefore(Instant.now());
     }
 
     public boolean isActive() {

@@ -52,12 +52,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Optional<User> optionalUser = userRepository.findById(userId);
 
             if (optionalUser.isEmpty()) {
-                SecurityContextHolder.clearContext();
                 filterChain.doFilter(request, response);
                 return;
             }
 
             User user = optionalUser.get();
+
+            if (!user.isVerified() || user.isBlocked()) {
+                SecurityContextHolder.clearContext();
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             if (jwtService.isTokenValid(jwt, user)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         user.getId(),

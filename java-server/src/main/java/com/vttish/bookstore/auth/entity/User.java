@@ -12,7 +12,6 @@ import lombok.*;
 @Table(name = "users")
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
     private String email;
@@ -20,4 +19,19 @@ public class User extends BaseEntity {
 
     @Enumerated(value = EnumType.STRING)
     private Role role;
+
+    @Setter(value = AccessLevel.NONE)
+    private boolean isVerified = false;
+
+    private boolean isBlocked = false;
+
+    public User(String email, String password, Role role) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public void verify() {
+        isVerified = true;
+    }
 }
