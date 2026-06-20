@@ -1,8 +1,8 @@
 package com.vttish.bookstore.orders.service.impl;
 
 import com.vttish.bookstore.common.exception.EntityNotFoundException;
-import com.vttish.bookstore.orders.dto.OrderCardDto;
-import com.vttish.bookstore.orders.dto.OrderDetailsDto;
+import com.vttish.bookstore.orders.dto.OrderCardResponseDto;
+import com.vttish.bookstore.orders.dto.OrderDetailsResponseDto;
 import com.vttish.bookstore.orders.entity.Order;
 import com.vttish.bookstore.orders.entity.enums.OrderStatus;
 import com.vttish.bookstore.orders.mapper.OrderMapper;
@@ -24,12 +24,12 @@ public class OrderQueryServiceImpl implements OrderQueryService {
     private final OrderMapper mapper;
 
     @Override
-    public Page<OrderCardDto> getByClientId(UUID clientId, Pageable pageable) {
+    public Page<OrderCardResponseDto> getByClientId(UUID clientId, Pageable pageable) {
         return orderRepository.findAllByClientId(clientId, pageable).map(mapper::toOrderCardDto);
     }
 
     @Override
-    public OrderDetailsDto getByIdAndClientId(UUID id, UUID clientId) {
+    public OrderDetailsResponseDto getByIdAndClientId(UUID id, UUID clientId) {
         Order order = orderRepository.findByIdAndClientId(id, clientId).orElseThrow(() ->
             new EntityNotFoundException(Order.class, id)
         );
@@ -38,12 +38,12 @@ public class OrderQueryServiceImpl implements OrderQueryService {
     }
 
     @Override
-    public Page<OrderCardDto> getAll(UUID employeeId, OrderStatus status, Pageable pageable) {
+    public Page<OrderCardResponseDto> getAll(UUID employeeId, OrderStatus status, Pageable pageable) {
         return orderRepository.findByFilters(employeeId, status, pageable).map(mapper::toOrderCardDto);
     }
 
     @Override
-    public OrderDetailsDto getById(UUID id) {
+    public OrderDetailsResponseDto getById(UUID id) {
         Order order = orderRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException(Order.class, id)
         );

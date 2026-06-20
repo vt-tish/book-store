@@ -41,14 +41,14 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public void register(RegisterDto registerDto) {
-        if (userRepository.findByEmail(registerDto.email()).isPresent()) {
+    public void register(RegisterRequestDto registerRequestDto) {
+        if (userRepository.findByEmail(registerRequestDto.email()).isPresent()) {
             throw new BadRequestException("Email is already in use");
         }
 
         User user = userRepository.save(new User(
-                registerDto.email(),
-                passwordEncoder.encode(registerDto.password()),
+                registerRequestDto.email(),
+                passwordEncoder.encode(registerRequestDto.password()),
                 Role.CLIENT
         ));
 
@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
         );
 
         token = verifyTokenRepository.save(token);
-        emailService.sendVerificationEmail(registerDto.email(), token.getToken());
+        emailService.sendVerificationEmail(registerRequestDto.email(), token.getToken());
     }
 
     @Override
@@ -121,8 +121,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public TokensDto login(LoginDto loginDto) {
-        User user = userRepository.findByEmail(loginDto.email()).orElseThrow(() ->
+    public TokensDto login(LoginRequestDto loginRequestDto) {
+        User user = userRepository.findByEmail(loginRequestDto.email()).orElseThrow(() ->
                 new BadCredentialsException("Invalid email or password")
         );
 
@@ -134,7 +134,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BadRequestException("User has been blocked");
         }
 
-        if (!passwordEncoder.matches(loginDto.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(loginRequestDto.password(), user.getPassword())) {
             throw new BadCredentialsException("Invalid email or password");
         }
 

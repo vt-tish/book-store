@@ -49,6 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // TODO: Redis black list to avoid database look up
             Optional<User> optionalUser = userRepository.findById(userId);
 
             if (optionalUser.isEmpty()) {

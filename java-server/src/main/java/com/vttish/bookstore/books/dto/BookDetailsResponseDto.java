@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public record BookDetailsDto(
+public record BookDetailsResponseDto(
         UUID id,
         String name,
         String genre,

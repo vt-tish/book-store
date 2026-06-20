@@ -25,8 +25,8 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseDto register(@Valid @RequestBody RegisterDto registerDto) {
-        authService.register(registerDto);
+    public ResponseDto register(@Valid @RequestBody RegisterRequestDto registerRequestDto) {
+        authService.register(registerRequestDto);
         return new ResponseDto("Successfully registered, verification link sent to the email");
     }
 
@@ -49,8 +49,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginDto loginDto) {
-        TokensDto tokens = authService.login(loginDto);
+    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginRequestDto loginRequestDto) {
+        TokensDto tokens = authService.login(loginRequestDto);
         return ResponseEntity.ok()
                 .headers(cookieService.createRefreshTokenCookie(tokens.refreshToken(), AUTH_COOKIE_PATH))
                 .body(new AuthResponseDto(tokens.accessToken()));

@@ -1,7 +1,7 @@
 package com.vttish.bookstore.books.service.impl;
 
-import com.vttish.bookstore.books.dto.AdminBookDetailsDto;
-import com.vttish.bookstore.books.dto.BookDto;
+import com.vttish.bookstore.books.dto.AdminBookDetailsResponseDto;
+import com.vttish.bookstore.books.dto.BookRequestDto;
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.mapper.BookMapper;
 import com.vttish.bookstore.books.repository.BookRepository;
@@ -24,17 +24,17 @@ public class BookManagementServiceImpl implements BookManagementService {
 
     @Override
     @Transactional
-    public AdminBookDetailsDto create(BookDto bookDto) {
-        Book book = mapper.toBook(bookDto);
+    public AdminBookDetailsResponseDto create(BookRequestDto bookRequestDto) {
+        Book book = mapper.toBook(bookRequestDto);
         return mapper.toAminBookDetailsDto(bookRepository.save(book));
     }
 
     @Override
     @Transactional
-    public AdminBookDetailsDto update(UUID id, BookDto bookDto) {
+    public AdminBookDetailsResponseDto update(UUID id, BookRequestDto bookRequestDto) {
         Book book = getEntityById(id);
 
-        mapper.update(bookDto, book);
+        mapper.update(bookRequestDto, book);
         return mapper.toAminBookDetailsDto(bookRepository.save(book));
     }
 

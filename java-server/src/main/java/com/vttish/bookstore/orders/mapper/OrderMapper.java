@@ -1,8 +1,8 @@
 package com.vttish.bookstore.orders.mapper;
 
 import com.vttish.bookstore.orders.dto.BookItemDto;
-import com.vttish.bookstore.orders.dto.OrderCardDto;
-import com.vttish.bookstore.orders.dto.OrderDetailsDto;
+import com.vttish.bookstore.orders.dto.OrderCardResponseDto;
+import com.vttish.bookstore.orders.dto.OrderDetailsResponseDto;
 import com.vttish.bookstore.orders.entity.BookItem;
 import com.vttish.bookstore.orders.entity.Order;
 import org.mapstruct.*;
@@ -11,10 +11,10 @@ import java.math.BigDecimal;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface OrderMapper {
-    OrderDetailsDto toOrderDetailsDto(Order order);
+    OrderDetailsResponseDto toOrderDetailsDto(Order order);
 
     @Mapping(target = "totalItems", expression = "java(order.getBookItems().size())")
-    OrderCardDto toOrderCardDto(Order order);
+    OrderCardResponseDto toOrderCardDto(Order order);
 
     @Mapping(target = "subtotalPrice", expression = "java(calculateSubtotal(bookItem))")
     BookItemDto toBookItemDto(BookItem bookItem);

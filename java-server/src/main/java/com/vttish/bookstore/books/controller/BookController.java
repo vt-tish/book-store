@@ -1,7 +1,7 @@
 package com.vttish.bookstore.books.controller;
 
-import com.vttish.bookstore.books.dto.BookCardDto;
-import com.vttish.bookstore.books.dto.BookDetailsDto;
+import com.vttish.bookstore.books.dto.BookCardResponseDto;
+import com.vttish.bookstore.books.dto.BookDetailsResponseDto;
 import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.common.constant.ApiRoutingConstants;
 import lombok.RequiredArgsConstructor;
@@ -20,12 +20,12 @@ public class BookController {
     private final BookQueryService bookQueryService;
 
     @GetMapping
-    public Page<BookCardDto> getAvailable(Pageable pageable) {
+    public Page<BookCardResponseDto> getAvailable(Pageable pageable) {
         return bookQueryService.getAvailable(pageable);
     }
 
     @GetMapping("/{id}")
-    public BookDetailsDto getById(@PathVariable UUID id) {
+    public BookDetailsResponseDto getById(@PathVariable UUID id) {
         return bookQueryService.getById(id);
     }
 }

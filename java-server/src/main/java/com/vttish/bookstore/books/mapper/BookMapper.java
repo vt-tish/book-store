@@ -11,12 +11,12 @@ import org.mapstruct.MappingTarget;
 public interface BookMapper {
 
     @Mapping(target = "isAvailable", expression = "java(!book.isArchived())")
-    BookDetailsDto toBookDetailsDto(Book book);
+    BookDetailsResponseDto toBookDetailsDto(Book book);
 
-    BookCardDto toBookCardDto(Book book);
-    Book toBook(BookDto bookDto);
-    AdminBookDetailsDto toAminBookDetailsDto(Book book);
-    AdminBookCardDto toAdminBookCardDto(Book book);
+    BookCardResponseDto toBookCardDto(Book book);
+    Book toBook(BookRequestDto bookRequestDto);
+    AdminBookDetailsResponseDto toAminBookDetailsDto(Book book);
+    AdminBookCardResponseDto toAdminBookCardDto(Book book);
 
-    void update(BookDto bookDto, @MappingTarget Book book);
+    void update(BookRequestDto bookRequestDto, @MappingTarget Book book);
 }

@@ -1,7 +1,7 @@
 package com.vttish.bookstore.cart.mapper;
 
 import com.vttish.bookstore.books.dto.CartBookView;
-import com.vttish.bookstore.cart.dto.CartDto;
+import com.vttish.bookstore.cart.dto.CartResponseDto;
 import com.vttish.bookstore.cart.dto.CartItemDto;
 import com.vttish.bookstore.cart.entity.Cart;
 import com.vttish.bookstore.cart.entity.CartItem;
@@ -15,9 +15,9 @@ import java.util.UUID;
 
 @Component
 public class CartMapper {
-    public CartDto toCartDto(Cart cart, Map<UUID, CartBookView> books) {
+    public CartResponseDto toCartDto(Cart cart, Map<UUID, CartBookView> books) {
         if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
-            return CartDto.empty();
+            return CartResponseDto.empty();
         }
 
         List<CartItemDto> itemDtos = new ArrayList<>();
@@ -45,6 +45,6 @@ public class CartMapper {
             ));
         }
 
-        return new CartDto(itemDtos, totalPrice);
+        return new CartResponseDto(itemDtos, totalPrice);
     }
 }

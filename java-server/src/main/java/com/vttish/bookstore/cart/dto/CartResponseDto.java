@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public record CartDto(
+public record CartResponseDto(
         List<CartItemDto> cartItems,
         BigDecimal totalPrice
 ) {
-    public static CartDto empty() {
-        return new CartDto(new ArrayList<>(), BigDecimal.ZERO);
+    public static CartResponseDto empty() {
+        return new CartResponseDto(new ArrayList<>(), BigDecimal.ZERO);
     }
 }

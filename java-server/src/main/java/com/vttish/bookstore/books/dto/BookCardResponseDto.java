@@ -3,7 +3,7 @@ package com.vttish.bookstore.books.dto;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record BookCardDto(
+public record BookCardResponseDto(
         UUID id,
         String name,
         String author,

@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,22 +23,22 @@ public class BookQueryServiceImpl implements BookQueryService {
     private final BookMapper mapper;
 
     @Override
-    public Page<BookCardDto> getAvailable(Pageable pageable) {
+    public Page<BookCardResponseDto> getAvailable(Pageable pageable) {
         return bookRepository.findAllByIsArchivedFalse(pageable).map(mapper::toBookCardDto);
     }
 
     @Override
-    public Page<AdminBookCardDto> getAll(Pageable pageable) {
+    public Page<AdminBookCardResponseDto> getAll(Pageable pageable) {
         return bookRepository.findAll(pageable).map(mapper::toAdminBookCardDto);
     }
 
     @Override
-    public BookDetailsDto getById(UUID id) {
+    public BookDetailsResponseDto getById(UUID id) {
         return mapper.toBookDetailsDto(getEntityById(id));
     }
 
     @Override
-    public AdminBookDetailsDto getByIdAdmin(UUID id) {
+    public AdminBookDetailsResponseDto getByIdAdmin(UUID id) {
         return mapper.toAminBookDetailsDto(getEntityById(id));
     }
 

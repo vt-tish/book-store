@@ -2,9 +2,9 @@ package com.vttish.bookstore.cart.service.impl;
 
 import com.vttish.bookstore.books.dto.CartBookView;
 import com.vttish.bookstore.books.service.BookQueryService;
-import com.vttish.bookstore.cart.dto.AddCartItemDto;
-import com.vttish.bookstore.cart.dto.CartDto;
-import com.vttish.bookstore.cart.dto.UpdateCartItemDto;
+import com.vttish.bookstore.cart.dto.AddCartItemRequestDto;
+import com.vttish.bookstore.cart.dto.CartResponseDto;
+import com.vttish.bookstore.cart.dto.UpdateCartItemRequestDto;
 import com.vttish.bookstore.cart.entity.Cart;
 import com.vttish.bookstore.cart.entity.CartItem;
 import com.vttish.bookstore.cart.mapper.CartMapper;
@@ -31,11 +31,11 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartDto get(UUID ownerId) {
+    public CartResponseDto get(UUID ownerId) {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 
         if (cart == null) {
-            return CartDto.empty();
+            return CartResponseDto.empty();
         }
 
         Map<UUID, CartBookView> books = fetchBooks(cart);
@@ -49,7 +49,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartDto addItem(UUID ownerId, AddCartItemDto addCartItemDto) {
+    public CartResponseDto addItem(UUID ownerId, AddCartItemRequestDto addCartItemRequestDto) {
         Cart cart;
 
         try {
@@ -61,14 +61,14 @@ public class CartServiceImpl implements CartService {
         }
 
         CartItem item = cart.getItems().stream()
-                .filter(cartItem -> cartItem.getBookId().equals(addCartItemDto.bookId()))
+                .filter(cartItem -> cartItem.getBookId().equals(addCartItemRequestDto.bookId()))
                 .findFirst()
                 .orElse(null);
 
         if (item != null) {
-            item.setQuantity(item.getQuantity() + addCartItemDto.quantity());
+            item.setQuantity(item.getQuantity() + addCartItemRequestDto.quantity());
         } else {
-            cart.addItem(new CartItem(addCartItemDto.bookId(), null, addCartItemDto.quantity()));
+            cart.addItem(new CartItem(addCartItemRequestDto.bookId(), null, addCartItemRequestDto.quantity()));
         }
 
         Map<UUID, CartBookView> books = fetchBooks(cart);
@@ -78,7 +78,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartDto updateItem(UUID ownerId, UUID bookId, UpdateCartItemDto updateCartItemDto) {
+    public CartResponseDto updateItem(UUID ownerId, UUID bookId, UpdateCartItemRequestDto updateCartItemRequestDto) {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 
         if (cart == null) {
@@ -90,7 +90,7 @@ public class CartServiceImpl implements CartService {
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException(CartItem.class, bookId));
 
-        item.setQuantity(updateCartItemDto.quantity());
+        item.setQuantity(updateCartItemRequestDto.quantity());
 
         Map<UUID, CartBookView> books = fetchBooks(cart);
         syncCartItemNames(cart, books);
@@ -99,11 +99,11 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartDto removeItem(UUID ownerId, UUID bookId) {
+    public CartResponseDto removeItem(UUID ownerId, UUID bookId) {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 
         if (cart == null) {
-            return CartDto.empty();
+            return CartResponseDto.empty();
         }
 
         cart.getItems().removeIf(cartItem -> cartItem.getBookId().equals(bookId));

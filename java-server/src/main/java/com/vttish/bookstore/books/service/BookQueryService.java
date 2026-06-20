@@ -7,10 +7,10 @@ import org.springframework.data.domain.Pageable;
 import java.util.*;
 
 public interface BookQueryService {
-    Page<BookCardDto> getAvailable(Pageable pageable);
-    Page<AdminBookCardDto> getAll(Pageable pageable);
-    BookDetailsDto getById(UUID id);
-    AdminBookDetailsDto getByIdAdmin(UUID id);
+    Page<BookCardResponseDto> getAvailable(Pageable pageable);
+    Page<AdminBookCardResponseDto> getAll(Pageable pageable);
+    BookDetailsResponseDto getById(UUID id);
+    AdminBookDetailsResponseDto getByIdAdmin(UUID id);
 
     Map<UUID, CartBookView> getBooksForCart(Set<UUID> ids);
     Map<UUID, OrderBookView> getBooksForOrder(Set<UUID> ids);
