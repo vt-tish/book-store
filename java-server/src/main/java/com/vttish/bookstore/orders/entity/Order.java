@@ -1,9 +1,9 @@
 package com.vttish.bookstore.orders.entity;
 
 import com.vttish.bookstore.common.entity.BaseEntity;
-import com.vttish.bookstore.common.exception.IllegalEntityAccessException;
-import com.vttish.bookstore.common.exception.IllegalEntityStateException;
 import com.vttish.bookstore.orders.entity.enums.OrderStatus;
+import com.vttish.bookstore.orders.exception.InvalidOrderStateException;
+import com.vttish.bookstore.orders.exception.OrderEmployeeMismatchException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,7 +44,7 @@ public class Order extends BaseEntity {
 
     public void accept(UUID employeeId) {
         if (status != OrderStatus.PENDING) {
-            throw new IllegalEntityStateException("Cannot accept order with status " + status);
+            throw new InvalidOrderStateException(status.name());
         }
 
         status = OrderStatus.ACCEPTED;
@@ -53,11 +53,11 @@ public class Order extends BaseEntity {
 
     public void cancel(UUID employeeId) {
         if (status != OrderStatus.ACCEPTED) {
-            throw new IllegalEntityStateException("Cannot cancel order with status " + status);
+            throw new InvalidOrderStateException(status.name());
         }
 
         if (this.employeeId == null || !this.employeeId.equals(employeeId)) {
-            throw new IllegalEntityAccessException("Order only can be canceled by employee who accepted it");
+            throw new OrderEmployeeMismatchException();
         }
 
         status = OrderStatus.CANCELLED;
@@ -66,11 +66,11 @@ public class Order extends BaseEntity {
 
     public void complete(UUID employeeId) {
         if (status != OrderStatus.ACCEPTED) {
-            throw new IllegalEntityStateException("Cannot complete order with status " + status);
+            throw new InvalidOrderStateException(status.name());
         }
 
         if (this.employeeId == null || !this.employeeId.equals(employeeId)) {
-            throw new IllegalEntityAccessException("Order can only be completed by the employee who accepted it");
+            throw new OrderEmployeeMismatchException();
         }
 
         status = OrderStatus.COMPLETED;

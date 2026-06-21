@@ -5,11 +5,11 @@ import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.cart.dto.CartResponseDto;
 import com.vttish.bookstore.cart.dto.CartItemDto;
 import com.vttish.bookstore.cart.service.CartService;
-import com.vttish.bookstore.common.exception.BadRequestException;
-import com.vttish.bookstore.common.exception.EmptyEntityException;
 import com.vttish.bookstore.orders.dto.OrderDetailsResponseDto;
 import com.vttish.bookstore.orders.entity.BookItem;
 import com.vttish.bookstore.orders.entity.Order;
+import com.vttish.bookstore.orders.exception.EmptyCartException;
+import com.vttish.bookstore.orders.exception.UnavailableBookException;
 import com.vttish.bookstore.orders.mapper.OrderMapper;
 import com.vttish.bookstore.orders.repository.OrderRepository;
 import com.vttish.bookstore.orders.service.OrderSubmissionService;
@@ -36,14 +36,12 @@ public class OrderSubmissionServiceImpl implements OrderSubmissionService {
         CartResponseDto cartResponseDto = cartService.get(clientId);
 
         if (cartResponseDto.cartItems().isEmpty()) {
-            throw new EmptyEntityException("Cannot submit empty cart");
+            throw new EmptyCartException();
         }
 
         cartResponseDto.cartItems().forEach(cartItem -> {
             if (!cartItem.isAvailable()) {
-                throw new BadRequestException(
-                        String.format("Book '%s' is unavailable", cartItem.bookName())
-                );
+                throw new UnavailableBookException();
             }
         });
 

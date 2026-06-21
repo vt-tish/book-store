@@ -1,7 +1,9 @@
 package com.vttish.bookstore.common.exception;
 
-public class BadRequestException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public abstract class BadRequestException extends BaseException {
     public BadRequestException(String message) {
-        super(message);
+        super(message, HttpStatus.BAD_REQUEST);
     }
 }

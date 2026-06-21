@@ -7,12 +7,11 @@ import com.vttish.bookstore.cart.dto.CartResponseDto;
 import com.vttish.bookstore.cart.dto.UpdateCartItemRequestDto;
 import com.vttish.bookstore.cart.entity.Cart;
 import com.vttish.bookstore.cart.entity.CartItem;
+import com.vttish.bookstore.cart.exception.CartItemNotFoundException;
 import com.vttish.bookstore.cart.mapper.CartMapper;
 import com.vttish.bookstore.cart.repository.CartRepository;
 import com.vttish.bookstore.cart.service.CartInitializer;
 import com.vttish.bookstore.cart.service.CartService;
-import com.vttish.bookstore.common.exception.EntityCreationConflictException;
-import com.vttish.bookstore.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -56,7 +55,7 @@ public class CartServiceImpl implements CartService {
             cart = cartInitializer.getOrCreate(ownerId);
         } catch (DataIntegrityViolationException ex) {
             cart = cartRepository.findByOwnerId(ownerId).orElseThrow(
-                    () -> new EntityCreationConflictException("Cart is not found after conflict", ex)
+                    CartItemNotFoundException::new
             );
         }
 
@@ -82,13 +81,13 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
 
         if (cart == null) {
-            throw new EntityNotFoundException(CartItem.class, bookId);
+            throw new CartItemNotFoundException();
         }
 
         CartItem item = cart.getItems().stream()
                 .filter(cartItem -> cartItem.getBookId().equals(bookId))
                 .findFirst()
-                .orElseThrow(() -> new EntityNotFoundException(CartItem.class, bookId));
+                .orElseThrow(CartItemNotFoundException::new);
 
         item.setQuantity(updateCartItemRequestDto.quantity());
 

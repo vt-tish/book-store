@@ -3,11 +3,11 @@ package com.vttish.bookstore.books.service.impl;
 import com.vttish.bookstore.books.dto.AdminBookDetailsResponseDto;
 import com.vttish.bookstore.books.dto.BookRequestDto;
 import com.vttish.bookstore.books.entity.Book;
+import com.vttish.bookstore.books.exception.BookHasOrdersException;
+import com.vttish.bookstore.books.exception.BookNotFoundException;
 import com.vttish.bookstore.books.mapper.BookMapper;
 import com.vttish.bookstore.books.repository.BookRepository;
 import com.vttish.bookstore.books.service.BookManagementService;
-import com.vttish.bookstore.common.exception.BadRequestException;
-import com.vttish.bookstore.common.exception.EntityNotFoundException;
 import com.vttish.bookstore.orders.service.OrderQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,9 +42,7 @@ public class BookManagementServiceImpl implements BookManagementService {
     @Transactional
     public void delete(UUID id) {
         if (orderQueryService.hasBookBeenOrdered(id)) {
-            throw new BadRequestException(
-                    String.format("Book with id %s is associated with orders, archive book instead", id)
-            );
+            throw new BookHasOrdersException();
         }
 
         bookRepository.deleteById(id);
@@ -77,8 +75,6 @@ public class BookManagementServiceImpl implements BookManagementService {
     }
 
     private Book getEntityById(UUID id) {
-        return bookRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(Book.class, id)
-        );
+        return bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
     }
 }

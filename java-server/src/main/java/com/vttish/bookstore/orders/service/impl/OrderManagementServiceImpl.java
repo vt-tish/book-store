@@ -1,7 +1,7 @@
 package com.vttish.bookstore.orders.service.impl;
 
-import com.vttish.bookstore.common.exception.EntityNotFoundException;
 import com.vttish.bookstore.orders.entity.Order;
+import com.vttish.bookstore.orders.exception.OrderNotFoundException;
 import com.vttish.bookstore.orders.mapper.OrderMapper;
 import com.vttish.bookstore.orders.repository.OrderRepository;
 import com.vttish.bookstore.orders.service.OrderManagementService;
@@ -42,8 +42,6 @@ public class OrderManagementServiceImpl implements OrderManagementService {
     }
 
     private Order getEntityById(UUID id) {
-        return orderRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException(Order.class, id)
-        );
+        return orderRepository.findById(id).orElseThrow(OrderNotFoundException::new);
     }
 }

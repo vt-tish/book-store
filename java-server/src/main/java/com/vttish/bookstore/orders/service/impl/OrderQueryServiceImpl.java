@@ -1,10 +1,10 @@
 package com.vttish.bookstore.orders.service.impl;
 
-import com.vttish.bookstore.common.exception.EntityNotFoundException;
 import com.vttish.bookstore.orders.dto.OrderCardResponseDto;
 import com.vttish.bookstore.orders.dto.OrderDetailsResponseDto;
 import com.vttish.bookstore.orders.entity.Order;
 import com.vttish.bookstore.orders.entity.enums.OrderStatus;
+import com.vttish.bookstore.orders.exception.OrderNotFoundException;
 import com.vttish.bookstore.orders.mapper.OrderMapper;
 import com.vttish.bookstore.orders.repository.OrderRepository;
 import com.vttish.bookstore.orders.service.OrderQueryService;
@@ -30,8 +30,8 @@ public class OrderQueryServiceImpl implements OrderQueryService {
 
     @Override
     public OrderDetailsResponseDto getByIdAndClientId(UUID id, UUID clientId) {
-        Order order = orderRepository.findByIdAndClientId(id, clientId).orElseThrow(() ->
-            new EntityNotFoundException(Order.class, id)
+        Order order = orderRepository.findByIdAndClientId(id, clientId).orElseThrow(
+                OrderNotFoundException::new
         );
 
         return mapper.toOrderDetailsDto(order);
@@ -44,9 +44,7 @@ public class OrderQueryServiceImpl implements OrderQueryService {
 
     @Override
     public OrderDetailsResponseDto getById(UUID id) {
-        Order order = orderRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException(Order.class, id)
-        );
+        Order order = orderRepository.findById(id).orElseThrow(OrderNotFoundException::new);
 
         return mapper.toOrderDetailsDto(order);
     }

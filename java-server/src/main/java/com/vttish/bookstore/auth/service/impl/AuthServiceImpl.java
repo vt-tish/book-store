@@ -7,6 +7,7 @@ import com.vttish.bookstore.auth.entity.ResetPasswordToken;
 import com.vttish.bookstore.auth.entity.User;
 import com.vttish.bookstore.auth.entity.VerifyToken;
 import com.vttish.bookstore.auth.entity.enums.Role;
+import com.vttish.bookstore.auth.exception.*;
 import com.vttish.bookstore.auth.repository.RefreshTokenRepository;
 import com.vttish.bookstore.auth.repository.ResetPasswordTokenRepository;
 import com.vttish.bookstore.auth.repository.UserRepository;
@@ -14,14 +15,13 @@ import com.vttish.bookstore.auth.repository.VerifyTokenRepository;
 import com.vttish.bookstore.auth.service.AuthService;
 import com.vttish.bookstore.auth.service.EmailService;
 import com.vttish.bookstore.auth.service.JwtService;
-import com.vttish.bookstore.common.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void register(RegisterRequestDto registerRequestDto) {
         if (userRepository.findByEmail(registerRequestDto.email()).isPresent()) {
-            throw new BadRequestException("Email is already in use");
+            throw new EmailTakenException();
         }
 
         User user = userRepository.save(new User(
@@ -66,11 +66,11 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public TokensDto verify(VerifyRequestDto verifyRequestDto) {
         VerifyToken verifyToken = verifyTokenRepository.findByToken(verifyRequestDto.token())
-                .orElseThrow(() -> new BadCredentialsException("Invalid verify token"));
+                .orElseThrow(InvalidTokenException::new);
 
         if (verifyToken.isExpired()) {
             verifyTokenRepository.delete(verifyToken);
-            throw new BadRequestException("Verification link is expired, request a new one");
+            throw new ExpiredTokenException();
         }
 
         User user = verifyToken.getUser();
@@ -97,10 +97,12 @@ public class AuthServiceImpl implements AuthService {
         Optional<VerifyToken> existingToken = verifyTokenRepository.findByUserId(user.getId());
 
         if (existingToken.isPresent()) {
-            if (existingToken.get().getCreatedAt()
-                    .plusMillis(securityProperties.cooldownMs()).isAfter(Instant.now())
-            ) {
-                return;
+            long secondsSinceLastEmail = Duration.between(
+                    existingToken.get().getCreatedAt(), Instant.now()).getSeconds();
+            long cooldownSeconds = securityProperties.cooldownMs() / 1000;
+
+            if (secondsSinceLastEmail < cooldownSeconds) {
+                throw new EmailCooldownException(cooldownSeconds - secondsSinceLastEmail);
             }
 
             verifyTokenRepository.delete(existingToken.get());
@@ -122,20 +124,20 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public TokensDto login(LoginRequestDto loginRequestDto) {
-        User user = userRepository.findByEmail(loginRequestDto.email()).orElseThrow(() ->
-                new BadCredentialsException("Invalid email or password")
+        User user = userRepository.findByEmail(loginRequestDto.email()).orElseThrow(
+                InvalidCredentialsException::new
         );
 
         if (!user.isVerified()) {
-            throw new BadRequestException("User is not verified");
+            throw new UnverifiedUserException();
         }
 
         if (user.isBlocked()) {
-            throw new BadRequestException("User has been blocked");
+            throw new BlockedUserException();
         }
 
         if (!passwordEncoder.matches(loginRequestDto.password(), user.getPassword())) {
-            throw new BadCredentialsException("Invalid email or password");
+            throw new InvalidCredentialsException();
         }
 
         return new TokensDto(generateNewRefreshToken(user), jwtService.generateAccessToken(user));
@@ -144,12 +146,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public TokensDto refresh(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(() ->
-                new BadCredentialsException("Invalid refresh token")
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(
+                InvalidTokenException::new
         );
 
         if (refreshToken.isRevoked()) {
-            throw new BadCredentialsException("Session terminated, log in again");
+            throw new RevokedTokenException();
         }
 
         User user = refreshToken.getUser();
@@ -167,13 +169,13 @@ public class AuthServiceImpl implements AuthService {
 
             revokeRefreshTokenFamily(refreshToken.getFamilyId());
             emailService.sendSecurityAlert(user.getEmail());
-            throw new BadCredentialsException("Token reuse detected, session terminated");
+            throw new TokenReuseException();
         }
 
         if (refreshToken.isExpired()) {
             refreshToken.revoke();
             refreshTokenRepository.save(refreshToken);
-            throw new BadCredentialsException("Refresh token expired, log in again");
+            throw new ExpiredTokenException();
         }
 
         String newToken = jwtService.generateOpaqueToken();
@@ -213,10 +215,12 @@ public class AuthServiceImpl implements AuthService {
         Optional<ResetPasswordToken> existingToken = resetPasswordTokenRepository.findByUserId(user.getId());
 
         if (existingToken.isPresent()) {
-            if (existingToken.get().getCreatedAt()
-                    .plusMillis(securityProperties.cooldownMs()).isAfter(Instant.now())
-            ) {
-                return;
+            long secondsSinceLastEmail = Duration.between(
+                    existingToken.get().getCreatedAt(), Instant.now()).getSeconds();
+            long cooldownSeconds = securityProperties.cooldownMs() / 1000;
+
+            if (secondsSinceLastEmail < cooldownSeconds) {
+                throw new EmailCooldownException(cooldownSeconds - secondsSinceLastEmail);
             }
 
             resetPasswordTokenRepository.delete(existingToken.get());
@@ -240,11 +244,11 @@ public class AuthServiceImpl implements AuthService {
     public void resetPassword(ResetPasswordRequestDto resetPasswordRequestDto) {
         ResetPasswordToken token = resetPasswordTokenRepository.findByToken(
                 resetPasswordRequestDto.token()
-        ).orElseThrow(() -> new BadCredentialsException("Invalid reset password token"));
+        ).orElseThrow(InvalidTokenException::new);
 
         if (token.isExpired()) {
             resetPasswordTokenRepository.delete(token);
-            throw new BadRequestException("Reset password link is expired, request a new one");
+            throw new ExpiredTokenException();
         }
 
         User user = token.getUser();

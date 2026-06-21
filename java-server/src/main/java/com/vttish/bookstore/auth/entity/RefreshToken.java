@@ -1,7 +1,6 @@
 package com.vttish.bookstore.auth.entity;
 
 import com.vttish.bookstore.auth.entity.enums.RefreshTokenStatus;
-import com.vttish.bookstore.common.exception.IllegalEntityStateException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -51,7 +50,7 @@ public class RefreshToken extends BaseToken {
 
     public void consume(String childToken) {
         if (status != RefreshTokenStatus.ACTIVE) {
-            throw new IllegalEntityStateException("Cannot consume a token with status " + status);
+            throw new IllegalStateException("Cannot consume a token with status " + status);
         }
 
         status = RefreshTokenStatus.CONSUMED;

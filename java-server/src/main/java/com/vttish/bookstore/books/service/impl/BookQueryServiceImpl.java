@@ -2,10 +2,10 @@ package com.vttish.bookstore.books.service.impl;
 
 import com.vttish.bookstore.books.dto.*;
 import com.vttish.bookstore.books.entity.Book;
+import com.vttish.bookstore.books.exception.BookNotFoundException;
 import com.vttish.bookstore.books.mapper.BookMapper;
 import com.vttish.bookstore.books.repository.BookRepository;
 import com.vttish.bookstore.books.service.BookQueryService;
-import com.vttish.bookstore.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -67,8 +67,6 @@ public class BookQueryServiceImpl implements BookQueryService {
     }
 
     private Book getEntityById(UUID id) {
-        return bookRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException(Book.class, id)
-        );
+        return bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
     }
 }
