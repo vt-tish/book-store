@@ -15,5 +15,5 @@ public record OrderDetailsResponseDto(
         OrderStatus status,
         Instant createdAt,
         Instant closedAt,
-        List<BookItemDto> bookItems
+        List<OrderItemDto> bookItems
 ) {}

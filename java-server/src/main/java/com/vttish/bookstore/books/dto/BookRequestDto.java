@@ -2,51 +2,51 @@ package com.vttish.bookstore.books.dto;
 
 import com.vttish.bookstore.books.entity.enums.AgeGroup;
 import com.vttish.bookstore.books.entity.enums.Language;
+import com.vttish.bookstore.common.validation.ImageUrl;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record BookRequestDto(
-        @NotBlank(message = "Name is required")
-        @Size(max = 255, message = "Max book name length is 255 characters")
+        @NotBlank(message = "{error.validation.required}")
+        @Size(max = 255, message = "{error.validation.max_length}")
         String name,
 
-        @NotBlank(message = "Genre is required")
-        @Size(max = 100, message = "Max genre name length is 100 characters")
+        @NotBlank(message = "{error.validation.required}")
+        @Size(max = 100, message = "{error.validation.max_length}")
         String genre,
 
-        // TODO: Add custom URL validation annotation
-        @Size(max = 2048, message = "Max preview URL length is 2048 characters")
-        @Pattern(regexp = "^(http|https)://.*$", message = "Preview URL must be a valid HTTP/HTTPS link")
+        @Size(max = 2048, message = "{error.validation.max_length}")
+        @ImageUrl(message = "{error.validation.image_url}")
         String previewUrl,
 
-        @NotNull(message = "Age group is required")
+        @NotNull(message = "{error.validation.required}")
         AgeGroup ageGroup,
 
-        @NotNull(message = "Price is required")
-        @Positive(message = "Price must be greater than zero")
-        @Digits(integer = 8, fraction = 2, message = "Price must be a valid monetary amount")
+        @NotNull(message = "{error.validation.required}")
+        @Positive(message = "{error.validation.positive}")
+        @Digits(integer = 8, fraction = 2, message = "{error.validation.digits}")
         BigDecimal price,
 
-        @NotNull(message = "Publication date is required")
-        @PastOrPresent(message = "Publication date cannot be in the future")
+        @NotNull(message = "{error.validation.required}")
+        @PastOrPresent(message = "{error.validation.past_or_present}")
         LocalDate publicationDate,
 
-        @NotBlank(message = "Author is required")
-        @Size(max = 255, message = "Max author name length is 255 characters")
+        @NotBlank(message = "{error.validation.required}")
+        @Size(max = 255, message = "{error.validation.max_length}")
         String author,
 
-        @NotNull(message = "Number of pages is required")
-        @Min(value = 5, message = "Min number of pages must is 5")
+        @NotNull(message = "{error.validation.required}")
+        @Min(value = 5, message = "{error.validation.min_value}")
         Integer pages,
 
-        @Size(max = 2000, message = "Max characteristics length is 2000 characters")
+        @Size(max = 2000, message = "{error.validation.max_length}")
         String characteristics,
 
-        @Size(max = 5000, message = "Max description length is 5000 characters")
+        @Size(max = 5000, message = "{error.validation.max_length}")
         String description,
 
-        @NotNull(message = "Language is required")
+        @NotNull(message = "{error.validation.required}")
         Language language
 ) {}

@@ -1,9 +1,11 @@
 package com.vttish.bookstore.auth.dto;
 
-import jakarta.validation.constraints.Email;
+import com.vttish.bookstore.common.validation.Email;
+import jakarta.validation.constraints.NotBlank;
 
 public record ForgotPasswordRequestDto(
 
-        @Email(message = "Email is not valid")
+        @NotBlank(message = "{error.validation.required}")
+        @Email(message = "{error.validation.email}")
         String email
 ) {}

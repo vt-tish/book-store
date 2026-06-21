@@ -9,7 +9,7 @@ CREATE TABLE orders (
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-CREATE TABLE book_items (
+CREATE TABLE order_items (
     id UUID NOT NULL PRIMARY KEY,
     order_id UUID NOT NULL,
     book_id UUID NOT NULL,

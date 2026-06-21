@@ -11,10 +11,10 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name = "book_items")
+@Table(name = "order_items")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BookItem extends BaseEntity {
+public class OrderItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
@@ -28,7 +28,7 @@ public class BookItem extends BaseEntity {
 
     private Integer quantity;
 
-    public BookItem(UUID bookId, String bookName, String bookAuthor, BigDecimal pricePerUnit, Integer quantity) {
+    public OrderItem(UUID bookId, String bookName, String bookAuthor, BigDecimal pricePerUnit, Integer quantity) {
         this.bookId = bookId;
         this.bookName = bookName;
         this.bookAuthor = bookAuthor;

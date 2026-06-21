@@ -15,7 +15,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderManagementServiceImpl implements OrderManagementService {
     private final OrderRepository orderRepository;
-    private final OrderMapper mapper;
 
     @Override
     @Transactional

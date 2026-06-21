@@ -6,7 +6,7 @@ import com.vttish.bookstore.cart.dto.CartResponseDto;
 import com.vttish.bookstore.cart.dto.CartItemDto;
 import com.vttish.bookstore.cart.service.CartService;
 import com.vttish.bookstore.orders.dto.OrderDetailsResponseDto;
-import com.vttish.bookstore.orders.entity.BookItem;
+import com.vttish.bookstore.orders.entity.OrderItem;
 import com.vttish.bookstore.orders.entity.Order;
 import com.vttish.bookstore.orders.exception.EmptyCartException;
 import com.vttish.bookstore.orders.exception.UnavailableBookException;
@@ -56,7 +56,7 @@ public class OrderSubmissionServiceImpl implements OrderSubmissionService {
         for (CartItemDto cartItem : cartResponseDto.cartItems()) {
             OrderBookView book = books.get(cartItem.bookId());
 
-            order.addBookItem(new BookItem(
+            order.addItem(new OrderItem(
                     book.getId(),
                     book.getName(),
                     book.getAuthor(),

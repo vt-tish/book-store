@@ -3,7 +3,7 @@ package com.vttish.bookstore.orders.dto;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record BookItemDto(
+public record OrderItemDto(
     UUID id,
     UUID bookId,
     String bookName,

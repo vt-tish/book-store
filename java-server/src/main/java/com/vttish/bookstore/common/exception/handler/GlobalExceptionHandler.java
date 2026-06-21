@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -65,7 +66,10 @@ public class GlobalExceptionHandler {
             Locale locale
     ) {
         List<ValidationErrorDto> validationErrors = ex.getFieldErrors().stream()
-                .map(error -> new ValidationErrorDto(error.getField(), error.getDefaultMessage()))
+                .map(error -> new ValidationErrorDto(
+                        error.getField(),
+                        messageSource.getMessage(error, locale)
+                ))
                 .toList();
 
         return new ApiErrorResponseDto(
@@ -75,6 +79,22 @@ public class GlobalExceptionHandler {
                 messageSource.getMessage("error.common.validation_failed", null, locale),
                 request.getRequestURI(),
                 validationErrors
+        );
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorResponseDto handleHttpMessageNotReadableExceptions(
+            HttpServletRequest request,
+            Locale locale
+    ) {
+        return new ApiErrorResponseDto(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                messageSource.getMessage("error.common.invalid_json", null, locale),
+                request.getRequestURI(),
+                null
         );
     }
 

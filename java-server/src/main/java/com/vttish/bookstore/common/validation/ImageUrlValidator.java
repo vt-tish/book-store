@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class ImageUrlValidator implements ConstraintValidator<ImageUrl, String> {
     private static final String IMAGE_URL_PATTERN =
-            "(?i)^https?://([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}.*\\.(png|jpg|jpeg|gif|webp|svg)(\\?.*)?$";
+            "(?i)^https?://([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,}.*\\.(png|jpg|jpeg|webp|svg)(\\?.*)?$";
 
     @Override
     public boolean isValid(String imageUrl, ConstraintValidatorContext constraintValidatorContext) {

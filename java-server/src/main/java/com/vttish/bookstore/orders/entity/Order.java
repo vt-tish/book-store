@@ -25,7 +25,7 @@ public class Order extends BaseEntity {
     private BigDecimal totalPrice;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookItem> bookItems = new ArrayList<>();
+    private List<OrderItem> items = new ArrayList<>();
 
     @Enumerated(value = EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
@@ -37,9 +37,9 @@ public class Order extends BaseEntity {
         this.totalPrice = totalPrice;
     }
 
-    public void addBookItem(BookItem bookItem) {
-        bookItems.add(bookItem);
-        bookItem.setOrder(this);
+    public void addItem(OrderItem orderItem) {
+        items.add(orderItem);
+        orderItem.setOrder(this);
     }
 
     public void accept(UUID employeeId) {
