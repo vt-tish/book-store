@@ -1,7 +1,8 @@
-package com.vttish.bookstore.common.exception;
+package com.vttish.bookstore.common.exception.handler;
 
 import com.vttish.bookstore.common.dto.ApiErrorResponseDto;
 import com.vttish.bookstore.common.dto.ValidationErrorDto;
+import com.vttish.bookstore.common.exception.BaseException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
