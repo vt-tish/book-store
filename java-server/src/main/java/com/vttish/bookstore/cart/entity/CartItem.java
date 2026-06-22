@@ -1,23 +1,30 @@
 package com.vttish.bookstore.cart.entity;
 
-import jakarta.persistence.Embeddable;
+import com.vttish.bookstore.books.entity.Book;
+import com.vttish.bookstore.common.entity.BaseEntity;
+import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
-@Embeddable
+@Entity
+@Table(name = "cart_items")
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "bookId")
-public class CartItem {
-    private UUID bookId;
+public class CartItem extends BaseEntity {
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cart_id")
     @Setter
-    private String bookName;
+    private Cart cart;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id")
+    private Book book;
 
     @Setter
     private Integer quantity;
 
+    public CartItem(Book book, Integer quantity) {
+        this.book = book;
+        this.quantity = quantity;
+    }
 }

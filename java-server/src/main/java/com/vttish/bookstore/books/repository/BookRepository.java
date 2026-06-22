@@ -48,7 +48,7 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
             t.characteristics,
             t.description,
             b.language,
-            CASE WHEN b.isArchived = true THEN false ELSE true END
+            (b.isArchived = false)
         )
         FROM Book b
         JOIN b.translations t

@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Locale;
 import java.util.UUID;
 
 @RestController
@@ -24,33 +25,36 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping
-    public CartResponseDto getCart(@AuthenticationPrincipal UUID ownerId) {
-        return cartService.get(ownerId);
+    public CartResponseDto getCart(@AuthenticationPrincipal UUID ownerId, Locale locale) {
+        return cartService.get(ownerId, locale.getLanguage());
     }
 
     @PostMapping("/items")
     public CartResponseDto addItem(
+            @AuthenticationPrincipal UUID ownerId,
             @Valid @RequestBody AddCartItemRequestDto addCartItemRequestDto,
-            @AuthenticationPrincipal UUID ownerId
+            Locale locale
     ) {
-        return cartService.addItem(ownerId, addCartItemRequestDto);
+        return cartService.addItem(ownerId, locale.getLanguage(), addCartItemRequestDto);
     }
 
-    @PutMapping("/items/{bookId}")
+    @PutMapping("/items/{id}")
     public CartResponseDto updateItemQuantity(
-            @PathVariable UUID bookId,
+            @AuthenticationPrincipal UUID ownerId,
+            @PathVariable UUID id,
             @Valid @RequestBody UpdateCartItemRequestDto updateCartItemRequestDto,
-            @AuthenticationPrincipal UUID ownerId
+            Locale locale
     ) {
-        return cartService.updateItem(ownerId, bookId, updateCartItemRequestDto);
+        return cartService.updateItem(ownerId, id, locale.getLanguage(), updateCartItemRequestDto);
     }
 
-    @DeleteMapping("/items/{bookId}")
+    @DeleteMapping("/items/{id}")
     public CartResponseDto removeItem(
-            @PathVariable UUID bookId,
-            @AuthenticationPrincipal UUID ownerId
+            @AuthenticationPrincipal UUID ownerId,
+            @PathVariable UUID id,
+            Locale locale
     ) {
-        return cartService.removeItem(ownerId, bookId);
+        return cartService.removeItem(ownerId, id, locale.getLanguage());
     }
 
     @DeleteMapping

@@ -1,6 +1,7 @@
 package com.vttish.bookstore.books.service;
 
 import com.vttish.bookstore.books.dto.*;
+import com.vttish.bookstore.books.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,6 +13,6 @@ public interface BookQueryService {
     BookDetailsResponseDto getById(UUID id, String lang);
     AdminBookDetailsResponseDto getByIdAdmin(UUID id, String lang);
 
-    Map<UUID, CartBookView> getBooksForCart(Set<UUID> ids);
+    Book getByIdAvailable(UUID id);
     Map<UUID, OrderBookView> getBooksForOrder(Set<UUID> ids);
 }

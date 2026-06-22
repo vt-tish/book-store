@@ -6,11 +6,13 @@ CREATE TABLE carts (
 );
 
 CREATE TABLE cart_items (
+    id UUID NOT NULL PRIMARY KEY,
     cart_id UUID NOT NULL,
     book_id UUID NOT NULL,
-    book_name VARCHAR(255) NOT NULL,
     quantity INT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
-    PRIMARY KEY (cart_id, book_id),
-    CONSTRAINT fk_cart_items_cart FOREIGN KEY (cart_id) REFERENCES carts (id) ON DELETE CASCADE
+    CONSTRAINT fk_cart_items_cart_id FOREIGN KEY (cart_id) REFERENCES carts (id) ON DELETE CASCADE,
+    CONSTRAINT u_cart_id_book_id UNIQUE (cart_id, book_id)
 );

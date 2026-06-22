@@ -10,5 +10,5 @@ CREATE TABLE refresh_tokens (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
-    CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    CONSTRAINT fk_refresh_tokens_user_id FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );

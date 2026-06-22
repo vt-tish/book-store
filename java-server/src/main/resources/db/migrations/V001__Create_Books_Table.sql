@@ -23,7 +23,6 @@ CREATE TABLE book_translations (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_book_translation_book FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE CASCADE,
-
-    CONSTRAINT uq_book_language UNIQUE (book_id, language_code)
+    CONSTRAINT fk_book_translations_book_id FOREIGN KEY (book_id) REFERENCES books (id) ON DELETE CASCADE,
+    CONSTRAINT u_book_id_language_code UNIQUE (book_id, language_code)
 );

@@ -17,11 +17,7 @@ import java.util.UUID;
 public class Cart extends BaseEntity {
     private UUID ownerId;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "cart_items",
-            joinColumns = @JoinColumn(name = "cart_id")
-    )
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItem> items = new HashSet<>();
 
     public Cart(UUID ownerId) {
@@ -29,6 +25,17 @@ public class Cart extends BaseEntity {
     }
 
     public void addItem(CartItem item) {
+        item.setCart(this);
         items.add(item);
+    }
+
+    public void removeItem(CartItem item) {
+        items.remove(item);
+        item.setCart(null);
+    }
+
+    public void clear() {
+        items.forEach(item -> item.setCart(null));
+        items.clear();
     }
 }

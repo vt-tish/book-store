@@ -1,54 +1,48 @@
 package com.vttish.bookstore.cart.service.impl;
 
-import com.vttish.bookstore.books.dto.CartBookView;
+import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.cart.dto.AddCartItemRequestDto;
+import com.vttish.bookstore.cart.dto.CartItemDto;
 import com.vttish.bookstore.cart.dto.CartResponseDto;
 import com.vttish.bookstore.cart.dto.UpdateCartItemRequestDto;
 import com.vttish.bookstore.cart.entity.Cart;
 import com.vttish.bookstore.cart.entity.CartItem;
 import com.vttish.bookstore.cart.exception.CartItemNotFoundException;
-import com.vttish.bookstore.cart.mapper.CartMapper;
+import com.vttish.bookstore.cart.repository.CartItemRepository;
 import com.vttish.bookstore.cart.repository.CartRepository;
 import com.vttish.bookstore.cart.service.CartInitializer;
 import com.vttish.bookstore.cart.service.CartService;
+import com.vttish.bookstore.common.config.LocalizationProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
     private final BookQueryService bookQueryService;
     private final CartInitializer cartInitializer;
-    private final CartMapper cartMapper;
+    private final LocalizationProperties localizationProps;
 
     @Override
-    @Transactional
-    public CartResponseDto get(UUID ownerId) {
-        Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
+    public CartResponseDto get(UUID ownerId, String lang) {
+        Optional<Cart> existingCart = cartRepository.findByOwnerId(ownerId);
 
-        if (cart == null) {
-            return CartResponseDto.empty();
-        }
-
-        Map<UUID, CartBookView> books = fetchBooks(cart);
-
-        if (syncCartItemNames(cart, books)) {
-            cart = cartRepository.save(cart);
-        }
-
-        return cartMapper.toCartDto(cart, books);
+        return existingCart.map(cart -> toCartResponseDto(cart, lang))
+                .orElseGet(CartResponseDto::empty);
     }
 
     @Override
     @Transactional
-    public CartResponseDto addItem(UUID ownerId, AddCartItemRequestDto addCartItemRequestDto) {
+    public CartResponseDto addItem(UUID ownerId, String lang, AddCartItemRequestDto addCartItemRequestDto) {
         Cart cart;
 
         try {
@@ -59,96 +53,89 @@ public class CartServiceImpl implements CartService {
             );
         }
 
-        CartItem item = cart.getItems().stream()
-                .filter(cartItem -> cartItem.getBookId().equals(addCartItemRequestDto.bookId()))
-                .findFirst()
-                .orElse(null);
+        Optional<CartItem> existingItem = cart.getItems().stream()
+                .filter(item -> item.getBook().getId().equals(addCartItemRequestDto.bookId()))
+                .findFirst();
 
-        if (item != null) {
+        if (existingItem.isPresent()) {
+            CartItem item = existingItem.get();
             item.setQuantity(item.getQuantity() + addCartItemRequestDto.quantity());
         } else {
-            cart.addItem(new CartItem(addCartItemRequestDto.bookId(), null, addCartItemRequestDto.quantity()));
+            Book book = bookQueryService.getByIdAvailable(addCartItemRequestDto.bookId());
+            cart.addItem(new CartItem(book, addCartItemRequestDto.quantity()));
         }
 
-        Map<UUID, CartBookView> books = fetchBooks(cart);
-        syncCartItemNames(cart, books);
-        return cartMapper.toCartDto(cartRepository.save(cart), books);
+        return toCartResponseDto(cartRepository.saveAndFlush(cart), lang);
     }
 
     @Override
     @Transactional
-    public CartResponseDto updateItem(UUID ownerId, UUID bookId, UpdateCartItemRequestDto updateCartItemRequestDto) {
-        Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
+    public CartResponseDto updateItem(
+            UUID ownerId,
+            UUID id,
+            String lang,
+            UpdateCartItemRequestDto updateCartItemRequestDto
+    ) {
+        Optional<Cart> existingCart = cartRepository.findByOwnerId(ownerId);
 
-        if (cart == null) {
+        if (existingCart.isEmpty()) {
             throw new CartItemNotFoundException();
         }
 
+        Cart cart = existingCart.get();
         CartItem item = cart.getItems().stream()
-                .filter(cartItem -> cartItem.getBookId().equals(bookId))
+                .filter(cartItem -> cartItem.getId().equals(id))
                 .findFirst()
                 .orElseThrow(CartItemNotFoundException::new);
 
         item.setQuantity(updateCartItemRequestDto.quantity());
-
-        Map<UUID, CartBookView> books = fetchBooks(cart);
-        syncCartItemNames(cart, books);
-        return cartMapper.toCartDto(cartRepository.save(cart), books);
+        return toCartResponseDto(cartRepository.saveAndFlush(cart), lang);
     }
 
     @Override
     @Transactional
-    public CartResponseDto removeItem(UUID ownerId, UUID bookId) {
-        Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
+    public CartResponseDto removeItem(UUID ownerId, UUID id, String lang) {
+        Optional<Cart> existingCart = cartRepository.findByOwnerId(ownerId);
 
-        if (cart == null) {
+        if (existingCart.isEmpty()) {
             return CartResponseDto.empty();
         }
 
-        cart.getItems().removeIf(cartItem -> cartItem.getBookId().equals(bookId));
+        Cart cart = existingCart.get();
+        CartItem item = cart.getItems().stream()
+                .filter(cartItem -> cartItem.getId().equals(id))
+                .findFirst()
+                .orElseThrow(CartItemNotFoundException::new);
 
-        Map<UUID, CartBookView> books = fetchBooks(cart);
-        syncCartItemNames(cart, books);
-        return cartMapper.toCartDto(cartRepository.save(cart), books);
+        cart.removeItem(item);
+        return toCartResponseDto(cartRepository.saveAndFlush(cart), lang);
     }
 
     @Override
     @Transactional
     public void clear(UUID ownerId) {
-        Cart cart = cartRepository.findByOwnerId(ownerId).orElse(null);
+        Optional<Cart> existingCart = cartRepository.findByOwnerId(ownerId);
 
-        if (cart == null) {
+        if (existingCart.isEmpty()) {
             return;
         }
 
-        cart.getItems().clear();
+        Cart cart = existingCart.get();
+        cart.clear();
         cartRepository.save(cart);
     }
 
-    private Map<UUID, CartBookView> fetchBooks(Cart cart) {
-        if (cart.getItems().isEmpty()) {
-            return Map.of();
-        }
+    private CartResponseDto toCartResponseDto(Cart cart, String lang) {
+        List<CartItemDto> items = cartItemRepository.findAllWithLocalizedBooks(
+                cart.getId(),
+                localizationProps.resolveLanguage(lang)
+        );
 
-        Set<UUID> bookIds = cart.getItems().stream()
-                .map(CartItem::getBookId)
-                .collect(Collectors.toSet());
+        BigDecimal totalPrice = items.stream()
+                .filter(CartItemDto::isAvailable)
+                .map(CartItemDto::subtotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return bookQueryService.getBooksForCart(bookIds);
-    }
-
-    private boolean syncCartItemNames(Cart cart, Map<UUID, CartBookView> books) {
-        boolean hasChanged = false;
-
-        for (CartItem item : cart.getItems()) {
-            CartBookView book = books.get(item.getBookId());
-
-            if (book != null && !book.getName().equals(item.getBookName())) {
-                item.setBookName(book.getName());
-                hasChanged = true;
-            }
-        }
-
-        return hasChanged;
+        return new CartResponseDto(items, totalPrice);
     }
 }

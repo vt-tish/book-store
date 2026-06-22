@@ -33,7 +33,7 @@ public class OrderSubmissionServiceImpl implements OrderSubmissionService {
     @Override
     @Transactional
     public OrderDetailsResponseDto submitByClientId(UUID clientId) {
-        CartResponseDto cartResponseDto = cartService.get(clientId);
+        CartResponseDto cartResponseDto = cartService.get(clientId, "uk");
 
         if (cartResponseDto.cartItems().isEmpty()) {
             throw new EmptyCartException();

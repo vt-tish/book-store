@@ -1,6 +1,7 @@
 package com.vttish.bookstore.books.service.impl;
 
 import com.vttish.bookstore.books.dto.*;
+import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.exception.BookNotFoundException;
 import com.vttish.bookstore.books.repository.BookRepository;
 import com.vttish.bookstore.books.service.BookQueryService;
@@ -50,14 +51,16 @@ public class BookQueryServiceImpl implements BookQueryService {
     }
 
     @Override
-    public Map<UUID, CartBookView> getBooksForCart(Set<UUID> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return Map.of();
+    public Book getByIdAvailable(UUID id) {
+        Book book = bookRepository.findById(id).orElseThrow(
+                BookNotFoundException::new
+        );
+
+        if (book.isArchived()) {
+            throw new BookNotFoundException();
         }
 
-        Set<CartBookView> prices = bookRepository.findByIdInAndIsArchivedFalse(ids, CartBookView.class);
-        return prices.stream()
-                .collect(Collectors.toMap(CartBookView::getId, view -> view));
+        return book;
     }
 
     @Override

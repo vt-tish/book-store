@@ -20,5 +20,5 @@ CREATE TABLE order_items (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
 
-    CONSTRAINT fk_book_items_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+    CONSTRAINT fk_book_items_order_id FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );
