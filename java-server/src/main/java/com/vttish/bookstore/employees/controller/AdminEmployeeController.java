@@ -72,11 +72,13 @@ public class AdminEmployeeController {
     }
 
     @PutMapping("/{id}/block")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void block(@PathVariable UUID id) {
         employeeManagementService.block(id);
     }
 
     @PutMapping("/{id}/unblock")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void unblock(@PathVariable UUID id) {
         employeeManagementService.unblock(id);
     }

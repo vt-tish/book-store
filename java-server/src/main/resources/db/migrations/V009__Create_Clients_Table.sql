@@ -1,0 +1,7 @@
+CREATE TABLE clients (
+    user_id UUID NOT NULL PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
+
+    CONSTRAINT fk_clients_users FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
