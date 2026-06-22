@@ -1,6 +1,5 @@
 package com.vttish.bookstore.employees.service.impl;
 
-import com.vttish.bookstore.auth.dto.RegisterRequestDto;
 import com.vttish.bookstore.auth.entity.User;
 import com.vttish.bookstore.auth.service.AuthService;
 import com.vttish.bookstore.employees.dto.AdminEmployeeResponseDto;

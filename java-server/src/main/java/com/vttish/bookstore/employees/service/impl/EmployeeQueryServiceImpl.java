@@ -9,10 +9,14 @@ import com.vttish.bookstore.employees.repository.EmployeeRepository;
 import com.vttish.bookstore.employees.service.EmployeeQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,7 +28,8 @@ public class EmployeeQueryServiceImpl implements EmployeeQueryService {
 
     @Override
     public Page<AdminEmployeeResponseDto> getAll(Pageable pageable) {
-        return employeeRepository.findAll(pageable).map(mapper::toAdminEmployeeDto);
+        return employeeRepository.findAll(translatePageable(pageable))
+                .map(mapper::toAdminEmployeeDto);
     }
 
     @Override
@@ -34,5 +39,25 @@ public class EmployeeQueryServiceImpl implements EmployeeQueryService {
         );
 
         return mapper.toEmployeeDto(employee);
+    }
+
+    private Pageable translatePageable(Pageable pageable) {
+        List<Sort.Order> orders = new ArrayList<>();
+
+        for (Sort.Order order : pageable.getSort()) {
+            String property = switch (order.getProperty()) {
+                case "email" -> "user.email";
+                case "isBlocked" -> "user.isBlocked";
+                default -> order.getProperty();
+            };
+
+            orders.add(order.withProperty(property));
+        }
+
+        return PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(orders)
+        );
     }
 }
