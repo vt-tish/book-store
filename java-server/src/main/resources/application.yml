@@ -17,8 +17,10 @@ spring:
 book-store:
   frontend:
     verify-url: ${FRONTEND_VERIFY_URL:http://localhost:8080/verify}
+    employee-verify-url: ${FRONTEND_EMPLOYEE_VERIFY_URL:http://localhost:8080/employees/verify}
     reset-password-url: ${FRONTEND_RESET_PASSWORD_URL:http://localhost:8080/reset-password}
   security:
+    unverified-user-ttl-days: ${UNVERIFIED_USER_TTL_DAYS:7}
     token:
       cooldown-period-ms: ${TOKEN_COOLDOWN_PERIOD_MS:180000}
       reset-password-expiration-ms: ${TOKEN_RESET_PASSWORD_EXPIRATION_MS:900000}

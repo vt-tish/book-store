@@ -24,6 +24,9 @@ public class EmailServiceImpl implements EmailService {
     @Value("${book-store.frontend.verify-url}")
     private String verifyUrl;
 
+    @Value("${book-store.frontend.employee-verify-url}")
+    private String employeeVerifyUrl;
+
     @Value("${book-store.frontend.reset-password-url}")
     private String resetPasswordUrl;
 
@@ -32,6 +35,15 @@ public class EmailServiceImpl implements EmailService {
     public void sendVerificationEmail(String email, String token) {
         Map<String, Object> variables = new HashMap<>();
         variables.put("verifyLink", verifyUrl + "?token=" + token);
+
+        sendEmail(email, "Verification", "verify-user-email", variables);
+    }
+
+    @Override
+    @Async
+    public void sendEmployeeVerificationEmail(String email, String token) {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("verifyLink", employeeVerifyUrl + "?token=" + token);
 
         sendEmail(email, "Verification", "verify-user-email", variables);
     }

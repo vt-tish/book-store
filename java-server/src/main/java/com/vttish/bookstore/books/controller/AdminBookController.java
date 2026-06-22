@@ -67,13 +67,13 @@ public class AdminBookController {
         bookManagementService.delete(id);
     }
 
-    @PatchMapping("/{id}/archive")
+    @PutMapping("/{id}/archive")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void archive(@PathVariable UUID id) {
         bookManagementService.archive(id);
     }
 
-    @PatchMapping("/{id}/unarchive")
+    @PutMapping("/{id}/unarchive")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void unarchive(@PathVariable UUID id) {
         bookManagementService.unarchive(id);

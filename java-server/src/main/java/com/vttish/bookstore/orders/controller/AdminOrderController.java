@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -39,19 +40,19 @@ public class AdminOrderController {
 
     @PatchMapping("/{id}/accept")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void acceptOrder(@PathVariable UUID id, UUID employeeId) {
+    public void acceptOrder(@PathVariable UUID id, @AuthenticationPrincipal UUID employeeId) {
         orderManagementService.accept(employeeId, id);
     }
 
     @PatchMapping("/{id}/complete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void completeOrder(@PathVariable UUID id, UUID employeeId) {
+    public void completeOrder(@PathVariable UUID id, @AuthenticationPrincipal UUID employeeId) {
         orderManagementService.complete(employeeId, id);
     }
 
     @PatchMapping("/{id}/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancelOrder(@PathVariable UUID id, UUID employeeId) {
+    public void cancelOrder(@PathVariable UUID id, @AuthenticationPrincipal UUID employeeId) {
         orderManagementService.cancel(employeeId, id);
     }
 }

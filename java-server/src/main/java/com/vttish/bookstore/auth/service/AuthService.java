@@ -1,6 +1,7 @@
 package com.vttish.bookstore.auth.service;
 
 import com.vttish.bookstore.auth.dto.*;
+import com.vttish.bookstore.auth.entity.User;
 
 public interface AuthService {
     void register(RegisterRequestDto registerRequestDto);
@@ -11,4 +12,7 @@ public interface AuthService {
     void logout(String token);
     void forgotPassword(ForgotPasswordRequestDto forgotPasswordRequestDto);
     void resetPassword(ResetPasswordRequestDto resetPasswordRequestDto);
+
+    User registerEmployee(String email, String password);
+    void verifyEmployee(String token);
 }

@@ -15,6 +15,8 @@ import com.vttish.bookstore.auth.repository.VerifyTokenRepository;
 import com.vttish.bookstore.auth.service.AuthService;
 import com.vttish.bookstore.auth.service.EmailService;
 import com.vttish.bookstore.auth.service.JwtService;
+import com.vttish.bookstore.employees.entity.Employee;
+import com.vttish.bookstore.employees.exception.EmployeeNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,43 +44,14 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public void register(RegisterRequestDto registerRequestDto) {
-        if (userRepository.findByEmail(registerRequestDto.email()).isPresent()) {
-            throw new EmailTakenException();
-        }
-
-        User user = userRepository.save(new User(
-                registerRequestDto.email(),
-                passwordEncoder.encode(registerRequestDto.password()),
-                Role.CLIENT
-        ));
-
-        VerifyToken token = new VerifyToken(
-                jwtService.generateOpaqueToken(),
-                user,
-                Instant.now().plusMillis(securityProperties.verifyTokenExpirationMs())
-        );
-
-        token = verifyTokenRepository.save(token);
+        VerifyToken token = registerWithRole(registerRequestDto.email(), registerRequestDto.password(), Role.CLIENT);
         emailService.sendVerificationEmail(registerRequestDto.email(), token.getToken());
     }
 
     @Override
     @Transactional
     public TokensDto verify(VerifyRequestDto verifyRequestDto) {
-        VerifyToken verifyToken = verifyTokenRepository.findByToken(verifyRequestDto.token())
-                .orElseThrow(InvalidTokenException::new);
-
-        if (verifyToken.isExpired()) {
-            verifyTokenRepository.delete(verifyToken);
-            throw new ExpiredTokenException();
-        }
-
-        User user = verifyToken.getUser();
-        user.verify();
-
-        user = userRepository.save(user);
-        verifyTokenRepository.delete(verifyToken);
-
+        User user = verifyUser(verifyRequestDto.token());
         return new TokensDto(generateNewRefreshToken(user), jwtService.generateAccessToken(user));
     }
 
@@ -259,6 +232,57 @@ public class AuthServiceImpl implements AuthService {
         user = userRepository.save(user);
         revokeRefreshTokensByUserId(user.getId());
         resetPasswordTokenRepository.delete(token);
+    }
+
+    @Override
+    @Transactional
+    public User registerEmployee(String email, String password) {
+        VerifyToken token = registerWithRole(email, password, Role.EMPLOYEE);
+        emailService.sendEmployeeVerificationEmail(email, token.getToken());
+        return token.getUser();
+    }
+
+    @Override
+    @Transactional
+    public void verifyEmployee(String token) {
+        verifyUser(token);
+    }
+
+    private User verifyUser(String token) {
+        VerifyToken verifyToken = verifyTokenRepository.findByToken(token)
+                .orElseThrow(InvalidTokenException::new);
+
+        if (verifyToken.isExpired()) {
+            verifyTokenRepository.delete(verifyToken);
+            throw new ExpiredTokenException();
+        }
+
+        User user = verifyToken.getUser();
+        user.verify();
+
+        user = userRepository.save(user);
+        verifyTokenRepository.delete(verifyToken);
+        return user;
+    }
+
+    private VerifyToken registerWithRole(String email, String password, Role role) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new EmailTakenException();
+        }
+
+        User user = userRepository.save(new User(
+                email,
+                passwordEncoder.encode(password),
+                role
+        ));
+
+        VerifyToken token = new VerifyToken(
+                jwtService.generateOpaqueToken(),
+                user,
+                Instant.now().plusMillis(securityProperties.verifyTokenExpirationMs())
+        );
+
+        return verifyTokenRepository.save(token);
     }
 
     public String generateNewRefreshToken(User user) {
