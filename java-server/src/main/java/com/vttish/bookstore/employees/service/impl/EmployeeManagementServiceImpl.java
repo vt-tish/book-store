@@ -59,32 +59,6 @@ public class EmployeeManagementServiceImpl implements EmployeeManagementService 
         return mapper.toAdminEmployeeDto(employeeRepository.save(employee));
     }
 
-    @Override
-    @Transactional
-    public void block(UUID employeeId) {
-        Employee employee = getEntityById(employeeId);
-
-        if (employee.getUser().isBlocked()) {
-            return;
-        }
-
-        employee.getUser().setBlocked(true);
-        employeeRepository.save(employee);
-    }
-
-    @Override
-    @Transactional
-    public void unblock(UUID employeeId) {
-        Employee employee = getEntityById(employeeId);
-
-        if (!employee.getUser().isBlocked()) {
-            return;
-        }
-
-        employee.getUser().setBlocked(false);
-        employeeRepository.save(employee);
-    }
-
     private Employee getEntityById(UUID employeeId) {
         return employeeRepository.findById(employeeId).orElseThrow(
                 EmployeeNotFoundException::new

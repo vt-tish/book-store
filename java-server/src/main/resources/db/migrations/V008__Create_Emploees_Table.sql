@@ -1,6 +1,5 @@
 CREATE TABLE employees (
-    id UUID NOT NULL PRIMARY KEY,
-    user_id UUID NOT NULL UNIQUE,
+    user_id UUID NOT NULL PRIMARY KEY,
     phone VARCHAR(20) NOT NULL UNIQUE,
     birth_date DATE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,

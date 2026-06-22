@@ -20,7 +20,7 @@ public class EmployeeController {
     private final EmployeeQueryService employeeQueryService;
 
     @GetMapping("/me")
-    public EmployeeResponseDto profile(@AuthenticationPrincipal UUID userId) {
-        return employeeQueryService.getByUserId(userId);
+    public EmployeeResponseDto profile(@AuthenticationPrincipal UUID employeeId) {
+        return employeeQueryService.getById(employeeId);
     }
 }

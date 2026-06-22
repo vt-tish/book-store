@@ -11,6 +11,4 @@ public interface EmployeeManagementService {
     void register(RegisterEmployeeRequestDto registerEmployeeRequestDto);
     void verify(VerifyEmployeeRequestDto verifyEmployeeRequestDto);
     AdminEmployeeResponseDto update(UUID employeeId, UpdateEmployeeRequestDto updateEmployeeRequestDto);
-    void block(UUID employeeId);
-    void unblock(UUID employeeId);
 }

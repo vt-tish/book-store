@@ -33,8 +33,8 @@ public class EmployeeQueryServiceImpl implements EmployeeQueryService {
     }
 
     @Override
-    public EmployeeResponseDto getByUserId(UUID userId) {
-        Employee employee = employeeRepository.findByUserId(userId).orElseThrow(
+    public EmployeeResponseDto getById(UUID id) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(
             EmployeeNotFoundException::new
         );
 

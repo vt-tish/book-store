@@ -1,5 +1,6 @@
 package com.vttish.bookstore.employees.controller;
 
+import com.vttish.bookstore.auth.service.UserService;
 import com.vttish.bookstore.common.constant.ApiRoutingConstants;
 import com.vttish.bookstore.common.dto.ResponseDto;
 import com.vttish.bookstore.employees.dto.AdminEmployeeResponseDto;
@@ -31,6 +32,7 @@ import java.util.UUID;
 public class AdminEmployeeController {
     private final EmployeeManagementService employeeManagementService;
     private final EmployeeQueryService employeeQueryService;
+    private final UserService userService;
     private final MessageSource messageSource;
 
     @PostMapping("/register")
@@ -74,12 +76,12 @@ public class AdminEmployeeController {
     @PutMapping("/{id}/block")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void block(@PathVariable UUID id) {
-        employeeManagementService.block(id);
+        userService.block(id);
     }
 
     @PutMapping("/{id}/unblock")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void unblock(@PathVariable UUID id) {
-        employeeManagementService.unblock(id);
+        userService.unblock(id);
     }
 }

@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public record AdminEmployeeResponseDto(
-        UUID userId,
+        UUID id,
         String email,
         String phone,
         LocalDate birthDate,

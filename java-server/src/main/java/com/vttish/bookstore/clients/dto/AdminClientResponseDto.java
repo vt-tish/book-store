@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record AdminClientResponseDto(
-        UUID userId,
+        UUID id,
         String email,
         Integer ordersCount,
         boolean isBlocked,

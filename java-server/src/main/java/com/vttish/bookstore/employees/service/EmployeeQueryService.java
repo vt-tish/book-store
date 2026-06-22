@@ -9,5 +9,5 @@ import java.util.UUID;
 
 public interface EmployeeQueryService {
     Page<AdminEmployeeResponseDto> getAll(Pageable pageable);
-    EmployeeResponseDto getByUserId(UUID userId);
+    EmployeeResponseDto getById(UUID id);
 }

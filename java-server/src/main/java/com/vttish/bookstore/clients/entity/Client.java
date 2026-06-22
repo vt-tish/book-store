@@ -14,12 +14,11 @@ import java.util.UUID;
 @Entity
 @Table(name = "clients")
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Client extends BaseTimestampEntity {
 
     @Id
-    UUID id;
+    private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
