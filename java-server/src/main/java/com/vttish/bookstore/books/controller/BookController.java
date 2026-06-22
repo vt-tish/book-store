@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Locale;
 import java.util.UUID;
 
 @RestController
@@ -20,12 +21,12 @@ public class BookController {
     private final BookQueryService bookQueryService;
 
     @GetMapping
-    public Page<BookCardResponseDto> getAvailable(Pageable pageable) {
-        return bookQueryService.getAvailable(pageable);
+    public Page<BookCardResponseDto> getAvailable(Pageable pageable, Locale locale) {
+        return bookQueryService.getAvailable(locale.getLanguage(), pageable);
     }
 
     @GetMapping("/{id}")
-    public BookDetailsResponseDto getById(@PathVariable UUID id) {
-        return bookQueryService.getById(id);
+    public BookDetailsResponseDto getById(@PathVariable UUID id, Locale locale) {
+        return bookQueryService.getById(id, locale.getLanguage());
     }
 }

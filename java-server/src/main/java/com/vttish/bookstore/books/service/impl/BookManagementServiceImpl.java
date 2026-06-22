@@ -3,11 +3,13 @@ package com.vttish.bookstore.books.service.impl;
 import com.vttish.bookstore.books.dto.AdminBookDetailsResponseDto;
 import com.vttish.bookstore.books.dto.BookRequestDto;
 import com.vttish.bookstore.books.entity.Book;
+import com.vttish.bookstore.books.entity.BookTranslation;
 import com.vttish.bookstore.books.exception.BookHasOrdersException;
 import com.vttish.bookstore.books.exception.BookNotFoundException;
 import com.vttish.bookstore.books.mapper.BookMapper;
 import com.vttish.bookstore.books.repository.BookRepository;
 import com.vttish.bookstore.books.service.BookManagementService;
+import com.vttish.bookstore.common.config.LocalizationProperties;
 import com.vttish.bookstore.orders.service.OrderQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,22 +22,43 @@ import java.util.UUID;
 public class BookManagementServiceImpl implements BookManagementService {
     private final BookRepository bookRepository;
     private final OrderQueryService orderQueryService;
+    private final LocalizationProperties localizationProperties;
     private final BookMapper mapper;
 
     @Override
     @Transactional
-    public AdminBookDetailsResponseDto create(BookRequestDto bookRequestDto) {
+    public AdminBookDetailsResponseDto create(String lang, BookRequestDto bookRequestDto) {
         Book book = mapper.toBook(bookRequestDto);
-        return mapper.toAminBookDetailsDto(bookRepository.save(book));
+
+        bookRequestDto.translations().forEach((langCode, translationDto) ->
+                book.addTranslation(langCode, mapper.toBookTranslation(translationDto))
+        );
+
+        return mapper.toAdminBookDetails(
+                bookRepository.save(book), lang, localizationProperties.defaultLanguage()
+        );
     }
 
     @Override
     @Transactional
-    public AdminBookDetailsResponseDto update(UUID id, BookRequestDto bookRequestDto) {
+    public AdminBookDetailsResponseDto update(UUID id, String lang, BookRequestDto bookRequestDto) {
         Book book = getEntityById(id);
 
         mapper.update(bookRequestDto, book);
-        return mapper.toAminBookDetailsDto(bookRepository.save(book));
+
+        bookRequestDto.translations().forEach((langCode, translationDto) -> {
+            BookTranslation translation = book.getTranslations().get(langCode);
+
+            if (translation != null) {
+                mapper.updateTranslation(translationDto, translation);
+            } else {
+                book.addTranslation(langCode, mapper.toBookTranslation(translationDto));
+            }
+        });
+
+        return mapper.toAdminBookDetails(
+                bookRepository.save(book), lang, localizationProperties.defaultLanguage()
+        );
     }
 
     @Override

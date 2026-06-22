@@ -3,19 +3,16 @@ package com.vttish.bookstore.books.dto;
 import com.vttish.bookstore.books.entity.enums.AgeGroup;
 import com.vttish.bookstore.books.entity.enums.Language;
 import com.vttish.bookstore.common.validation.ImageUrl;
+import com.vttish.bookstore.common.validation.SupportedTranslations;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 public record BookRequestDto(
-        @NotBlank(message = "{error.validation.required}")
-        @Size(max = 255, message = "{error.validation.max_length}")
-        String name,
-
-        @NotBlank(message = "{error.validation.required}")
-        @Size(max = 100, message = "{error.validation.max_length}")
-        String genre,
 
         @Size(max = 2048, message = "{error.validation.max_length}")
         @ImageUrl(message = "{error.validation.image_url}")
@@ -33,20 +30,13 @@ public record BookRequestDto(
         @PastOrPresent(message = "{error.validation.past_or_present}")
         LocalDate publicationDate,
 
-        @NotBlank(message = "{error.validation.required}")
-        @Size(max = 255, message = "{error.validation.max_length}")
-        String author,
-
         @NotNull(message = "{error.validation.required}")
         @Min(value = 5, message = "{error.validation.min_value}")
         Integer pages,
 
-        @Size(max = 2000, message = "{error.validation.max_length}")
-        String characteristics,
-
-        @Size(max = 5000, message = "{error.validation.max_length}")
-        String description,
-
         @NotNull(message = "{error.validation.required}")
-        Language language
+        Language language,
+
+        @SupportedTranslations
+        Map<String, @Valid BookTranslationDto> translations
 ) {}

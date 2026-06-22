@@ -15,6 +15,11 @@ spring:
             required: true
 
 book-store:
+  localization:
+    default-language: en
+    supported-languages:
+      - en
+      - uk
   frontend:
     verify-url: ${FRONTEND_VERIFY_URL:http://localhost:8080/verify}
     employee-verify-url: ${FRONTEND_EMPLOYEE_VERIFY_URL:http://localhost:8080/employees/verify}

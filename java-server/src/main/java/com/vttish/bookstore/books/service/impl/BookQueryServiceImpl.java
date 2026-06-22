@@ -1,11 +1,10 @@
 package com.vttish.bookstore.books.service.impl;
 
 import com.vttish.bookstore.books.dto.*;
-import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.exception.BookNotFoundException;
-import com.vttish.bookstore.books.mapper.BookMapper;
 import com.vttish.bookstore.books.repository.BookRepository;
 import com.vttish.bookstore.books.service.BookQueryService;
+import com.vttish.bookstore.common.config.LocalizationProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,26 +19,34 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookQueryServiceImpl implements BookQueryService {
     private final BookRepository bookRepository;
-    private final BookMapper mapper;
+    private final LocalizationProperties localizationProps;
 
     @Override
-    public Page<BookCardResponseDto> getAvailable(Pageable pageable) {
-        return bookRepository.findAllByIsArchivedFalse(pageable).map(mapper::toBookCardDto);
+    public Page<BookCardResponseDto> getAvailable(String lang, Pageable pageable) {
+        return bookRepository.findAllIsArchivedFalseCards(
+                localizationProps.resolveLanguage(lang), pageable
+        );
     }
 
     @Override
-    public Page<AdminBookCardResponseDto> getAll(Pageable pageable) {
-        return bookRepository.findAll(pageable).map(mapper::toAdminBookCardDto);
+    public Page<AdminBookCardResponseDto> getAll(String lang, Pageable pageable) {
+        return bookRepository.findAllAdminCards(
+                localizationProps.resolveLanguage(lang), pageable
+        );
     }
 
     @Override
-    public BookDetailsResponseDto getById(UUID id) {
-        return mapper.toBookDetailsDto(getEntityById(id));
+    public BookDetailsResponseDto getById(UUID id, String lang) {
+        return bookRepository.findByIdDetails(
+                id, localizationProps.resolveLanguage(lang)
+        ).orElseThrow(BookNotFoundException::new);
     }
 
     @Override
-    public AdminBookDetailsResponseDto getByIdAdmin(UUID id) {
-        return mapper.toAminBookDetailsDto(getEntityById(id));
+    public AdminBookDetailsResponseDto getByIdAdmin(UUID id, String lang) {
+        return bookRepository.findByIdAdminDetails(
+                id, localizationProps.resolveLanguage(lang)
+        ).orElseThrow(BookNotFoundException::new);
     }
 
     @Override
@@ -49,7 +56,6 @@ public class BookQueryServiceImpl implements BookQueryService {
         }
 
         Set<CartBookView> prices = bookRepository.findByIdInAndIsArchivedFalse(ids, CartBookView.class);
-
         return prices.stream()
                 .collect(Collectors.toMap(CartBookView::getId, view -> view));
     }
@@ -64,9 +70,5 @@ public class BookQueryServiceImpl implements BookQueryService {
 
         return bookViews.stream()
                 .collect(Collectors.toMap(OrderBookView::getId, view -> view));
-    }
-
-    private Book getEntityById(UUID id) {
-        return bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
     }
 }

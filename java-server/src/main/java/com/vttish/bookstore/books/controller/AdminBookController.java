@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Locale;
 import java.util.UUID;
 
 @RestController
@@ -31,9 +32,12 @@ public class AdminBookController {
 
     @PostMapping
     public ResponseEntity<AdminBookDetailsResponseDto> create(
-            @Valid @RequestBody BookRequestDto bookRequestDto
+            @Valid @RequestBody BookRequestDto bookRequestDto,
+            Locale locale
     ) {
-        AdminBookDetailsResponseDto createdBook = bookManagementService.create(bookRequestDto);
+        AdminBookDetailsResponseDto createdBook = bookManagementService.create(
+                locale.getLanguage(), bookRequestDto
+        );
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -45,20 +49,22 @@ public class AdminBookController {
     }
 
     @GetMapping
-    public Page<AdminBookCardResponseDto> getAll(Pageable pageable) {
-        return bookQueryService.getAll(pageable);
+    public Page<AdminBookCardResponseDto> getAll(Pageable pageable, Locale locale) {
+        return bookQueryService.getAll(locale.getLanguage(), pageable);
     }
 
-    @GetMapping("{id}")
-    public AdminBookDetailsResponseDto getById(@PathVariable UUID id) {
-        return bookQueryService.getByIdAdmin(id);
+    @GetMapping("/{id}")
+    public AdminBookDetailsResponseDto getById(@PathVariable UUID id, Locale locale) {
+        return bookQueryService.getByIdAdmin(id, locale.getLanguage());
     }
 
     @PutMapping("/{id}")
     public AdminBookDetailsResponseDto update(
-            @PathVariable UUID id, @Valid @RequestBody BookRequestDto bookRequestDto
+            @PathVariable UUID id,
+            @Valid @RequestBody BookRequestDto bookRequestDto,
+            Locale locale
     ) {
-        return bookManagementService.update(id, bookRequestDto);
+        return bookManagementService.update(id, locale.getLanguage(), bookRequestDto);
     }
 
     @DeleteMapping("/{id}")
