@@ -25,7 +25,6 @@ book-store:
     employee-verify-url: ${FRONTEND_EMPLOYEE_VERIFY_URL:http://localhost:8080/employees/verify}
     reset-password-url: ${FRONTEND_RESET_PASSWORD_URL:http://localhost:8080/reset-password}
   security:
-    unverified-user-ttl-days: ${UNVERIFIED_USER_TTL_DAYS:7}
     token:
       cooldown-period-ms: ${TOKEN_COOLDOWN_PERIOD_MS:180000}
       reset-password-expiration-ms: ${TOKEN_RESET_PASSWORD_EXPIRATION_MS:900000}
@@ -38,4 +37,7 @@ book-store:
         expiration-ms: ${JWT_ACCESS_TOKEN_EXPIRATION_MS:900000}
         secret-key: ${JWT_SECRET:YmVsaWV2ZWR0ZW50Y292ZXJvbGRlc3RvY2N1cm5vZGRlZGNpdGl6ZW50b29rc29sYXI=}
   scheduler:
-    cleanup-cron: ${CLEANUP_CRON:0 0 0 * * *}
+    cleanup:
+      cart-ttl-days: 30
+      unverified-user-ttl-days: ${UNVERIFIED_USER_TTL_DAYS:7}
+      cron: ${CLEANUP_CRON:0 0 0 * * *}

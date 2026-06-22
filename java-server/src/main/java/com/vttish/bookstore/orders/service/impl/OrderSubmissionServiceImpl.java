@@ -4,7 +4,7 @@ import com.vttish.bookstore.books.dto.OrderBookView;
 import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.cart.dto.CartResponseDto;
 import com.vttish.bookstore.cart.dto.CartItemDto;
-import com.vttish.bookstore.cart.service.CartService;
+import com.vttish.bookstore.cart.service.CartManagementService;
 import com.vttish.bookstore.orders.dto.OrderDetailsResponseDto;
 import com.vttish.bookstore.orders.entity.OrderItem;
 import com.vttish.bookstore.orders.entity.Order;
@@ -26,14 +26,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderSubmissionServiceImpl implements OrderSubmissionService {
     private final OrderRepository orderRepository;
-    private final CartService cartService;
+    private final CartManagementService cartManagementService;
     private final BookQueryService bookQueryService;
     private final OrderMapper mapper;
 
     @Override
     @Transactional
     public OrderDetailsResponseDto submitByClientId(UUID clientId) {
-        CartResponseDto cartResponseDto = cartService.get(clientId, "uk");
+        CartResponseDto cartResponseDto = cartManagementService.get(clientId, "uk");
 
         if (cartResponseDto.cartItems().isEmpty()) {
             throw new EmptyCartException();
@@ -65,7 +65,7 @@ public class OrderSubmissionServiceImpl implements OrderSubmissionService {
             ));
         }
 
-        cartService.clear(clientId);
+        cartManagementService.clear(clientId);
         return mapper.toOrderDetailsDto(orderRepository.save(order));
     }
 }

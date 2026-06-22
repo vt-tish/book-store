@@ -9,6 +9,7 @@ import com.vttish.bookstore.books.exception.BookNotFoundException;
 import com.vttish.bookstore.books.mapper.BookMapper;
 import com.vttish.bookstore.books.repository.BookRepository;
 import com.vttish.bookstore.books.service.BookManagementService;
+import com.vttish.bookstore.cart.service.CartQueryService;
 import com.vttish.bookstore.common.config.LocalizationProperties;
 import com.vttish.bookstore.orders.service.OrderQueryService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class BookManagementServiceImpl implements BookManagementService {
     private final BookRepository bookRepository;
     private final OrderQueryService orderQueryService;
+    private final CartQueryService cartQueryService;
     private final LocalizationProperties localizationProperties;
     private final BookMapper mapper;
 
@@ -66,6 +68,10 @@ public class BookManagementServiceImpl implements BookManagementService {
     public void delete(UUID id) {
         if (orderQueryService.hasBookBeenOrdered(id)) {
             throw new BookHasOrdersException();
+        }
+
+        if (cartQueryService.containsBook(id)) {
+            throw new BookWithinCartException();
         }
 
         bookRepository.deleteById(id);

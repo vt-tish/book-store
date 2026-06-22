@@ -3,7 +3,7 @@ package com.vttish.bookstore.cart.controller;
 import com.vttish.bookstore.cart.dto.AddCartItemRequestDto;
 import com.vttish.bookstore.cart.dto.CartResponseDto;
 import com.vttish.bookstore.cart.dto.UpdateCartItemRequestDto;
-import com.vttish.bookstore.cart.service.CartService;
+import com.vttish.bookstore.cart.service.CartManagementService;
 import com.vttish.bookstore.common.constant.ApiRoutingConstants;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +22,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('CLIENT')")
 public class CartController {
-    private final CartService cartService;
+    private final CartManagementService cartManagementService;
 
     @GetMapping
     public CartResponseDto getCart(@AuthenticationPrincipal UUID ownerId, Locale locale) {
-        return cartService.get(ownerId, locale.getLanguage());
+        return cartManagementService.get(ownerId, locale.getLanguage());
     }
 
     @PostMapping("/items")
@@ -35,7 +35,7 @@ public class CartController {
             @Valid @RequestBody AddCartItemRequestDto addCartItemRequestDto,
             Locale locale
     ) {
-        return cartService.addItem(ownerId, locale.getLanguage(), addCartItemRequestDto);
+        return cartManagementService.addItem(ownerId, locale.getLanguage(), addCartItemRequestDto);
     }
 
     @PutMapping("/items/{id}")
@@ -45,7 +45,7 @@ public class CartController {
             @Valid @RequestBody UpdateCartItemRequestDto updateCartItemRequestDto,
             Locale locale
     ) {
-        return cartService.updateItem(ownerId, id, locale.getLanguage(), updateCartItemRequestDto);
+        return cartManagementService.updateItem(ownerId, id, locale.getLanguage(), updateCartItemRequestDto);
     }
 
     @DeleteMapping("/items/{id}")
@@ -54,12 +54,12 @@ public class CartController {
             @PathVariable UUID id,
             Locale locale
     ) {
-        return cartService.removeItem(ownerId, id, locale.getLanguage());
+        return cartManagementService.removeItem(ownerId, id, locale.getLanguage());
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void clearCart(@AuthenticationPrincipal UUID ownerId) {
-        cartService.clear(ownerId);
+        cartManagementService.clear(ownerId);
     }
 }

@@ -51,6 +51,6 @@ public class OrderQueryServiceImpl implements OrderQueryService {
 
     @Override
     public boolean hasBookBeenOrdered(UUID bookId) {
-        return orderRepository.hasBookBeenOrdered(bookId);
+        return orderRepository.existsByBookId(bookId);
     }
 }

@@ -38,21 +38,24 @@ public class AdminOrderController {
         return orderQueryService.getById(id);
     }
 
-    @PatchMapping("/{id}/accept")
+    @PutMapping("/{id}/accept")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void acceptOrder(@PathVariable UUID id, @AuthenticationPrincipal UUID employeeId) {
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public void acceptOrder(@AuthenticationPrincipal UUID employeeId, @PathVariable UUID id) {
         orderManagementService.accept(employeeId, id);
     }
 
-    @PatchMapping("/{id}/complete")
+    @PutMapping("/{id}/complete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void completeOrder(@PathVariable UUID id, @AuthenticationPrincipal UUID employeeId) {
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public void completeOrder(@AuthenticationPrincipal UUID employeeId, @PathVariable UUID id) {
         orderManagementService.complete(employeeId, id);
     }
 
-    @PatchMapping("/{id}/cancel")
+    @PutMapping("/{id}/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void cancelOrder(@PathVariable UUID id, @AuthenticationPrincipal UUID employeeId) {
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public void cancelOrder(@AuthenticationPrincipal UUID employeeId, @PathVariable UUID id) {
         orderManagementService.cancel(employeeId, id);
     }
 }

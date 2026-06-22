@@ -24,6 +24,6 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
             Pageable pageable
     );
 
-    @Query("SELECT COUNT(o) > 0 FROM Order o JOIN o.items item WHERE item.bookId = :bookId")
-    boolean hasBookBeenOrdered(@Param("bookId") UUID bookId);
+    @Query("SELECT COUNT(o) > 0 FROM Order o JOIN o.items it WHERE it.bookId = :bookId")
+    boolean existsByBookId(@Param("bookId") UUID bookId);
 }

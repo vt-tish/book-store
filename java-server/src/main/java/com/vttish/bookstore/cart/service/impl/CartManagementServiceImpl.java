@@ -12,7 +12,7 @@ import com.vttish.bookstore.cart.exception.CartItemNotFoundException;
 import com.vttish.bookstore.cart.repository.CartItemRepository;
 import com.vttish.bookstore.cart.repository.CartRepository;
 import com.vttish.bookstore.cart.service.CartInitializer;
-import com.vttish.bookstore.cart.service.CartService;
+import com.vttish.bookstore.cart.service.CartManagementService;
 import com.vttish.bookstore.common.config.LocalizationProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -25,7 +25,7 @@ import java.util.*;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class CartServiceImpl implements CartService {
+public class CartManagementServiceImpl implements CartManagementService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final BookQueryService bookQueryService;
