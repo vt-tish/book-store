@@ -18,6 +18,7 @@ import com.vttish.bookstore.auth.service.JwtService;
 import com.vttish.bookstore.employees.entity.Employee;
 import com.vttish.bookstore.employees.exception.EmployeeNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -91,7 +93,9 @@ public class AuthServiceImpl implements AuthService {
         try {
             token = verifyTokenRepository.saveAndFlush(token);
             emailService.sendVerificationEmail(user.getEmail(), token.getToken());
-        } catch (DataIntegrityViolationException ignored) {}
+        } catch (DataIntegrityViolationException ignored) {
+            log.warn("Concurrent verify token creation, token exists");
+        }
     }
 
     @Override
@@ -209,7 +213,9 @@ public class AuthServiceImpl implements AuthService {
         try {
             token = resetPasswordTokenRepository.saveAndFlush(token);
             emailService.sendPasswordResetEmail(user.getEmail(), token.getToken());
-        } catch (DataIntegrityViolationException ignored) {}
+        } catch (DataIntegrityViolationException ignored) {
+            log.warn("Concurrent reset password toke creation, token exists");
+        }
     }
 
     @Override
