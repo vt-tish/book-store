@@ -1,6 +1,5 @@
 package com.vttish.bookstore.orders.controller;
 
-import com.vttish.bookstore.auth.entity.enums.Role;
 import com.vttish.bookstore.common.constant.ApiRoutingConstants;
 import com.vttish.bookstore.orders.dto.AdminOrderCardResponseDto;
 import com.vttish.bookstore.orders.dto.AdminOrderDetailsResponseDto;
@@ -12,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,23 +27,12 @@ public class AdminOrderController {
 
     @GetMapping
     public Page<AdminOrderCardResponseDto> getAll(
-            @AuthenticationPrincipal UUID userId,
-            Authentication authentication,
             @RequestParam(required = false) UUID employeeId,
             @RequestParam(required = false) OrderStatus status,
             Pageable pageable
     ) {
-        boolean isEmployee = authentication.getAuthorities().stream()
-                .anyMatch(auth ->
-                        auth.getAuthority().equals("ROLE_" + Role.EMPLOYEE.name())
-                );
-
-        if (isEmployee) {
-            if (status == OrderStatus.PENDING) {
-                employeeId = null;
-            } else {
-                employeeId = userId;
-            }
+        if (status == null) {
+            status = OrderStatus.PENDING;
         }
 
         return orderQueryService.getAll(employeeId, status, pageable);

@@ -266,15 +266,16 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private VerifyToken registerWithRole(String email, String password, Role role) {
-        if (userRepository.findByEmail(email).isPresent()) {
+        User user;
+        try {
+            user = userRepository.saveAndFlush(new User(
+                    email,
+                    passwordEncoder.encode(password),
+                    role
+            ));
+        } catch (DataIntegrityViolationException ex) {
             throw new EmailTakenException();
         }
-
-        User user = userRepository.save(new User(
-                email,
-                passwordEncoder.encode(password),
-                role
-        ));
 
         VerifyToken token = new VerifyToken(
                 jwtService.generateOpaqueToken(),
@@ -285,7 +286,7 @@ public class AuthServiceImpl implements AuthService {
         return verifyTokenRepository.save(token);
     }
 
-    public String generateNewRefreshToken(User user) {
+    private String generateNewRefreshToken(User user) {
         RefreshToken refreshToken = refreshTokenRepository.save(new RefreshToken(
                 jwtService.generateOpaqueToken(),
                 user,

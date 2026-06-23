@@ -35,7 +35,7 @@ book-store:
         grace-period-ms: ${JWT_REFRESH_TOKEN_GRACE_PERIOD_MS:15000}
       access-token:
         expiration-ms: ${JWT_ACCESS_TOKEN_EXPIRATION_MS:900000}
-        secret-key: ${JWT_SECRET:YmVsaWV2ZWR0ZW50Y292ZXJvbGRlc3RvY2N1cm5vZGRlZGNpdGl6ZW50b29rc29sYXI=}
+        secret-key: ${JWT_SECRET}
   scheduler:
     cleanup:
       cart-ttl-days: 30

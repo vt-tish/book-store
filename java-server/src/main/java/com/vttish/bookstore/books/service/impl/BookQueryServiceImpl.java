@@ -4,7 +4,7 @@ import com.vttish.bookstore.books.dto.*;
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.exception.BookNotFoundException;
 import com.vttish.bookstore.books.mapper.BookMapper;
-import com.vttish.bookstore.books.mapper.BookSpecifications;
+import com.vttish.bookstore.books.repository.BookSpecifications;
 import com.vttish.bookstore.books.repository.BookRepository;
 import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.common.config.LocalizationProperties;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)

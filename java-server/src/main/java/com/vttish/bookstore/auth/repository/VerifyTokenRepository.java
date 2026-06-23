@@ -10,6 +10,6 @@ import java.util.UUID;
 
 public interface VerifyTokenRepository extends BaseTokenRepository<VerifyToken> {
 
-    @Query("SELECT r FROM ResetPasswordToken r WHERE r.user.id = :userId")
+    @Query("SELECT v FROM VerifyToken v WHERE v.user.id = :userId")
     Optional<VerifyToken> findByUserId(@Param("userId") UUID userId);
 }

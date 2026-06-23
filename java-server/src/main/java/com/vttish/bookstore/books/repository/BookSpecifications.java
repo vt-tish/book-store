@@ -1,10 +1,10 @@
-package com.vttish.bookstore.books.mapper;
+package com.vttish.bookstore.books.repository;
 
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.entity.BookTranslation;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.ArrayList;
@@ -22,17 +22,26 @@ public class BookSpecifications {
             }
 
             String[] keywords = query.trim().toLowerCase().split("\\s+");
-            Join<Book, BookTranslation> translations = root.join("translations", JoinType.LEFT);
-            q.distinct(true);
-
             List<Predicate> predicates = new ArrayList<>();
-            for (String keyword : keywords) {
-                String pattern = "%" + keyword+ "%";
 
-                predicates.add(cb.or(
-                        cb.like(cb.lower(translations.get("name")), pattern),
-                        cb.like(cb.lower(translations.get("author")), pattern)
-                ));
+            for (String keyword : keywords) {
+                String pattern = "%" + keyword + "%";
+
+                Subquery<BookTranslation> subquery = q.subquery(BookTranslation.class);
+                Root<BookTranslation> translation = subquery.from(BookTranslation.class);
+                subquery.select(translation);
+
+                subquery.select(translation).where(
+                        cb.and(
+                                cb.equal(translation.get("book"), root),
+                                cb.or(
+                                        cb.like(cb.lower(translation.get("name")), pattern),
+                                        cb.like(cb.lower(translation.get("author")), pattern)
+                                )
+                        )
+                );
+
+                predicates.add(cb.exists(subquery));
             }
 
             return cb.and(predicates.toArray(Predicate[]::new));

@@ -9,6 +9,7 @@ import com.vttish.bookstore.cart.dto.UpdateCartItemRequestDto;
 import com.vttish.bookstore.cart.entity.Cart;
 import com.vttish.bookstore.cart.entity.CartItem;
 import com.vttish.bookstore.cart.exception.CartItemNotFoundException;
+import com.vttish.bookstore.cart.exception.CartNotFoundException;
 import com.vttish.bookstore.cart.repository.CartItemRepository;
 import com.vttish.bookstore.cart.repository.CartRepository;
 import com.vttish.bookstore.cart.service.CartInitializer;
@@ -49,7 +50,7 @@ public class CartManagementServiceImpl implements CartManagementService {
             cart = cartInitializer.getOrCreate(ownerId);
         } catch (DataIntegrityViolationException ex) {
             cart = cartRepository.findByOwnerId(ownerId).orElseThrow(
-                    CartItemNotFoundException::new
+                    CartNotFoundException::new
             );
         }
 

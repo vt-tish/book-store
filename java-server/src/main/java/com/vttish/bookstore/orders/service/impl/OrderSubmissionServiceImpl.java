@@ -48,15 +48,16 @@ public class OrderSubmissionServiceImpl implements OrderSubmissionService {
         });
 
         BigDecimal totalPrice = cart.getItems().stream()
-                .map(item -> item.getBook().getPrice())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(item -> item.getBook().getPrice().multiply(
+                        BigDecimal.valueOf(item.getQuantity())
+                )).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Order order = new Order(userService.getRefById(clientId), totalPrice);
 
         for (CartItem item : cart.getItems()) {
             order.addItem(new OrderItem(
                     item.getBook(),
-                    item.getBook().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())),
+                    item.getBook().getPrice(),
                     item.getQuantity()
             ));
         }
