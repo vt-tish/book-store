@@ -20,8 +20,8 @@ public class CartCleanupScheduler {
 
     @Scheduled(cron = "${book-store.scheduler.cleanup.cron}")
     @Transactional
-    public void cleanupCarts() {
+    public Integer cleanupCarts() {
         Instant cutoffTime = Instant.now().minus(cartTtlDays, ChronoUnit.DAYS);
-        int deleted = cartRepository.deleteOlderThan(cutoffTime);
+        return cartRepository.deleteOlderThan(cutoffTime);
     }
 }

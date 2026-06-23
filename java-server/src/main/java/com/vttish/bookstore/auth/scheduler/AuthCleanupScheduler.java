@@ -24,20 +24,20 @@ public class AuthCleanupScheduler {
 
     @Scheduled(cron = "${book-store.scheduler.cleanup.cron}")
     @Transactional
-    public void cleanupRefreshTokens() {
-        int deleted = refreshTokenRepository.deleteAllExpired();
+    public Integer cleanupRefreshTokens() {
+        return refreshTokenRepository.deleteAllExpired();
     }
 
     @Scheduled(cron = "${book-store.scheduler.cleanup.cron}")
     @Transactional
-    public void cleanupUnverifiedUsers() {
+    public Integer cleanupUnverifiedUsers() {
         Instant cutoffTime = Instant.now().minus(unverifiedUserTtlDays, ChronoUnit.DAYS);
-        int deleted = userRepository.deleteUnverifiedOlderThan(cutoffTime);
+        return userRepository.deleteUnverifiedOlderThan(cutoffTime);
     }
 
     @Scheduled(cron = "${book-store.scheduler.cleanup.cron}")
     @Transactional
-    public void cleanupResetPasswordTokens() {
-        int deleted = resetPasswordTokenRepository.deleteAllExpired();
+    public Integer cleanupResetPasswordTokens() {
+        return resetPasswordTokenRepository.deleteAllExpired();
     }
 }
