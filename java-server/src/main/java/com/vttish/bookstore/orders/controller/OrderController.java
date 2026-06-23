@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Locale;
 import java.util.UUID;
 
 @RestController
@@ -26,8 +27,13 @@ public class OrderController {
     private final OrderSubmissionService orderSubmissionService;
 
     @PostMapping
-    public ResponseEntity<OrderDetailsResponseDto> submit(@AuthenticationPrincipal UUID clientId) {
-        OrderDetailsResponseDto createdOrder = orderSubmissionService.submitByClientId(clientId);
+    public ResponseEntity<OrderDetailsResponseDto> submit(
+            @AuthenticationPrincipal UUID clientId,
+            Locale locale
+    ) {
+        OrderDetailsResponseDto createdOrder = orderSubmissionService.submitByClientId(
+                clientId, locale.getLanguage()
+        );
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -40,7 +46,8 @@ public class OrderController {
 
     @GetMapping
     public Page<OrderCardResponseDto> getAll(
-            @AuthenticationPrincipal UUID clientId, Pageable pageable
+            @AuthenticationPrincipal UUID clientId,
+            Pageable pageable
     ) {
         return orderQueryService.getByClientId(clientId, pageable);
     }
@@ -48,8 +55,9 @@ public class OrderController {
     @GetMapping("/{id}")
     public OrderDetailsResponseDto get(
             @AuthenticationPrincipal UUID clientId,
-            @PathVariable UUID id
+            @PathVariable UUID id,
+            Locale locale
     ) {
-        return orderQueryService.getByIdAndClientId(id, clientId);
+        return orderQueryService.getByIdAndClientId(id, clientId, locale.getLanguage());
     }
 }

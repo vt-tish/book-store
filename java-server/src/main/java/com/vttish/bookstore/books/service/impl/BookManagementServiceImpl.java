@@ -6,6 +6,7 @@ import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.entity.BookTranslation;
 import com.vttish.bookstore.books.exception.BookHasOrdersException;
 import com.vttish.bookstore.books.exception.BookNotFoundException;
+import com.vttish.bookstore.books.exception.BookWithinCartException;
 import com.vttish.bookstore.books.mapper.BookMapper;
 import com.vttish.bookstore.books.repository.BookRepository;
 import com.vttish.bookstore.books.service.BookManagementService;

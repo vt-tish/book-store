@@ -16,6 +16,11 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
+    public User getRefById(UUID id) {
+        return userRepository.getReferenceById(id);
+    }
+
+    @Override
     @Transactional
     public void block(UUID userId) {
         User user = getEntityById(userId);

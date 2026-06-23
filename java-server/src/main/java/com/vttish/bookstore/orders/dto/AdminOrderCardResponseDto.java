@@ -6,8 +6,12 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-public record OrderCardResponseDto(
+public record AdminOrderCardResponseDto(
         UUID id,
+        UUID clientId,
+        String clientEmail,
+        UUID employeeId,
+        String employeeEmail,
         BigDecimal totalPrice,
         Integer totalItems,
         OrderStatus status,

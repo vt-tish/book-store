@@ -1,5 +1,7 @@
 package com.vttish.bookstore.cart.service.impl;
 
+import com.vttish.bookstore.cart.entity.Cart;
+import com.vttish.bookstore.cart.exception.CartNotFoundException;
 import com.vttish.bookstore.cart.repository.CartRepository;
 import com.vttish.bookstore.cart.service.CartQueryService;
 import lombok.RequiredArgsConstructor;
@@ -17,5 +19,12 @@ public class CartQueryServiceImpl implements CartQueryService {
     @Override
     public boolean containsBook(UUID bookId) {
         return cartRepository.existsByBookId(bookId);
+    }
+
+    @Override
+    public Cart getCartForSubmission(UUID ownerId) {
+        return cartRepository.findFullByOwnerId(ownerId).orElseThrow(
+                CartNotFoundException::new
+        );
     }
 }

@@ -12,10 +12,10 @@ import java.time.temporal.ChronoUnit;
 
 @Component
 @RequiredArgsConstructor
-public class CleanupScheduler {
+public class CartCleanupScheduler {
     private final CartRepository cartRepository;
 
-    @Value("${book-store.scheduler.cleanup.cart-ttl-day}")
+    @Value("${book-store.scheduler.cleanup.cart-ttl-days}")
     private Long cartTtlDays;
 
     @Scheduled(cron = "${book-store.scheduler.cleanup.cron}")

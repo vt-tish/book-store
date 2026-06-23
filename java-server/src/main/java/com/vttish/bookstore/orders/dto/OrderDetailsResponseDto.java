@@ -9,11 +9,9 @@ import java.util.UUID;
 
 public record OrderDetailsResponseDto(
         UUID id,
-        UUID clientId,
-        UUID employeeId,
         BigDecimal totalPrice,
         OrderStatus status,
         Instant createdAt,
         Instant closedAt,
-        List<OrderItemDto> bookItems
+        List<OrderItemDto> items
 ) {}

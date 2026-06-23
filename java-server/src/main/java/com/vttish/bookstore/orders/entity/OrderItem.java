@@ -1,5 +1,6 @@
 package com.vttish.bookstore.orders.entity;
 
+import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -8,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Entity
 @Table(name = "order_items")
@@ -18,20 +18,18 @@ public class OrderItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
-    @Setter(value = AccessLevel.PACKAGE)
+    @Setter
     private Order order;
 
-    private UUID bookId;
-    private String bookName;
-    private String bookAuthor;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Book book;
+
     private BigDecimal pricePerUnit;
 
     private Integer quantity;
 
-    public OrderItem(UUID bookId, String bookName, String bookAuthor, BigDecimal pricePerUnit, Integer quantity) {
-        this.bookId = bookId;
-        this.bookName = bookName;
-        this.bookAuthor = bookAuthor;
+    public OrderItem(Book book, BigDecimal pricePerUnit, Integer quantity) {
+        this.book = book;
         this.pricePerUnit = pricePerUnit;
         this.quantity = quantity;
     }

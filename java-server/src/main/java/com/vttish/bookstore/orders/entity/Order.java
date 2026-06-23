@@ -1,5 +1,6 @@
 package com.vttish.bookstore.orders.entity;
 
+import com.vttish.bookstore.auth.entity.User;
 import com.vttish.bookstore.common.entity.BaseEntity;
 import com.vttish.bookstore.orders.entity.enums.OrderStatus;
 import com.vttish.bookstore.orders.exception.InvalidOrderStateException;
@@ -20,8 +21,15 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
-    private UUID clientId;
-    private UUID employeeId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id")
+    private User client;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id")
+    private User employee;
+
     private BigDecimal totalPrice;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -32,8 +40,8 @@ public class Order extends BaseEntity {
 
     private Instant closedAt;
 
-    public Order(UUID clientId, BigDecimal totalPrice) {
-        this.clientId = clientId;
+    public Order(User client, BigDecimal totalPrice) {
+        this.client = client;
         this.totalPrice = totalPrice;
     }
 
@@ -42,21 +50,21 @@ public class Order extends BaseEntity {
         orderItem.setOrder(this);
     }
 
-    public void accept(UUID employeeId) {
+    public void accept(User employee) {
         if (status != OrderStatus.PENDING) {
             throw new InvalidOrderStateException(status.name());
         }
 
         status = OrderStatus.ACCEPTED;
-        this.employeeId = employeeId;
+        this.employee = employee;
     }
 
-    public void cancel(UUID employeeId) {
+    public void cancel(User employee) {
         if (status != OrderStatus.ACCEPTED) {
             throw new InvalidOrderStateException(status.name());
         }
 
-        if (this.employeeId == null || !this.employeeId.equals(employeeId)) {
+        if (this.employee == null || !this.employee.getId().equals(employee.getId())) {
             throw new OrderEmployeeMismatchException();
         }
 
@@ -64,12 +72,12 @@ public class Order extends BaseEntity {
         closedAt = Instant.now();
     }
 
-    public void complete(UUID employeeId) {
+    public void complete(User employee) {
         if (status != OrderStatus.ACCEPTED) {
             throw new InvalidOrderStateException(status.name());
         }
 
-        if (this.employeeId == null || !this.employeeId.equals(employeeId)) {
+        if (this.employee == null || !this.employee.getId().equals(employee.getId())) {
             throw new OrderEmployeeMismatchException();
         }
 

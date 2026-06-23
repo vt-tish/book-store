@@ -125,6 +125,17 @@ public class CartManagementServiceImpl implements CartManagementService {
         cartRepository.save(cart);
     }
 
+    @Override
+    @Transactional
+    public void clear(Cart cart) {
+        if (cart.getItems().isEmpty()) {
+            return;
+        }
+
+        cart.clear();
+        cartRepository.save(cart);
+    }
+
     private CartResponseDto toCartResponseDto(Cart cart, String lang) {
         List<CartItemDto> items = cartItemRepository.findAllWithLocalizedBooks(
                 cart.getId(),

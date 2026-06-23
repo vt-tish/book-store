@@ -1,8 +1,9 @@
 package com.vttish.bookstore.orders.controller;
 
+import com.vttish.bookstore.auth.entity.enums.Role;
 import com.vttish.bookstore.common.constant.ApiRoutingConstants;
-import com.vttish.bookstore.orders.dto.OrderCardResponseDto;
-import com.vttish.bookstore.orders.dto.OrderDetailsResponseDto;
+import com.vttish.bookstore.orders.dto.AdminOrderCardResponseDto;
+import com.vttish.bookstore.orders.dto.AdminOrderDetailsResponseDto;
 import com.vttish.bookstore.orders.entity.enums.OrderStatus;
 import com.vttish.bookstore.orders.service.OrderManagementService;
 import com.vttish.bookstore.orders.service.OrderQueryService;
@@ -11,9 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Locale;
 import java.util.UUID;
 
 @RestController
@@ -25,17 +28,32 @@ public class AdminOrderController {
     private final OrderQueryService orderQueryService;
 
     @GetMapping
-    public Page<OrderCardResponseDto> getAll(
+    public Page<AdminOrderCardResponseDto> getAll(
+            @AuthenticationPrincipal UUID userId,
+            Authentication authentication,
             @RequestParam(required = false) UUID employeeId,
             @RequestParam(required = false) OrderStatus status,
             Pageable pageable
     ) {
+        boolean isEmployee = authentication.getAuthorities().stream()
+                .anyMatch(auth ->
+                        auth.getAuthority().equals("ROLE_" + Role.EMPLOYEE.name())
+                );
+
+        if (isEmployee) {
+            if (status == OrderStatus.PENDING) {
+                employeeId = null;
+            } else {
+                employeeId = userId;
+            }
+        }
+
         return orderQueryService.getAll(employeeId, status, pageable);
     }
 
     @GetMapping("/{id}")
-    public OrderDetailsResponseDto getById(@PathVariable UUID id) {
-        return orderQueryService.getById(id);
+    public AdminOrderDetailsResponseDto getById(@PathVariable UUID id, Locale locale) {
+        return orderQueryService.getById(id, locale.getLanguage());
     }
 
     @PutMapping("/{id}/accept")

@@ -1,5 +1,6 @@
 package com.vttish.bookstore.orders.service.impl;
 
+import com.vttish.bookstore.auth.service.UserService;
 import com.vttish.bookstore.orders.entity.Order;
 import com.vttish.bookstore.orders.exception.OrderNotFoundException;
 import com.vttish.bookstore.orders.repository.OrderRepository;
@@ -14,12 +15,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderManagementServiceImpl implements OrderManagementService {
     private final OrderRepository orderRepository;
+    private final UserService userService;
 
     @Override
     @Transactional
     public void accept(UUID employeeId, UUID id) {
         Order order = getEntityById(id);
-        order.accept(employeeId);
+        order.accept(userService.getRefById(employeeId));
         orderRepository.save(order);
     }
 
@@ -27,7 +29,7 @@ public class OrderManagementServiceImpl implements OrderManagementService {
     @Transactional
     public void cancel(UUID employeeId, UUID id) {
         Order order = getEntityById(id);
-        order.cancel(employeeId);
+        order.cancel(userService.getRefById(employeeId));
         orderRepository.save(order);
     }
 
@@ -35,7 +37,7 @@ public class OrderManagementServiceImpl implements OrderManagementService {
     @Transactional
     public void complete(UUID employeeId, UUID id) {
         Order order = getEntityById(id);
-        order.complete(employeeId);
+        order.complete(userService.getRefById(employeeId));
         orderRepository.save(order);
     }
 

@@ -3,7 +3,6 @@ package com.vttish.bookstore.auth.scheduler;
 import com.vttish.bookstore.auth.repository.RefreshTokenRepository;
 import com.vttish.bookstore.auth.repository.ResetPasswordTokenRepository;
 import com.vttish.bookstore.auth.repository.UserRepository;
-import com.vttish.bookstore.auth.repository.VerifyTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,7 +14,7 @@ import java.time.temporal.ChronoUnit;
 
 @Component
 @RequiredArgsConstructor
-public class CleanupScheduler {
+public class AuthCleanupScheduler {
     private final RefreshTokenRepository refreshTokenRepository;
     private final ResetPasswordTokenRepository resetPasswordTokenRepository;
     private final UserRepository userRepository;
