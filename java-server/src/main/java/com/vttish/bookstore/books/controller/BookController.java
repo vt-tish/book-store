@@ -21,8 +21,12 @@ public class BookController {
     private final BookQueryService bookQueryService;
 
     @GetMapping
-    public Page<BookCardResponseDto> getAvailable(Pageable pageable, Locale locale) {
-        return bookQueryService.getAvailable(locale.getLanguage(), pageable);
+    public Page<BookCardResponseDto> getAvailable(
+            @RequestParam(required = false) String search,
+            Pageable pageable,
+            Locale locale
+    ) {
+        return bookQueryService.getAvailable(search, locale.getLanguage(), pageable);
     }
 
     @GetMapping("/{id}")

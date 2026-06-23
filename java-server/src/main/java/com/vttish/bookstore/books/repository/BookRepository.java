@@ -5,34 +5,25 @@ import com.vttish.bookstore.books.dto.AdminBookDetailsResponseDto;
 import com.vttish.bookstore.books.dto.BookCardResponseDto;
 import com.vttish.bookstore.books.dto.BookDetailsResponseDto;
 import com.vttish.bookstore.books.entity.Book;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
-public interface BookRepository extends JpaRepository<Book, UUID> {
-    <T> Set<T> findByIdInAndIsArchivedFalse(Set<UUID> ids, Class<T> type);
+public interface BookRepository extends JpaRepository<Book, UUID>, JpaSpecificationExecutor<Book> {
 
-    @Query("""
-        SELECT new com.vttish.bookstore.books.dto.BookCardResponseDto(
-            b.id,
-            t.name,
-            t.author,
-            t.genre,
-            b.price,
-            b.previewUrl
-        )
-        FROM Book b
-        JOIN b.translations t
-        WHERE t.languageCode = :lang
-        AND b.isArchived = false
-    """)
-    Page<BookCardResponseDto> findAllIsArchivedFalseCards(@Param("lang") String lang, Pageable pageable);
+    Optional<Book> findByIdAndIsArchivedFalse(UUID id);
+
+    @EntityGraph(attributePaths = "translations")
+    @NonNull Page<Book> findAll(Specification<Book> specification, @NonNull Pageable pageable);
 
     @Query("""
         SELECT new com.vttish.bookstore.books.dto.BookDetailsResponseDto(
@@ -56,23 +47,6 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
         AND t.languageCode = :lang
     """)
     Optional<BookDetailsResponseDto> findByIdDetails(@Param("id") UUID id, @Param("lang") String lang);
-
-
-    @Query("""
-        SELECT new com.vttish.bookstore.books.dto.AdminBookCardResponseDto(
-            b.id,
-            t.name,
-            t.author,
-            t.genre,
-            b.price,
-            b.previewUrl,
-            b.isArchived
-        )
-        FROM Book b
-        JOIN b.translations t
-        WHERE t.languageCode = :lang
-    """)
-    Page<AdminBookCardResponseDto> findAllAdminCards(@Param("lang") String lang, Pageable pageable);
 
     @Query("""
         SELECT new com.vttish.bookstore.books.dto.AdminBookDetailsResponseDto(

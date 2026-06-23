@@ -1,10 +1,6 @@
 package com.vttish.bookstore.orders.service.impl;
 
 import com.vttish.bookstore.auth.service.UserService;
-import com.vttish.bookstore.books.dto.OrderBookView;
-import com.vttish.bookstore.books.service.BookQueryService;
-import com.vttish.bookstore.cart.dto.CartResponseDto;
-import com.vttish.bookstore.cart.dto.CartItemDto;
 import com.vttish.bookstore.cart.entity.Cart;
 import com.vttish.bookstore.cart.entity.CartItem;
 import com.vttish.bookstore.cart.service.CartManagementService;
@@ -24,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

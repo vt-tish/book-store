@@ -3,6 +3,8 @@ package com.vttish.bookstore.books.service.impl;
 import com.vttish.bookstore.books.dto.*;
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.exception.BookNotFoundException;
+import com.vttish.bookstore.books.mapper.BookMapper;
+import com.vttish.bookstore.books.mapper.BookSpecifications;
 import com.vttish.bookstore.books.repository.BookRepository;
 import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.common.config.LocalizationProperties;
@@ -21,19 +23,22 @@ import java.util.stream.Collectors;
 public class BookQueryServiceImpl implements BookQueryService {
     private final BookRepository bookRepository;
     private final LocalizationProperties localizationProps;
+    private final BookMapper mapper;
 
     @Override
-    public Page<BookCardResponseDto> getAvailable(String lang, Pageable pageable) {
-        return bookRepository.findAllIsArchivedFalseCards(
-                localizationProps.resolveLanguage(lang), pageable
-        );
+    public Page<BookCardResponseDto> getAvailable(String search, String lang, Pageable pageable) {
+        return bookRepository.findAll(
+                BookSpecifications.searchAvailable(search),
+                pageable
+        ).map(book -> mapper.toBookCard(book, lang, localizationProps.defaultLanguage()));
     }
 
     @Override
-    public Page<AdminBookCardResponseDto> getAll(String lang, Pageable pageable) {
-        return bookRepository.findAllAdminCards(
-                localizationProps.resolveLanguage(lang), pageable
-        );
+    public Page<AdminBookCardResponseDto> getAll(String search, String lang, Pageable pageable) {
+        return bookRepository.findAll(
+                BookSpecifications.search(search),
+                pageable
+        ).map(book -> mapper.toAdminBookCard(book, lang, localizationProps.defaultLanguage()));
     }
 
     @Override
@@ -52,26 +57,8 @@ public class BookQueryServiceImpl implements BookQueryService {
 
     @Override
     public Book getByIdAvailable(UUID id) {
-        Book book = bookRepository.findById(id).orElseThrow(
+        return bookRepository.findByIdAndIsArchivedFalse(id).orElseThrow(
                 BookNotFoundException::new
         );
-
-        if (book.isArchived()) {
-            throw new BookNotFoundException();
-        }
-
-        return book;
-    }
-
-    @Override
-    public Map<UUID, OrderBookView> getBooksForOrder(Set<UUID> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return Map.of();
-        }
-
-        Set<OrderBookView> bookViews = bookRepository.findByIdInAndIsArchivedFalse(ids, OrderBookView.class);
-
-        return bookViews.stream()
-                .collect(Collectors.toMap(OrderBookView::getId, view -> view));
     }
 }

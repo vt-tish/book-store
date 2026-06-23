@@ -49,8 +49,12 @@ public class AdminBookController {
     }
 
     @GetMapping
-    public Page<AdminBookCardResponseDto> getAll(Pageable pageable, Locale locale) {
-        return bookQueryService.getAll(locale.getLanguage(), pageable);
+    public Page<AdminBookCardResponseDto> getAll(
+            @RequestParam(required = false) String search,
+            Pageable pageable,
+            Locale locale
+    ) {
+        return bookQueryService.getAll(search, locale.getLanguage(), pageable);
     }
 
     @GetMapping("/{id}")

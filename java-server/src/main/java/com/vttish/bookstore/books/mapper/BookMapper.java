@@ -23,6 +23,16 @@ public interface BookMapper {
     @Mapping(target = "characteristics", expression = "java(book.getCharacteristics(lang, defaultLang))")
     AdminBookDetailsResponseDto toAdminBookDetails(Book book, String lang, String defaultLang);
 
+    @Mapping(target = "name", expression = "java(book.getName(lang, defaultLang))")
+    @Mapping(target = "genre", expression = "java(book.getGenre(lang, defaultLang))")
+    @Mapping(target = "author", expression = "java(book.getAuthor(lang, defaultLang))")
+    AdminBookCardResponseDto toAdminBookCard(Book book, String lang, String defaultLang);
+
+    @Mapping(target = "name", expression = "java(book.getName(lang, defaultLang))")
+    @Mapping(target = "genre", expression = "java(book.getGenre(lang, defaultLang))")
+    @Mapping(target = "author", expression = "java(book.getAuthor(lang, defaultLang))")
+    BookCardResponseDto toBookCard(Book book, String lang, String defaultLang);
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "translations", ignore = true)
     void update(BookRequestDto bookRequestDto, @MappingTarget Book book);
