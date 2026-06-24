@@ -19,13 +19,17 @@ public interface BookMapper {
     @Mapping(target = "id", source = "book.id")
     @Mapping(target = "createdAt", source = "book.createdAt")
     @Mapping(target = "updatedAt", source = "book.updatedAt")
-    AdminBookDetailsResponseDto toAdminBookDetails(Book book, BookTranslation translation);
+    AdminBookDetailsResponseDto toAdminBookDetailsDto(Book book, BookTranslation translation);
 
     @Mapping(target = "id", source = "book.id")
-    AdminBookCardResponseDto toAdminBookCard(Book book, BookTranslation translation);
+    AdminBookCardResponseDto toAdminBookCardDto(Book book, BookTranslation translation);
 
     @Mapping(target = "id", source = "book.id")
-    BookCardResponseDto toBookCard(Book book, BookTranslation translation);
+    @Mapping(target = "isAvailable", expression = "java(!book.isArchived())")
+    BookDetailsResponseDto toBookDetailsDto(Book book, BookTranslation translation);
+
+    @Mapping(target = "id", source = "book.id")
+    BookCardResponseDto toBookCardDto(Book book, BookTranslation translation);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "translations", ignore = true)

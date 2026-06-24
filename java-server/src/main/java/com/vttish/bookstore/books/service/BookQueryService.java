@@ -14,6 +14,6 @@ public interface BookQueryService {
     BookDetailsResponseDto getById(UUID id, String lang);
     AdminBookDetailsResponseDto getByIdAdmin(UUID id, String lang);
 
-    Book getByIdAvailable(UUID id);
+    Book getAvailableById(UUID id);
     Map<UUID, BookTranslation> getTranslations(List<Book> books, String lang);
 }

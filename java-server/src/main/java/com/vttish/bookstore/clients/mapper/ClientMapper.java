@@ -9,7 +9,7 @@ import org.mapstruct.MappingConstants;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ClientMapper {
 
-    @Mapping(source = "user.email", target = "email")
-    @Mapping(source = "user.blocked", target = "isBlocked")
+    @Mapping(target = "email", source = "user.email")
+    @Mapping(target = "isBlocked", source = "user.blocked")
     AdminClientResponseDto toAdminClientDto(Client client);
 }

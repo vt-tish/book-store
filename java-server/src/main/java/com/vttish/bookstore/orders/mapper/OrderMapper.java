@@ -16,10 +16,10 @@ import java.util.UUID;
 public interface OrderMapper {
     OrderDetailsResponseDto toOrderDetailsDto(Order order, @Context Map<UUID, BookTranslation> translationMap);
 
-    @Mapping(target = "clientId", source = "order.client.id")
-    @Mapping(target = "clientEmail", source = "order.client.email")
-    @Mapping(target = "employeeId", source = "order.employee.id")
-    @Mapping(target = "employeeEmail", source = "order.employee.email")
+    @Mapping(target = "clientId", source = "client.id")
+    @Mapping(target = "clientEmail", source = "client.email")
+    @Mapping(target = "employeeId", source = "employee.id")
+    @Mapping(target = "employeeEmail", source = "employee.email")
     AdminOrderDetailsResponseDto toAdminOrderDetailsDto(
             Order order,
             @Context Map<UUID, BookTranslation> translationMap

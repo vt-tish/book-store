@@ -40,7 +40,7 @@ public class BookQueryServiceImpl implements BookQueryService {
         }
 
         Map<UUID, BookTranslation> translations = getTranslations(books.getContent(), lang);
-        return books.map(book -> mapper.toBookCard(book, translations.get(book.getId())));
+        return books.map(book -> mapper.toBookCardDto(book, translations.get(book.getId())));
     }
 
     @Override
@@ -55,25 +55,23 @@ public class BookQueryServiceImpl implements BookQueryService {
         }
 
         Map<UUID, BookTranslation> translations = getTranslations(books.getContent(), lang);
-        return books.map(book -> mapper.toAdminBookCard(book, translations.get(book.getId())));
+        return books.map(book -> mapper.toAdminBookCardDto(book, translations.get(book.getId())));
     }
 
     @Override
     public BookDetailsResponseDto getById(UUID id, String lang) {
-        return bookRepository.findByIdDetails(
-                id, localizationProps.resolveLanguage(lang)
-        ).orElseThrow(BookNotFoundException::new);
+        Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
+        return mapper.toBookDetailsDto(book, getTranslation(book, lang));
     }
 
     @Override
     public AdminBookDetailsResponseDto getByIdAdmin(UUID id, String lang) {
-        return bookRepository.findByIdAdminDetails(
-                id, localizationProps.resolveLanguage(lang)
-        ).orElseThrow(BookNotFoundException::new);
+        Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
+        return mapper.toAdminBookDetailsDto(book, getTranslation(book, lang));
     }
 
     @Override
-    public Book getByIdAvailable(UUID id) {
+    public Book getAvailableById(UUID id) {
         return bookRepository.findByIdAndIsArchivedFalse(id).orElseThrow(
                 BookNotFoundException::new
         );
@@ -91,5 +89,9 @@ public class BookQueryServiceImpl implements BookQueryService {
                         (existing, replacement) ->
                                 existing.getLanguageCode().equals(resolvedLang) ? existing : replacement
                 ));
+    }
+
+    private BookTranslation getTranslation(Book book, String lang) {
+        return getTranslations(List.of(book), lang).get(book.getId());
     }
 }

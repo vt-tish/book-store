@@ -1,6 +1,5 @@
 package com.vttish.bookstore.cart.mapper;
 
-import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.entity.BookTranslation;
 import com.vttish.bookstore.cart.dto.CartItemDto;
 import com.vttish.bookstore.cart.dto.CartResponseDto;
@@ -20,10 +19,10 @@ import java.util.UUID;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface CartMapper {
 
-    @Mapping(target = "bookId", source = "cartItem.book.id")
+    @Mapping(target = "bookId", source = "book.id")
     @Mapping(target = "bookName", expression = "java(getBookName(cartItem, translationMap))")
-    @Mapping(target = "previewUrl", source = "cartItem.book.previewUrl")
-    @Mapping(target = "pricePerUnit", source = "cartItem.book.price")
+    @Mapping(target = "previewUrl", source = "book.previewUrl")
+    @Mapping(target = "pricePerUnit", source = "book.price")
     @Mapping(target = "subtotalPrice", expression = "java(calculateSubtotal(cartItem))")
     @Mapping(target = "isAvailable", expression = "java(!cartItem.getBook().isArchived())")
     CartItemDto toCartItemDto(CartItem cartItem, @Context Map<UUID, BookTranslation> translationMap);

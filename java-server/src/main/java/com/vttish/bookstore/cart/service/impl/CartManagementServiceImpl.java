@@ -59,7 +59,7 @@ public class CartManagementServiceImpl implements CartManagementService {
             CartItem item = existingItem.get();
             item.setQuantity(item.getQuantity() + addCartItemRequestDto.quantity());
         } else {
-            Book book = bookQueryService.getByIdAvailable(addCartItemRequestDto.bookId());
+            Book book = bookQueryService.getAvailableById(addCartItemRequestDto.bookId());
             cart.addItem(new CartItem(book, addCartItemRequestDto.quantity()));
         }
 

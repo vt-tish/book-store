@@ -40,7 +40,7 @@ public class BookManagementServiceImpl implements BookManagementService {
         }
 
         book = bookRepository.save(book);
-        return mapper.toAdminBookDetails(
+        return mapper.toAdminBookDetailsDto(
                 book, book.getTranslations().get(localizationProps.resolveLanguage(lang))
         );
     }
@@ -64,7 +64,7 @@ public class BookManagementServiceImpl implements BookManagementService {
         }
 
         book = bookRepository.save(book);
-        return mapper.toAdminBookDetails(
+        return mapper.toAdminBookDetailsDto(
                 book, book.getTranslations().get(localizationProps.resolveLanguage(lang))
         );
     }

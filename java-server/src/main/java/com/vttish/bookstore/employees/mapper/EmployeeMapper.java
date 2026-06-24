@@ -12,11 +12,11 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface EmployeeMapper {
 
-    @Mapping(source = "user.email", target = "email")
+    @Mapping(target = "email", source = "user.email")
     EmployeeResponseDto toEmployeeDto(Employee employee);
 
-    @Mapping(source = "user.email", target = "email")
-    @Mapping(source = "user.blocked", target = "isBlocked")
+    @Mapping(target = "email", source = "user.email")
+    @Mapping(target = "isBlocked", source = "user.blocked")
     AdminEmployeeResponseDto toAdminEmployeeDto(Employee employee);
 
     void update(UpdateEmployeeRequestDto updateEmployeeRequestDto, @MappingTarget Employee employee);
