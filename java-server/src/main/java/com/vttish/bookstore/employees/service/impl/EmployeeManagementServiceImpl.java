@@ -13,6 +13,7 @@ import com.vttish.bookstore.employees.mapper.EmployeeMapper;
 import com.vttish.bookstore.employees.repository.EmployeeRepository;
 import com.vttish.bookstore.employees.service.EmployeeManagementService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,20 +29,20 @@ public class EmployeeManagementServiceImpl implements EmployeeManagementService 
     @Override
     @Transactional
     public void register(RegisterEmployeeRequestDto registerEmployeeRequestDto) {
-        if (employeeRepository.existsByPhone(registerEmployeeRequestDto.phone())) {
-            throw new PhoneTakenException();
-        }
-
         User user = authService.registerEmployee(
                 registerEmployeeRequestDto.email(),
                 registerEmployeeRequestDto.password()
         );
 
-        employeeRepository.save(new Employee(
-                user,
-                registerEmployeeRequestDto.phone(),
-                registerEmployeeRequestDto.birthDate()
-        ));
+        try {
+            employeeRepository.saveAndFlush(new Employee(
+                    user,
+                    registerEmployeeRequestDto.phone(),
+                    registerEmployeeRequestDto.birthDate()
+            ));
+        } catch (DataIntegrityViolationException ex) {
+            throw new PhoneTakenException();
+        }
     }
 
     @Override

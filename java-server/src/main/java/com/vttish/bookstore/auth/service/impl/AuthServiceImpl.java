@@ -24,13 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -79,6 +76,7 @@ public class AuthServiceImpl implements AuthService {
             }
 
             verifyTokenRepository.delete(existingToken.get());
+            verifyTokenRepository.flush();
         }
 
         VerifyToken token = new VerifyToken(
@@ -87,12 +85,8 @@ public class AuthServiceImpl implements AuthService {
                Instant.now().plusMillis(authProps.token().verifyExpirationMs())
         );
 
-        try {
-            token = verifyTokenRepository.saveAndFlush(token);
-            emailService.sendVerificationEmail(user.getEmail(), token.getToken());
-        } catch (DataIntegrityViolationException ignored) {
-            log.warn("Concurrent verify token creation, token exists");
-        }
+        token = verifyTokenRepository.saveAndFlush(token);
+        emailService.sendVerificationEmail(user.getEmail(), token.getToken());
     }
 
     @Override
@@ -198,6 +192,7 @@ public class AuthServiceImpl implements AuthService {
             }
 
             resetPasswordTokenRepository.delete(existingToken.get());
+            resetPasswordTokenRepository.flush();
         }
 
         ResetPasswordToken token = new ResetPasswordToken(
@@ -206,12 +201,8 @@ public class AuthServiceImpl implements AuthService {
                 Instant.now().plusMillis(authProps.token().resetPasswordExpirationMs())
         );
 
-        try {
-            token = resetPasswordTokenRepository.saveAndFlush(token);
-            emailService.sendPasswordResetEmail(user.getEmail(), token.getToken());
-        } catch (DataIntegrityViolationException ignored) {
-            log.warn("Concurrent reset password token creation, token exists");
-        }
+        token = resetPasswordTokenRepository.save(token);
+        emailService.sendResetPasswordEmail(user.getEmail(), token.getToken());
     }
 
     @Override

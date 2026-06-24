@@ -1,10 +1,12 @@
 package com.vttish.bookstore.auth.service.impl;
 
+import com.vttish.bookstore.auth.exception.EmailDeliveryException;
 import com.vttish.bookstore.auth.service.EmailService;
 import com.vttish.bookstore.auth.config.FrontendProperties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -42,7 +44,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public void sendPasswordResetEmail(String email, String token) {
+    public void sendResetPasswordEmail(String email, String token) {
         Map<String, Object> variables = new HashMap<>();
         variables.put("resetLink", frontendProps.getResetPasswordUrl() + "?token=" + token);
 
@@ -74,8 +76,8 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
             mailSender.send(message);
-        } catch (MessagingException ex) {
-            throw new RuntimeException(ex);
+        } catch (MessagingException | MailException ex) {
+            throw new EmailDeliveryException("Failed to prepare email", ex);
         }
     }
 }

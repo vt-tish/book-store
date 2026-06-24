@@ -4,7 +4,6 @@ import com.vttish.bookstore.auth.config.AuthProperties;
 import com.vttish.bookstore.auth.service.CookieService;
 import com.vttish.bookstore.common.constant.CookieConstants;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;

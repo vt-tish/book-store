@@ -31,10 +31,6 @@ public class AdminOrderController {
             @RequestParam(required = false) OrderStatus status,
             Pageable pageable
     ) {
-        if (status == null) {
-            status = OrderStatus.PENDING;
-        }
-
         return orderQueryService.getAll(employeeId, status, pageable);
     }
 

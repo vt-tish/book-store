@@ -87,11 +87,7 @@ public class CartManagementServiceImpl implements CartManagementService {
                 .findFirst()
                 .orElseThrow(CartItemNotFoundException::new);
 
-        if (updateCartItemRequestDto.quantity() <= 0) {
-            cart.removeItem(item);
-        } else {
-            item.setQuantity(updateCartItemRequestDto.quantity());
-        }
+        item.setQuantity(updateCartItemRequestDto.quantity());
 
         cart = cartRepository.save(cart);
         return mapper.toCartResponseDto(cart, bookQueryService.getTranslations(getBooks(cart), lang));

@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class SchedulerLoggingAspect {
 
-    @Pointcut("execution(* com.vttish.bookstore..scheduler.*.*(..))")
+    @Pointcut("execution(* com.vttish.bookstore..scheduler.*.*(..)) && " +
+            "!@annotation(org.springframework.scheduling.annotation.Scheduled)")
     public void schedulerPackageMethods() {}
 
     @Around("schedulerPackageMethods()")
