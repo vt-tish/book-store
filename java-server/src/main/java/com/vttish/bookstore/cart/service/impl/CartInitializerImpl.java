@@ -19,7 +19,7 @@ public class CartInitializerImpl implements CartInitializer {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Cart getOrCreate(UUID ownerId) {
-        return cartRepository.findByOwnerId(ownerId)
+        return cartRepository.findWithBooksByOwnerId(ownerId)
                 .orElseGet(() -> cartRepository.save(new Cart(ownerId)));
     }
 }

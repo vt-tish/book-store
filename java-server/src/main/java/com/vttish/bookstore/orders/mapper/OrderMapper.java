@@ -28,13 +28,13 @@ public interface OrderMapper {
     @Mapping(target = "subtotalPrice", expression = "java(calculateSubtotal(orderItem))")
     @Mapping(target = "bookName", expression = "java(getBookName(orderItem, translationMap))")
     @Mapping(target = "bookAuthor", expression = "java(getBookAuthor(orderItem, translationMap))")
-    OrderItemDto toOrderItem(OrderItem orderItem, @Context Map<UUID, BookTranslation> translationMap);
+    OrderItemDto toOrderItemDto(OrderItem orderItem, @Context Map<UUID, BookTranslation> translationMap);
 
-    default BigDecimal calculateSubtotal(OrderItem orderItem) {
-        if (orderItem.getPricePerUnit() == null || orderItem.getQuantity() == null) {
+    default BigDecimal calculateSubtotal(OrderItem item) {
+        if (item.getPricePerUnit() == null || item.getQuantity() == null) {
             return null;
         }
-        return orderItem.getPricePerUnit().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
+        return item.getPricePerUnit().multiply(BigDecimal.valueOf(item.getQuantity()));
     }
 
     default String getBookName(OrderItem item, @Context Map<UUID, BookTranslation> translationMap) {

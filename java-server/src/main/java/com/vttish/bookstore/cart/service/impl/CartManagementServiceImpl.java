@@ -3,24 +3,21 @@ package com.vttish.bookstore.cart.service.impl;
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.cart.dto.AddCartItemRequestDto;
-import com.vttish.bookstore.cart.dto.CartItemDto;
 import com.vttish.bookstore.cart.dto.CartResponseDto;
 import com.vttish.bookstore.cart.dto.UpdateCartItemRequestDto;
 import com.vttish.bookstore.cart.entity.Cart;
 import com.vttish.bookstore.cart.entity.CartItem;
 import com.vttish.bookstore.cart.exception.CartItemNotFoundException;
 import com.vttish.bookstore.cart.exception.CartNotFoundException;
-import com.vttish.bookstore.cart.repository.CartItemRepository;
+import com.vttish.bookstore.cart.mapper.CartMapper;
 import com.vttish.bookstore.cart.repository.CartRepository;
 import com.vttish.bookstore.cart.service.CartInitializer;
 import com.vttish.bookstore.cart.service.CartManagementService;
-import com.vttish.bookstore.common.config.LocalizationProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -28,17 +25,17 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CartManagementServiceImpl implements CartManagementService {
     private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
     private final BookQueryService bookQueryService;
     private final CartInitializer cartInitializer;
-    private final LocalizationProperties localizationProps;
+    private final CartMapper mapper;
 
     @Override
     public CartResponseDto get(UUID ownerId, String lang) {
-        Optional<Cart> existingCart = cartRepository.findByOwnerId(ownerId);
+        Optional<Cart> existingCart = cartRepository.findWithBooksByOwnerId(ownerId);
 
-        return existingCart.map(cart -> toCartResponseDto(cart, lang))
-                .orElseGet(CartResponseDto::empty);
+        return existingCart.map(cart ->
+                        mapper.toCartResponseDto(cart, bookQueryService.getTranslations(getBooks(cart), lang))
+                ).orElseGet(CartResponseDto::empty);
     }
 
     @Override
@@ -49,7 +46,7 @@ public class CartManagementServiceImpl implements CartManagementService {
         try {
             cart = cartInitializer.getOrCreate(ownerId);
         } catch (DataIntegrityViolationException ex) {
-            cart = cartRepository.findByOwnerId(ownerId).orElseThrow(
+            cart = cartRepository.findWithBooksByOwnerId(ownerId).orElseThrow(
                     CartNotFoundException::new
             );
         }
@@ -66,7 +63,8 @@ public class CartManagementServiceImpl implements CartManagementService {
             cart.addItem(new CartItem(book, addCartItemRequestDto.quantity()));
         }
 
-        return toCartResponseDto(cartRepository.saveAndFlush(cart), lang);
+        cart = cartRepository.save(cart);
+        return mapper.toCartResponseDto(cart, bookQueryService.getTranslations(getBooks(cart), lang));
     }
 
     @Override
@@ -77,7 +75,7 @@ public class CartManagementServiceImpl implements CartManagementService {
             String lang,
             UpdateCartItemRequestDto updateCartItemRequestDto
     ) {
-        Optional<Cart> existingCart = cartRepository.findByOwnerId(ownerId);
+        Optional<Cart> existingCart = cartRepository.findWithBooksByOwnerId(ownerId);
 
         if (existingCart.isEmpty()) {
             throw new CartItemNotFoundException();
@@ -89,14 +87,20 @@ public class CartManagementServiceImpl implements CartManagementService {
                 .findFirst()
                 .orElseThrow(CartItemNotFoundException::new);
 
-        item.setQuantity(updateCartItemRequestDto.quantity());
-        return toCartResponseDto(cartRepository.saveAndFlush(cart), lang);
+        if (updateCartItemRequestDto.quantity() <= 0) {
+            cart.removeItem(item);
+        } else {
+            item.setQuantity(updateCartItemRequestDto.quantity());
+        }
+
+        cart = cartRepository.save(cart);
+        return mapper.toCartResponseDto(cart, bookQueryService.getTranslations(getBooks(cart), lang));
     }
 
     @Override
     @Transactional
     public CartResponseDto removeItem(UUID ownerId, UUID id, String lang) {
-        Optional<Cart> existingCart = cartRepository.findByOwnerId(ownerId);
+        Optional<Cart> existingCart = cartRepository.findWithBooksByOwnerId(ownerId);
 
         if (existingCart.isEmpty()) {
             return CartResponseDto.empty();
@@ -109,7 +113,9 @@ public class CartManagementServiceImpl implements CartManagementService {
                 .orElseThrow(CartItemNotFoundException::new);
 
         cart.removeItem(item);
-        return toCartResponseDto(cartRepository.saveAndFlush(cart), lang);
+
+        cart = cartRepository.save(cart);
+        return mapper.toCartResponseDto(cart, bookQueryService.getTranslations(getBooks(cart), lang));
     }
 
     @Override
@@ -137,17 +143,9 @@ public class CartManagementServiceImpl implements CartManagementService {
         cartRepository.save(cart);
     }
 
-    private CartResponseDto toCartResponseDto(Cart cart, String lang) {
-        List<CartItemDto> items = cartItemRepository.findAllWithLocalizedBooks(
-                cart.getId(),
-                localizationProps.resolveLanguage(lang)
-        );
-
-        BigDecimal totalPrice = items.stream()
-                .filter(CartItemDto::isAvailable)
-                .map(CartItemDto::subtotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return new CartResponseDto(items, totalPrice);
+    private List<Book> getBooks(Cart cart) {
+        return cart.getItems().stream()
+                .map(CartItem::getBook)
+                .toList();
     }
 }

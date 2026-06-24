@@ -45,13 +45,9 @@ public class OrderQueryServiceImpl implements OrderQueryService {
                 OrderNotFoundException::new
         );
 
-        List<Book> books = order.getItems().stream()
-                .map(OrderItem::getBook)
-                .toList();
-
         return mapper.toOrderDetailsDto(
                 order,
-                bookQueryService.getTranslations(books, lang)
+                bookQueryService.getTranslations(getBooks(order), lang)
         );
     }
 
@@ -64,18 +60,20 @@ public class OrderQueryServiceImpl implements OrderQueryService {
     public AdminOrderDetailsResponseDto getById(UUID id, String lang) {
         Order order = orderRepository.findFullById(id).orElseThrow(OrderNotFoundException::new);
 
-        List<Book> books = order.getItems().stream()
-                .map(OrderItem::getBook)
-                .toList();
-
         return mapper.toAdminOrderDetailsDto(
                 order,
-                bookQueryService.getTranslations(books, lang)
+                bookQueryService.getTranslations(getBooks(order), lang)
         );
     }
 
     @Override
     public boolean hasBookBeenOrdered(UUID bookId) {
         return orderItemRepository.existsByBookId(bookId);
+    }
+
+    private List<Book> getBooks(Order order) {
+        return order.getItems().stream()
+                .map(OrderItem::getBook)
+                .toList();
     }
 }
