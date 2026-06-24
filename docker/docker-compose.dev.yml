@@ -1,11 +1,13 @@
 services:
   book-store-server:
     container_name: book-store-server
-    image: book-store-server:latest
+    image: book-store-server:dev
     build:
       context: ..
       dockerfile: java-server/Dockerfile
     env_file:
       - ../environments/.env
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
     ports:
       - "8080:8080"

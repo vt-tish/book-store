@@ -19,11 +19,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: validate
-  springdoc:
-    api-docs:
-      enabled: true
-    swagger-ui:
-      enabled: true
 
 book-store:
   auth:
