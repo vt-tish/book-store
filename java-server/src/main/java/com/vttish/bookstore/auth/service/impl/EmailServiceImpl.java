@@ -1,10 +1,10 @@
 package com.vttish.bookstore.auth.service.impl;
 
 import com.vttish.bookstore.auth.service.EmailService;
+import com.vttish.bookstore.auth.config.FrontendProperties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -20,21 +20,13 @@ import java.util.Map;
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
-
-    @Value("${book-store.frontend.verify-url}")
-    private String verifyUrl;
-
-    @Value("${book-store.frontend.employee-verify-url}")
-    private String employeeVerifyUrl;
-
-    @Value("${book-store.frontend.reset-password-url}")
-    private String resetPasswordUrl;
+    private final FrontendProperties frontendProps;
 
     @Override
     @Async
     public void sendVerificationEmail(String email, String token) {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("verifyLink", verifyUrl + "?token=" + token);
+        variables.put("verifyLink", frontendProps.getVerifyUrl() + "?token=" + token);
 
         sendEmail(email, "Verification", "verify-user-email", variables);
     }
@@ -43,7 +35,7 @@ public class EmailServiceImpl implements EmailService {
     @Async
     public void sendEmployeeVerificationEmail(String email, String token) {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("verifyLink", employeeVerifyUrl + "?token=" + token);
+        variables.put("verifyLink", frontendProps.getEmployeeVerifyUrl() + "?token=" + token);
 
         sendEmail(email, "Verification", "verify-user-email", variables);
     }
@@ -52,7 +44,7 @@ public class EmailServiceImpl implements EmailService {
     @Async
     public void sendPasswordResetEmail(String email, String token) {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("resetLink", resetPasswordUrl + "?token=" + token);
+        variables.put("resetLink", frontendProps.getResetPasswordUrl() + "?token=" + token);
 
         sendEmail(email, "Password Reset", "password-reset-email", variables);
     }

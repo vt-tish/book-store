@@ -1,28 +1,26 @@
 package com.vttish.bookstore.auth.service.impl;
 
+import com.vttish.bookstore.auth.config.AuthProperties;
 import com.vttish.bookstore.auth.service.CookieService;
 import com.vttish.bookstore.common.constant.CookieConstants;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CookieServiceImpl implements CookieService {
-
-    @Value("${book-store.security.jwt.refresh-token.expiration-ms}")
-    private Long refreshTokenExpirationMs;
-
-    @Value("${book-store.security.cookie.secure}")
-    private boolean isSecure;
+    private final AuthProperties authProps;
 
     @Override
     public HttpHeaders createRefreshTokenCookie(String refreshToken, String path) {
         ResponseCookie cookie = ResponseCookie.from(CookieConstants.REFRESH_TOKEN, refreshToken)
                 .httpOnly(true)
-                .secure(isSecure)
+                .secure(authProps.cookie().secure())
                 .sameSite("Strict")
-                .maxAge(refreshTokenExpirationMs / 1000)
+                .maxAge(authProps.jwt().refreshToken().expirationMs() / 1000)
                 .path(path)
                 .build();
 
@@ -35,7 +33,7 @@ public class CookieServiceImpl implements CookieService {
     public HttpHeaders clearRefreshTokenCookie(String path) {
         ResponseCookie cookie = ResponseCookie.from(CookieConstants.REFRESH_TOKEN, "")
                 .httpOnly(true)
-                .secure(isSecure)
+                .secure(authProps.cookie().secure())
                 .sameSite("Strict")
                 .maxAge(0)
                 .path(path)

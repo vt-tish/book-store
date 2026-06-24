@@ -29,7 +29,6 @@ public class BookSpecifications {
 
                 Subquery<BookTranslation> subquery = q.subquery(BookTranslation.class);
                 Root<BookTranslation> translation = subquery.from(BookTranslation.class);
-                subquery.select(translation);
 
                 subquery.select(translation).where(
                         cb.and(

@@ -27,7 +27,7 @@ spring:
       enabled: true
 
 book-store:
-  security:
+  auth:
     cookie:
       secure: false
   features:

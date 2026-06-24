@@ -1,6 +1,6 @@
 package com.vttish.bookstore.auth.service.impl;
 
-import com.vttish.bookstore.auth.config.SecurityProperties;
+import com.vttish.bookstore.auth.config.AuthProperties;
 import com.vttish.bookstore.auth.entity.User;
 import com.vttish.bookstore.auth.service.JwtService;
 import io.jsonwebtoken.Claims;
@@ -9,7 +9,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -21,7 +20,7 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
-    private final SecurityProperties securityProperties;
+    private final AuthProperties authProps;
 
     @Override
     public String generateAccessToken(User user) {
@@ -29,7 +28,7 @@ public class JwtServiceImpl implements JwtService {
                 .setSubject(user.getId().toString())
                 .claim("roles", List.of(user.getRole()))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + securityProperties.accessTokenExpirationMs()))
+                .setExpiration(new Date(System.currentTimeMillis() + authProps.jwt().accessToken().expirationMs()))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -64,6 +63,6 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getSignKey() {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(securityProperties.secretKey()));
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(authProps.jwt().accessToken().secretKey()));
     }
 }

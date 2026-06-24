@@ -21,10 +21,15 @@ book-store:
       - en
       - uk
   frontend:
-    verify-url: ${FRONTEND_VERIFY_URL:http://localhost:8080/verify}
-    employee-verify-url: ${FRONTEND_EMPLOYEE_VERIFY_URL:http://localhost:8080/employees/verify}
-    reset-password-url: ${FRONTEND_RESET_PASSWORD_URL:http://localhost:8080/reset-password}
-  security:
+    base-url: ${FRONTEND_BASE_URL}
+    verify-uri: ${FRONTEND_VERIFY_URI:/verify}
+    employee-verify-uri: ${FRONTEND_EMPLOYEE_VERIFY_URI:/employees/verify}
+    reset-password-uri: ${FRONTEND_RESET_PASSWORD_URI:/reset-password}
+  auth:
+    cors:
+      enabled: false
+      allowed-origins:
+        - ${FRONTEND_BASE_URL}
     token:
       cooldown-period-ms: ${TOKEN_COOLDOWN_PERIOD_MS:180000}
       reset-password-expiration-ms: ${TOKEN_RESET_PASSWORD_EXPIRATION_MS:900000}

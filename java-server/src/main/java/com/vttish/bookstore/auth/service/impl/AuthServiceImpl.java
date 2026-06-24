@@ -1,6 +1,6 @@
 package com.vttish.bookstore.auth.service.impl;
 
-import com.vttish.bookstore.auth.config.SecurityProperties;
+import com.vttish.bookstore.auth.config.AuthProperties;
 import com.vttish.bookstore.auth.dto.*;
 import com.vttish.bookstore.auth.entity.RefreshToken;
 import com.vttish.bookstore.auth.entity.ResetPasswordToken;
@@ -15,8 +15,6 @@ import com.vttish.bookstore.auth.repository.VerifyTokenRepository;
 import com.vttish.bookstore.auth.service.AuthService;
 import com.vttish.bookstore.auth.service.EmailService;
 import com.vttish.bookstore.auth.service.JwtService;
-import com.vttish.bookstore.employees.entity.Employee;
-import com.vttish.bookstore.employees.exception.EmployeeNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -41,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
-    private final SecurityProperties securityProperties;
+    private final AuthProperties authProps;
 
     @Override
     @Transactional
@@ -74,20 +72,19 @@ public class AuthServiceImpl implements AuthService {
         if (existingToken.isPresent()) {
             long secondsSinceLastEmail = Duration.between(
                     existingToken.get().getCreatedAt(), Instant.now()).getSeconds();
-            long cooldownSeconds = securityProperties.cooldownMs() / 1000;
+            long cooldownSeconds = authProps.token().cooldownPeriodMs() / 1000;
 
             if (secondsSinceLastEmail < cooldownSeconds) {
                 throw new EmailCooldownException(cooldownSeconds - secondsSinceLastEmail);
             }
 
             verifyTokenRepository.delete(existingToken.get());
-            verifyTokenRepository.flush();
         }
 
         VerifyToken token = new VerifyToken(
                jwtService.generateOpaqueToken(),
                user,
-               Instant.now().plusMillis(securityProperties.verifyTokenExpirationMs())
+               Instant.now().plusMillis(authProps.token().verifyExpirationMs())
         );
 
         try {
@@ -135,7 +132,7 @@ public class AuthServiceImpl implements AuthService {
         if (refreshToken.isConsumed()) {
             if (refreshToken.getConsumedAt() != null &&
                     refreshToken.getConsumedAt().plusMillis(
-                            securityProperties.gracePeriodMs()
+                            authProps.jwt().refreshToken().gracePeriodMs()
                     ).isAfter(Instant.now())
             ) {
                 return new TokensDto(
@@ -144,7 +141,7 @@ public class AuthServiceImpl implements AuthService {
                 );
             }
 
-            revokeRefreshTokenFamily(refreshToken.getFamilyId());
+            refreshTokenRepository.revokeAllByFamilyId(refreshToken.getFamilyId());
             emailService.sendSecurityAlert(user.getEmail());
             throw new TokenReuseException();
         }
@@ -194,27 +191,26 @@ public class AuthServiceImpl implements AuthService {
         if (existingToken.isPresent()) {
             long secondsSinceLastEmail = Duration.between(
                     existingToken.get().getCreatedAt(), Instant.now()).getSeconds();
-            long cooldownSeconds = securityProperties.cooldownMs() / 1000;
+            long cooldownSeconds = authProps.token().cooldownPeriodMs() / 1000;
 
             if (secondsSinceLastEmail < cooldownSeconds) {
                 throw new EmailCooldownException(cooldownSeconds - secondsSinceLastEmail);
             }
 
             resetPasswordTokenRepository.delete(existingToken.get());
-            resetPasswordTokenRepository.flush();
         }
 
         ResetPasswordToken token = new ResetPasswordToken(
                 jwtService.generateOpaqueToken(),
                 user,
-                Instant.now().plusMillis(securityProperties.resetPasswordTokenExpirationMs())
+                Instant.now().plusMillis(authProps.token().resetPasswordExpirationMs())
         );
 
         try {
             token = resetPasswordTokenRepository.saveAndFlush(token);
             emailService.sendPasswordResetEmail(user.getEmail(), token.getToken());
         } catch (DataIntegrityViolationException ignored) {
-            log.warn("Concurrent reset password toke creation, token exists");
+            log.warn("Concurrent reset password token creation, token exists");
         }
     }
 
@@ -236,7 +232,7 @@ public class AuthServiceImpl implements AuthService {
         );
 
         user = userRepository.save(user);
-        revokeRefreshTokensByUserId(user.getId());
+        refreshTokenRepository.revokeAllByUserId(user.getId());
         resetPasswordTokenRepository.delete(token);
     }
 
@@ -286,7 +282,7 @@ public class AuthServiceImpl implements AuthService {
         VerifyToken token = new VerifyToken(
                 jwtService.generateOpaqueToken(),
                 user,
-                Instant.now().plusMillis(securityProperties.verifyTokenExpirationMs())
+                Instant.now().plusMillis(authProps.token().verifyExpirationMs())
         );
 
         return verifyTokenRepository.save(token);
@@ -296,26 +292,9 @@ public class AuthServiceImpl implements AuthService {
         RefreshToken refreshToken = refreshTokenRepository.save(new RefreshToken(
                 jwtService.generateOpaqueToken(),
                 user,
-                Instant.now().plusMillis(securityProperties.refreshTokenExpirationMs())
+                Instant.now().plusMillis(authProps.jwt().refreshToken().expirationMs())
         ));
 
         return refreshToken.getToken();
-    }
-
-    private void revokeRefreshTokenFamily(UUID familyId) {
-        revokeRefreshTokens(refreshTokenRepository.findAllByFamilyId(familyId));
-    }
-
-    private void revokeRefreshTokensByUserId(UUID userId) {
-        revokeRefreshTokens(refreshTokenRepository.findAllByUserId(userId));
-    }
-
-    private void revokeRefreshTokens(List<RefreshToken> refreshTokens) {
-        if (refreshTokens.isEmpty()) {
-            return;
-        }
-
-        refreshTokens.forEach(RefreshToken::revoke);
-        refreshTokenRepository.saveAll(refreshTokens);
     }
 }
