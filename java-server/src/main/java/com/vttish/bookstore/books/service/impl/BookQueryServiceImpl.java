@@ -29,9 +29,9 @@ public class BookQueryServiceImpl implements BookQueryService {
     private final BookMapper mapper;
 
     @Override
-    public Page<BookCardResponseDto> getAvailable(String search, String lang, Pageable pageable) {
+    public Page<BookCardResponseDto> getAvailable(BookFilterDto filter, String lang, Pageable pageable) {
         Page<Book> books = bookRepository.findAll(
-                BookSpecifications.searchAvailable(search),
+                BookSpecifications.availableByFilter(filter),
                 pageable
         );
 
@@ -44,9 +44,9 @@ public class BookQueryServiceImpl implements BookQueryService {
     }
 
     @Override
-    public Page<AdminBookCardResponseDto> getAll(String search, String lang, Pageable pageable) {
+    public Page<AdminBookCardResponseDto> getAll(BookFilterDto filter, String lang, Pageable pageable) {
         Page<Book> books = bookRepository.findAll(
-                BookSpecifications.search(search),
+                BookSpecifications.byFilter(filter),
                 pageable
         );
 

@@ -22,7 +22,7 @@ public record BookRequestDto(
         AgeGroup ageGroup,
 
         @NotNull(message = "{error.validation.required}")
-        @Positive(message = "{error.validation.positive}")
+        @PositiveOrZero(message = "{error.validation.positive_or_zero}")
         @Digits(integer = 8, fraction = 2, message = "{error.validation.digits}")
         BigDecimal price,
 

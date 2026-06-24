@@ -2,8 +2,10 @@ package com.vttish.bookstore.books.controller;
 
 import com.vttish.bookstore.books.dto.BookCardResponseDto;
 import com.vttish.bookstore.books.dto.BookDetailsResponseDto;
+import com.vttish.bookstore.books.dto.BookFilterDto;
 import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.common.constant.ApiRoutingConstants;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,11 +24,11 @@ public class BookController {
 
     @GetMapping
     public Page<BookCardResponseDto> getAvailable(
-            @RequestParam(required = false) String search,
+            @Valid BookFilterDto filter,
             Pageable pageable,
             Locale locale
     ) {
-        return bookQueryService.getAvailable(search, locale.getLanguage(), pageable);
+        return bookQueryService.getAvailable(filter, locale.getLanguage(), pageable);
     }
 
     @GetMapping("/{id}")

@@ -1,5 +1,6 @@
 package com.vttish.bookstore.books.repository;
 
+import com.vttish.bookstore.books.dto.BookFilterDto;
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.entity.BookTranslation;
 import jakarta.persistence.criteria.Predicate;
@@ -7,6 +8,7 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,19 +17,55 @@ public class BookSpecifications {
         throw new UnsupportedOperationException();
     }
 
-    public static Specification<Book> search(String query) {
-        return (root, q, cb) -> {
-            if (query == null || query.trim().isEmpty()) {
-                return cb.conjunction();
-            }
+    public static Specification<Book> byFilter(BookFilterDto filter) {
+        Specification<Book> spec = Specification.unrestricted();
 
-            String[] keywords = query.trim().toLowerCase().split("\\s+");
+        if (filter == null) {
+            return spec;
+        }
+
+        if (filter.search() != null && !filter.search().trim().isEmpty()) {
+            spec = spec.and(search(filter.search()));
+        }
+
+        if (filter.minPrice() != null) {
+            spec = spec.and(priceGreaterThanOrEqual(filter.minPrice()));
+        }
+
+        if (filter.maxPrice() != null) {
+            spec = spec.and(priceLessThanOrEqual(filter.maxPrice()));
+        }
+
+        return spec;
+    }
+
+    public static Specification<Book> availableByFilter(BookFilterDto filter) {
+        return Specification.allOf(isAvailable(), byFilter(filter));
+    }
+
+    private static Specification<Book> priceGreaterThanOrEqual(BigDecimal minPrice) {
+        return (root, query, cb) ->
+            cb.greaterThanOrEqualTo(root.get("price"), minPrice);
+    }
+
+    private static Specification<Book> priceLessThanOrEqual(BigDecimal maxPrice) {
+        return (root, query, cb) ->
+                cb.lessThanOrEqualTo(root.get("price"), maxPrice);
+    }
+
+    private static Specification<Book> isAvailable() {
+        return (root, query, cb) -> cb.isFalse(root.get("isArchived"));
+    }
+
+    private static Specification<Book> search(String search) {
+        return (root, query, cb) -> {
+            String[] keywords = search.trim().toLowerCase().split("\\s+");
             List<Predicate> predicates = new ArrayList<>();
 
             for (String keyword : keywords) {
                 String pattern = "%" + keyword + "%";
 
-                Subquery<BookTranslation> subquery = q.subquery(BookTranslation.class);
+                Subquery<BookTranslation> subquery = query.subquery(BookTranslation.class);
                 Root<BookTranslation> translation = subquery.from(BookTranslation.class);
 
                 subquery.select(translation).where(
@@ -35,7 +73,8 @@ public class BookSpecifications {
                                 cb.equal(translation.get("book"), root),
                                 cb.or(
                                         cb.like(cb.lower(translation.get("name")), pattern),
-                                        cb.like(cb.lower(translation.get("author")), pattern)
+                                        cb.like(cb.lower(translation.get("author")), pattern),
+                                        cb.like(cb.lower(translation.get("genre")), pattern)
                                 )
                         )
                 );
@@ -44,16 +83,6 @@ public class BookSpecifications {
             }
 
             return cb.and(predicates.toArray(Predicate[]::new));
-        };
-    }
-
-    public static Specification<Book> searchAvailable(String query) {
-        return Specification.allOf(isAvailable(), search(query));
-    }
-
-    private static Specification<Book> isAvailable() {
-        return (root, query, cb) -> {
-            return cb.isFalse(root.get("isArchived"));
         };
     }
 }

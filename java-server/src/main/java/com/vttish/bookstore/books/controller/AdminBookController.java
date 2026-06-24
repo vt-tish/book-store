@@ -2,6 +2,7 @@ package com.vttish.bookstore.books.controller;
 
 import com.vttish.bookstore.books.dto.AdminBookCardResponseDto;
 import com.vttish.bookstore.books.dto.AdminBookDetailsResponseDto;
+import com.vttish.bookstore.books.dto.BookFilterDto;
 import com.vttish.bookstore.books.dto.BookRequestDto;
 import com.vttish.bookstore.books.service.BookManagementService;
 import com.vttish.bookstore.books.service.BookQueryService;
@@ -50,11 +51,11 @@ public class AdminBookController {
 
     @GetMapping
     public Page<AdminBookCardResponseDto> getAll(
-            @RequestParam(required = false) String search,
+            @Valid BookFilterDto filter,
             Pageable pageable,
             Locale locale
     ) {
-        return bookQueryService.getAll(search, locale.getLanguage(), pageable);
+        return bookQueryService.getAll(filter, locale.getLanguage(), pageable);
     }
 
     @GetMapping("/{id}")
