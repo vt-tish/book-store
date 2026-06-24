@@ -2,6 +2,7 @@ package com.vttish.bookstore.books.service.impl;
 
 import com.vttish.bookstore.books.dto.AdminBookDetailsResponseDto;
 import com.vttish.bookstore.books.dto.BookRequestDto;
+import com.vttish.bookstore.books.dto.BookTranslationDto;
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.entity.BookTranslation;
 import com.vttish.bookstore.books.exception.BookHasOrdersException;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -25,7 +27,7 @@ public class BookManagementServiceImpl implements BookManagementService {
     private final BookRepository bookRepository;
     private final OrderQueryService orderQueryService;
     private final CartQueryService cartQueryService;
-    private final LocalizationProperties localizationProperties;
+    private final LocalizationProperties localizationProps;
     private final BookMapper mapper;
 
     @Override
@@ -33,12 +35,13 @@ public class BookManagementServiceImpl implements BookManagementService {
     public AdminBookDetailsResponseDto create(String lang, BookRequestDto bookRequestDto) {
         Book book = mapper.toBook(bookRequestDto);
 
-        bookRequestDto.translations().forEach((langCode, translationDto) ->
-                book.addTranslation(langCode, mapper.toBookTranslation(translationDto))
-        );
+        for (Map.Entry<String, BookTranslationDto> translation : bookRequestDto.translations().entrySet()) {
+            book.addTranslation(translation.getKey(), mapper.toBookTranslation(translation.getValue()));
+        }
 
+        book = bookRepository.save(book);
         return mapper.toAdminBookDetails(
-                bookRepository.save(book), lang, localizationProperties.defaultLanguage()
+                book, book.getTranslations().get(localizationProps.resolveLanguage(lang))
         );
     }
 
@@ -49,18 +52,20 @@ public class BookManagementServiceImpl implements BookManagementService {
 
         mapper.update(bookRequestDto, book);
 
-        bookRequestDto.translations().forEach((langCode, translationDto) -> {
-            BookTranslation translation = book.getTranslations().get(langCode);
+        for (Map.Entry<String, BookTranslationDto> translation : bookRequestDto.translations().entrySet()) {
+            String langCode = translation.getKey();
+            BookTranslation translationEntity = book.getTranslations().get(langCode);
 
-            if (translation != null) {
-                mapper.updateTranslation(translationDto, translation);
+            if (translationEntity != null) {
+                mapper.updateTranslation(translation.getValue(), translationEntity);
             } else {
-                book.addTranslation(langCode, mapper.toBookTranslation(translationDto));
+                book.addTranslation(langCode, mapper.toBookTranslation(translation.getValue()));
             }
-        });
+        }
 
+        book = bookRepository.save(book);
         return mapper.toAdminBookDetails(
-                bookRepository.save(book), lang, localizationProperties.defaultLanguage()
+                book, book.getTranslations().get(localizationProps.resolveLanguage(lang))
         );
     }
 

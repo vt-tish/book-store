@@ -16,22 +16,14 @@ public interface BookMapper {
 
     BookTranslation toBookTranslation(BookTranslationDto bookTranslationDto);
 
-    @Mapping(target = "name", expression = "java(book.getName(lang, defaultLang))")
-    @Mapping(target = "genre", expression = "java(book.getGenre(lang, defaultLang))")
-    @Mapping(target = "author", expression = "java(book.getAuthor(lang, defaultLang))")
-    @Mapping(target = "description", expression = "java(book.getDescription(lang, defaultLang))")
-    @Mapping(target = "characteristics", expression = "java(book.getCharacteristics(lang, defaultLang))")
-    AdminBookDetailsResponseDto toAdminBookDetails(Book book, String lang, String defaultLang);
+    @Mapping(target = "id", source = "book.id")
+    AdminBookDetailsResponseDto toAdminBookDetails(Book book, BookTranslation translation);
 
-    @Mapping(target = "name", expression = "java(book.getName(lang, defaultLang))")
-    @Mapping(target = "genre", expression = "java(book.getGenre(lang, defaultLang))")
-    @Mapping(target = "author", expression = "java(book.getAuthor(lang, defaultLang))")
-    AdminBookCardResponseDto toAdminBookCard(Book book, String lang, String defaultLang);
+    @Mapping(target = "id", source = "book.id")
+    AdminBookCardResponseDto toAdminBookCard(Book book, BookTranslation translation);
 
-    @Mapping(target = "name", expression = "java(book.getName(lang, defaultLang))")
-    @Mapping(target = "genre", expression = "java(book.getGenre(lang, defaultLang))")
-    @Mapping(target = "author", expression = "java(book.getAuthor(lang, defaultLang))")
-    BookCardResponseDto toBookCard(Book book, String lang, String defaultLang);
+    @Mapping(target = "id", source = "book.id")
+    BookCardResponseDto toBookCard(Book book, BookTranslation translation);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "translations", ignore = true)

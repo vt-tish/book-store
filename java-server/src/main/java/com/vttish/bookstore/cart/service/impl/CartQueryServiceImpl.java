@@ -23,7 +23,7 @@ public class CartQueryServiceImpl implements CartQueryService {
 
     @Override
     public Cart getCartForSubmission(UUID ownerId) {
-        return cartRepository.findFullByOwnerId(ownerId).orElseThrow(
+        return cartRepository.findByOwnerId(ownerId).orElseThrow(
                 CartNotFoundException::new
         );
     }

@@ -1,15 +1,8 @@
 package com.vttish.bookstore.books.repository;
 
-import com.vttish.bookstore.books.dto.AdminBookCardResponseDto;
 import com.vttish.bookstore.books.dto.AdminBookDetailsResponseDto;
-import com.vttish.bookstore.books.dto.BookCardResponseDto;
 import com.vttish.bookstore.books.dto.BookDetailsResponseDto;
 import com.vttish.bookstore.books.entity.Book;
-import org.jspecify.annotations.NonNull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -21,9 +14,6 @@ import java.util.UUID;
 public interface BookRepository extends JpaRepository<Book, UUID>, JpaSpecificationExecutor<Book> {
 
     Optional<Book> findByIdAndIsArchivedFalse(UUID id);
-
-    @EntityGraph(attributePaths = "translations")
-    @NonNull Page<Book> findAll(Specification<Book> specification, @NonNull Pageable pageable);
 
     @Query("""
         SELECT new com.vttish.bookstore.books.dto.BookDetailsResponseDto(

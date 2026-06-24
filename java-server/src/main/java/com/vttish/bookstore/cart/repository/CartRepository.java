@@ -14,9 +14,6 @@ import java.util.UUID;
 public interface CartRepository extends JpaRepository<Cart, UUID> {
     Optional<Cart> findByOwnerId(UUID ownerId);
 
-    @EntityGraph(attributePaths = { "items", "items.book", "items.book.translations" })
-    Optional<Cart> findFullByOwnerId(UUID ownerId);
-
     @Query("SELECT COUNT(c) > 0 FROM Cart c JOIN c.items it WHERE it.book.id = :bookId")
     boolean existsByBookId(@Param("bookId") UUID bookId);
 
