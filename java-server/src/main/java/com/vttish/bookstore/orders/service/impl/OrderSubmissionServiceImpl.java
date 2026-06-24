@@ -1,6 +1,8 @@
 package com.vttish.bookstore.orders.service.impl;
 
 import com.vttish.bookstore.auth.service.UserService;
+import com.vttish.bookstore.books.entity.Book;
+import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.cart.entity.Cart;
 import com.vttish.bookstore.cart.entity.CartItem;
 import com.vttish.bookstore.cart.service.CartManagementService;
@@ -20,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,9 +31,9 @@ import java.util.UUID;
 public class OrderSubmissionServiceImpl implements OrderSubmissionService {
     private final OrderRepository orderRepository;
     private final CartQueryService cartQueryService;
+    private final BookQueryService bookQueryService;
     private final UserService userService;
     private final CartManagementService cartManagementService;
-    private final LocalizationProperties localizationProps;
     private final OrderMapper mapper;
 
     @Override
@@ -41,31 +45,31 @@ public class OrderSubmissionServiceImpl implements OrderSubmissionService {
             throw new EmptyCartException();
         }
 
-        cart.getItems().forEach(cartItem -> {
-            if (cartItem.getBook().isArchived()) {
-                throw new UnavailableBookException();
-            }
-        });
-
-        BigDecimal totalPrice = cart.getItems().stream()
-                .map(item -> item.getBook().getPrice().multiply(
-                        BigDecimal.valueOf(item.getQuantity())
-                )).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        Order order = new Order(userService.getRefById(clientId), totalPrice);
-
-        for (CartItem item : cart.getItems()) {
-            order.addItem(new OrderItem(
-                    item.getBook(),
-                    item.getBook().getPrice(),
-                    item.getQuantity()
-            ));
+        if (cart.getItems().stream().anyMatch(item -> item.getBook().isArchived())) {
+            throw new UnavailableBookException();
         }
 
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        List<Book> books = new ArrayList<>();
+        Order order = new Order(userService.getRefById(clientId));
+
+        for (CartItem item : cart.getItems()) {
+            Book book = item.getBook();
+            BigDecimal itemPrice = book.getPrice();
+            totalPrice = totalPrice.add(
+                    itemPrice.multiply(BigDecimal.valueOf(item.getQuantity()))
+            );
+
+            order.addItem(new OrderItem(book, itemPrice, item.getQuantity()));
+            books.add(book);
+        }
+
+        order.setTotalPrice(totalPrice);
         cartManagementService.clear(cart);
+
         return mapper.toOrderDetailsDto(
                 orderRepository.save(order),
-                new TranslationContext(lang, localizationProps.defaultLanguage())
+                bookQueryService.getTranslations(books, lang)
         );
     }
 }

@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -30,6 +31,7 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "employee_id")
     private User employee;
 
+    @Setter
     private BigDecimal totalPrice;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -40,9 +42,8 @@ public class Order extends BaseEntity {
 
     private Instant closedAt;
 
-    public Order(User client, BigDecimal totalPrice) {
+    public Order(User client) {
         this.client = client;
-        this.totalPrice = totalPrice;
     }
 
     public void addItem(OrderItem orderItem) {

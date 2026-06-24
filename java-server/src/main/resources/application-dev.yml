@@ -16,7 +16,6 @@ spring:
   flyway:
     locations: classpath:db/migrations, classpath:db/testdata
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     hibernate:
       ddl-auto: validate

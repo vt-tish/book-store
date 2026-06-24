@@ -28,4 +28,6 @@ public interface CartItemRepository extends JpaRepository<CartItem, UUID> {
         AND t.languageCode = :lang
     """)
     List<CartItemDto> findAllWithLocalizedBooks(@Param("cartId") UUID cartId, @Param("lang") String lang);
+
+    boolean existsByBookId(UUID bookId);
 }

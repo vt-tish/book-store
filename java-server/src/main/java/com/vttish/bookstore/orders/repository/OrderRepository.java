@@ -16,20 +16,15 @@ import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
 
-    @EntityGraph(attributePaths = {
-            "items",
-            "items.book",
-            "items.book.translations"
-    })
+    @EntityGraph(attributePaths = { "items", "items.book" })
     @Query("SELECT o FROM Order o WHERE o.id = :id AND o.client.id = :clientId")
-    Optional<Order> findFullByIdAndClientId(@Param("id") UUID id, @Param("clientId") UUID clientId);
+    Optional<Order> findWithBooksByIdAndClientId(@Param("id") UUID id, @Param("clientId") UUID clientId);
 
     @EntityGraph(attributePaths = {
             "client",
             "employee",
             "items",
-            "items.book",
-            "items.book.translations"
+            "items.book"
     })
     Optional<Order> findFullById(UUID id);
 
@@ -74,7 +69,4 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
             @Param("status") OrderStatus status,
             Pageable pageable
     );
-
-    @Query("SELECT COUNT(o) > 0 FROM Order o JOIN o.items it WHERE it.book.id = :bookId")
-    boolean existsByBookId(@Param("bookId") UUID bookId);
 }

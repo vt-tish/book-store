@@ -1,15 +1,18 @@
 package com.vttish.bookstore.orders.service.impl;
 
+import com.vttish.bookstore.books.entity.Book;
+import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.common.config.LocalizationProperties;
 import com.vttish.bookstore.orders.dto.AdminOrderCardResponseDto;
 import com.vttish.bookstore.orders.dto.AdminOrderDetailsResponseDto;
 import com.vttish.bookstore.orders.dto.OrderCardResponseDto;
 import com.vttish.bookstore.orders.dto.OrderDetailsResponseDto;
 import com.vttish.bookstore.orders.entity.Order;
+import com.vttish.bookstore.orders.entity.OrderItem;
 import com.vttish.bookstore.orders.entity.enums.OrderStatus;
 import com.vttish.bookstore.orders.exception.OrderNotFoundException;
 import com.vttish.bookstore.orders.mapper.OrderMapper;
-import com.vttish.bookstore.orders.mapper.TranslationContext;
+import com.vttish.bookstore.orders.repository.OrderItemRepository;
 import com.vttish.bookstore.orders.repository.OrderRepository;
 import com.vttish.bookstore.orders.service.OrderQueryService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -25,6 +29,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderQueryServiceImpl implements OrderQueryService {
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final BookQueryService bookQueryService;
     private final LocalizationProperties localizationProps;
     private final OrderMapper mapper;
 
@@ -35,13 +41,17 @@ public class OrderQueryServiceImpl implements OrderQueryService {
 
     @Override
     public OrderDetailsResponseDto getByIdAndClientId(UUID id, UUID clientId, String lang) {
-        Order order = orderRepository.findFullByIdAndClientId(id, clientId).orElseThrow(
+        Order order = orderRepository.findWithBooksByIdAndClientId(id, clientId).orElseThrow(
                 OrderNotFoundException::new
         );
 
+        List<Book> books = order.getItems().stream()
+                .map(OrderItem::getBook)
+                .toList();
+
         return mapper.toOrderDetailsDto(
                 order,
-                new TranslationContext(lang, localizationProps.defaultLanguage())
+                bookQueryService.getTranslations(books, lang)
         );
     }
 
@@ -53,14 +63,19 @@ public class OrderQueryServiceImpl implements OrderQueryService {
     @Override
     public AdminOrderDetailsResponseDto getById(UUID id, String lang) {
         Order order = orderRepository.findFullById(id).orElseThrow(OrderNotFoundException::new);
+
+        List<Book> books = order.getItems().stream()
+                .map(OrderItem::getBook)
+                .toList();
+
         return mapper.toAdminOrderDetailsDto(
                 order,
-                new TranslationContext(lang, localizationProps.defaultLanguage())
+                bookQueryService.getTranslations(books, lang)
         );
     }
 
     @Override
     public boolean hasBookBeenOrdered(UUID bookId) {
-        return orderRepository.existsByBookId(bookId);
+        return orderItemRepository.existsByBookId(bookId);
     }
 }

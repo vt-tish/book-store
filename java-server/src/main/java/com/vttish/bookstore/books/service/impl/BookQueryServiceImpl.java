@@ -79,7 +79,8 @@ public class BookQueryServiceImpl implements BookQueryService {
         );
     }
 
-    private Map<UUID, BookTranslation> getTranslations(List<Book> books, String lang) {
+    @Override
+    public Map<UUID, BookTranslation> getTranslations(List<Book> books, String lang) {
         String resolvedLang = localizationProps.resolveLanguage(lang);
 
         return bookTranslationRepository

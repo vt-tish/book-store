@@ -25,7 +25,6 @@ public class OrderItem extends BaseEntity {
     private Book book;
 
     private BigDecimal pricePerUnit;
-
     private Integer quantity;
 
     public OrderItem(Book book, BigDecimal pricePerUnit, Integer quantity) {

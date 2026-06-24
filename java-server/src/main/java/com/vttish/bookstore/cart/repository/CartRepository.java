@@ -12,10 +12,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CartRepository extends JpaRepository<Cart, UUID> {
+
+    @EntityGraph(attributePaths = { "items" })
     Optional<Cart> findByOwnerId(UUID ownerId);
 
-    @Query("SELECT COUNT(c) > 0 FROM Cart c JOIN c.items it WHERE it.book.id = :bookId")
-    boolean existsByBookId(@Param("bookId") UUID bookId);
+    @EntityGraph(attributePaths = { "items", "items.book" })
+    Optional<Cart> findWithBooksByOwnerId(UUID ownerId);
 
     @Modifying
     @Query("DELETE FROM Cart c WHERE c.updatedAt < :cutoffTime")
