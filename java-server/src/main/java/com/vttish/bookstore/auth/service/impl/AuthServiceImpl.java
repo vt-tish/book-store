@@ -16,7 +16,6 @@ import com.vttish.bookstore.auth.service.AuthService;
 import com.vttish.bookstore.auth.service.EmailService;
 import com.vttish.bookstore.auth.service.JwtService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,6 +63,11 @@ public class AuthServiceImpl implements AuthService {
         }
 
         User user = userOptional.get();
+
+        if (user.isVerified()) {
+            return;
+        }
+
         Optional<VerifyToken> existingToken = verifyTokenRepository.findByUserId(user.getId());
 
         if (existingToken.isPresent()) {
@@ -118,6 +122,12 @@ public class AuthServiceImpl implements AuthService {
                 InvalidTokenException::new
         );
 
+        if (refreshToken.isExpired()) {
+            refreshToken.revoke();
+            refreshTokenRepository.save(refreshToken);
+            throw new ExpiredTokenException();
+        }
+
         if (refreshToken.isRevoked()) {
             throw new RevokedTokenException();
         }
@@ -140,11 +150,6 @@ public class AuthServiceImpl implements AuthService {
             throw new TokenReuseException();
         }
 
-        if (refreshToken.isExpired()) {
-            refreshToken.revoke();
-            refreshTokenRepository.save(refreshToken);
-            throw new ExpiredTokenException();
-        }
 
         String newToken = jwtService.generateOpaqueToken();
         RefreshToken newRefreshToken = new RefreshToken(

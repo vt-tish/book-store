@@ -24,4 +24,4 @@ docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE" up --build -d
 
 echo ""
 echo "Done! To view live logs run:"
-echo "   docker compose -f $COMPOSE_FILE logs -f"
+echo "   docker compose -f $COMPOSE_FILE logs -f <container-name>"

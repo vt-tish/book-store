@@ -2,6 +2,7 @@ package com.vttish.bookstore.auth.service.impl;
 
 import com.vttish.bookstore.auth.config.AuthProperties;
 import com.vttish.bookstore.auth.entity.User;
+import com.vttish.bookstore.auth.exception.InvalidTokenException;
 import com.vttish.bookstore.auth.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -45,7 +46,11 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public boolean isTokenValid(String token, User user) {
-        return extractUserId(token).equals(user.getId()) && !isTokenExpired(token);
+        try {
+            return extractUserId(token).equals(user.getId()) && !isTokenExpired(token);
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     private boolean isTokenExpired(String token) {
