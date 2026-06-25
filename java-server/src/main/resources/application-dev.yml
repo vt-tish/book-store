@@ -14,7 +14,7 @@ spring:
       settings:
         web-allow-others: true
   flyway:
-    locations: classpath:db/migrations, classpath:db/testdata
+    locations: classpath:db/migrations, classpath:db/test-data
   jpa:
     show-sql: true
     hibernate:
