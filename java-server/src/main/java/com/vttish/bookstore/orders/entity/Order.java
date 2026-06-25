@@ -63,16 +63,18 @@ public class Order extends BaseEntity {
     }
 
     public void cancel(User employee) {
-        if (status != OrderStatus.ACCEPTED) {
+        if (status != OrderStatus.PENDING && status != OrderStatus.ACCEPTED) {
             throw new InvalidOrderStateException(status.name());
         }
 
-        if (this.employee == null || !this.employee.getId().equals(employee.getId())) {
+        if (status == OrderStatus.ACCEPTED &&
+                (this.employee == null || !this.employee.getId().equals(employee.getId()))) {
             throw new OrderEmployeeMismatchException();
         }
 
-        status = OrderStatus.CANCELLED;
-        closedAt = Instant.now();
+        this.employee = employee;
+        this.status = OrderStatus.CANCELLED;
+        this.closedAt = Instant.now();
     }
 
     public void complete(User employee) {
