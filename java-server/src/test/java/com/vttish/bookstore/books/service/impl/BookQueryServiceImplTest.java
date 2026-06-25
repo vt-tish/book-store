@@ -170,11 +170,11 @@ class BookQueryServiceImplTest {
         when(localizationProps.defaultLanguage()).thenReturn("en");
         when(bookTranslationRepository.findByBookInAndLanguageCodeIn(anyList(), anyList()))
                 .thenReturn(List.of(translation));
-        when(mapper.toAdminBookDetailsDto(book, translation)).thenReturn(responseDto);
+        when(mapper.toAdminBookDetailsDto(book)).thenReturn(responseDto);
 
         when(translation.getBook()).thenReturn(book);
 
-        AdminBookDetailsResponseDto result = bookQueryService.getByIdAdmin(id, "en");
+        AdminBookDetailsResponseDto result = bookQueryService.getByIdAdmin(id);
 
         assertEquals(responseDto, result);
     }

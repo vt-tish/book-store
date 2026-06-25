@@ -6,22 +6,19 @@ import com.vttish.bookstore.books.entity.enums.Language;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.UUID;
 
 public record AdminBookDetailsResponseDto(
         UUID id,
-        String name,
-        String genre,
         String previewUrl,
         AgeGroup ageGroup,
         BigDecimal price,
         LocalDate publicationDate,
-        String author,
         Integer pages,
-        String characteristics,
-        String description,
         Language language,
         Instant createdAt,
         Instant updatedAt,
-        boolean isArchived
+        boolean isArchived,
+        Map<String, BookTranslationDto> translations
 ) {}

@@ -32,7 +32,7 @@ public class BookManagementServiceImpl implements BookManagementService {
 
     @Override
     @Transactional
-    public AdminBookDetailsResponseDto create(String lang, BookRequestDto bookRequestDto) {
+    public AdminBookDetailsResponseDto create(BookRequestDto bookRequestDto) {
         Book book = mapper.toBook(bookRequestDto);
 
         for (Map.Entry<String, BookTranslationDto> translation : bookRequestDto.translations().entrySet()) {
@@ -40,14 +40,12 @@ public class BookManagementServiceImpl implements BookManagementService {
         }
 
         book = bookRepository.save(book);
-        return mapper.toAdminBookDetailsDto(
-                book, book.getTranslations().get(localizationProps.resolveLanguage(lang))
-        );
+        return mapper.toAdminBookDetailsDto(book);
     }
 
     @Override
     @Transactional
-    public AdminBookDetailsResponseDto update(UUID id, String lang, BookRequestDto bookRequestDto) {
+    public AdminBookDetailsResponseDto update(UUID id, BookRequestDto bookRequestDto) {
         Book book = getEntityById(id);
 
         mapper.update(bookRequestDto, book);
@@ -64,9 +62,7 @@ public class BookManagementServiceImpl implements BookManagementService {
         }
 
         book = bookRepository.save(book);
-        return mapper.toAdminBookDetailsDto(
-                book, book.getTranslations().get(localizationProps.resolveLanguage(lang))
-        );
+        return mapper.toAdminBookDetailsDto(book);
     }
 
     @Override

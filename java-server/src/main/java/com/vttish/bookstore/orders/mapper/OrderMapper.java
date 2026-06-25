@@ -37,6 +37,7 @@ public interface OrderMapper {
     @Mapping(target = "subtotalPrice", expression = "java(calculateSubtotal(orderItem))")
     @Mapping(target = "bookName", expression = "java(getBookName(orderItem, translationMap))")
     @Mapping(target = "bookAuthor", expression = "java(getBookAuthor(orderItem, translationMap))")
+    @Mapping(target = "bookId", source = "book.id")
     OrderItemDto toOrderItemDto(OrderItem orderItem, @Context Map<UUID, BookTranslation> translationMap);
 
     default BigDecimal calculateSubtotal(OrderItem item) {

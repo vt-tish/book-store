@@ -12,7 +12,7 @@ public interface BookQueryService {
     Page<BookCardResponseDto> getAvailable(BookFilterRequestDto filter, String lang, Pageable pageable);
     Page<AdminBookCardResponseDto> getAll(BookFilterRequestDto filter, String lang, Pageable pageable);
     BookDetailsResponseDto getById(UUID id, String lang);
-    AdminBookDetailsResponseDto getByIdAdmin(UUID id, String lang);
+    AdminBookDetailsResponseDto getByIdAdmin(UUID id);
 
     Book getAvailableById(UUID id);
     Map<UUID, BookTranslation> getTranslations(List<Book> books, String lang);

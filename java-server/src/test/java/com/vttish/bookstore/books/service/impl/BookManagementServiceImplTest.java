@@ -76,9 +76,9 @@ class BookManagementServiceImplTest {
         when(book.getTranslations()).thenReturn(translations);
         
         when(localizationProps.resolveLanguage("en")).thenReturn("en");
-        when(mapper.toAdminBookDetailsDto(book, translation)).thenReturn(responseDto);
+        when(mapper.toAdminBookDetailsDto(book)).thenReturn(responseDto);
 
-        AdminBookDetailsResponseDto result = bookManagementService.create("en", request);
+        AdminBookDetailsResponseDto result = bookManagementService.create(request);
 
         assertEquals(responseDto, result);
         verify(bookRepository).save(book);
@@ -106,9 +106,9 @@ class BookManagementServiceImplTest {
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
         when(bookRepository.save(book)).thenReturn(book);
         when(localizationProps.resolveLanguage("en")).thenReturn("en");
-        when(mapper.toAdminBookDetailsDto(book, existingTranslation)).thenReturn(responseDto);
+        when(mapper.toAdminBookDetailsDto(book)).thenReturn(responseDto);
 
-        AdminBookDetailsResponseDto result = bookManagementService.update(id, "en", request);
+        AdminBookDetailsResponseDto result = bookManagementService.update(id, request);
 
         assertEquals(responseDto, result);
         verify(mapper).update(request, book);
@@ -138,9 +138,9 @@ class BookManagementServiceImplTest {
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
         when(bookRepository.save(book)).thenReturn(book);
         when(localizationProps.resolveLanguage("en")).thenReturn("en");
-        when(mapper.toAdminBookDetailsDto(any(), any())).thenReturn(responseDto);
+        when(mapper.toAdminBookDetailsDto(any())).thenReturn(responseDto);
 
-        bookManagementService.update(id, "en", request);
+        bookManagementService.update(id, request);
 
         verify(mapper).update(request, book);
         verify(book).addTranslation("en", newTranslation);
@@ -152,7 +152,7 @@ class BookManagementServiceImplTest {
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(BookNotFoundException.class, () ->
-                bookManagementService.update(id, "en", mock(BookRequestDto.class)));
+                bookManagementService.update(id, mock(BookRequestDto.class)));
     }
 
     @Test

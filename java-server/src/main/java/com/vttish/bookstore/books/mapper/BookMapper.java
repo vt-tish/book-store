@@ -16,10 +16,10 @@ public interface BookMapper {
 
     BookTranslation toBookTranslation(BookTranslationDto bookTranslationDto);
 
-    @Mapping(target = "id", source = "book.id")
-    @Mapping(target = "createdAt", source = "book.createdAt")
-    @Mapping(target = "updatedAt", source = "book.updatedAt")
-    AdminBookDetailsResponseDto toAdminBookDetailsDto(Book book, BookTranslation translation);
+    @Mapping(target = "isArchived", source = "archived")
+    AdminBookDetailsResponseDto toAdminBookDetailsDto(Book book);
+
+    BookTranslationDto toBookTranslationDto(BookTranslation translation);
 
     @Mapping(target = "id", source = "book.id")
     AdminBookCardResponseDto toAdminBookCardDto(Book book, BookTranslation translation);

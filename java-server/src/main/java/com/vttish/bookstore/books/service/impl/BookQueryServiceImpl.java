@@ -65,9 +65,9 @@ public class BookQueryServiceImpl implements BookQueryService {
     }
 
     @Override
-    public AdminBookDetailsResponseDto getByIdAdmin(UUID id, String lang) {
-        Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
-        return mapper.toAdminBookDetailsDto(book, getTranslation(book, lang));
+    public AdminBookDetailsResponseDto getByIdAdmin(UUID id) {
+        Book book = bookRepository.findWithTranslationsById(id).orElseThrow(BookNotFoundException::new);
+        return mapper.toAdminBookDetailsDto(book);
     }
 
     @Override

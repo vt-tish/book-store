@@ -25,6 +25,6 @@ public class Client extends BaseTimestampEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Formula("(SELECT COUNT(o.id) FROM orders o WHERE o.client_id = id)")
+    @Formula("(SELECT COUNT(o.id) FROM orders o WHERE o.client_id = user_id)")
     private Integer ordersCount;
 }

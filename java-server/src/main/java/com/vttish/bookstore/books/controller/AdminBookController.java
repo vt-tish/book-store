@@ -36,9 +36,7 @@ public class AdminBookController {
             @Valid @RequestBody BookRequestDto bookRequestDto,
             Locale locale
     ) {
-        AdminBookDetailsResponseDto createdBook = bookManagementService.create(
-                locale.getLanguage(), bookRequestDto
-        );
+        AdminBookDetailsResponseDto createdBook = bookManagementService.create(bookRequestDto);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -59,17 +57,16 @@ public class AdminBookController {
     }
 
     @GetMapping("/{id}")
-    public AdminBookDetailsResponseDto getById(@PathVariable UUID id, Locale locale) {
-        return bookQueryService.getByIdAdmin(id, locale.getLanguage());
+    public AdminBookDetailsResponseDto getById(@PathVariable UUID id) {
+        return bookQueryService.getByIdAdmin(id);
     }
 
     @PutMapping("/{id}")
     public AdminBookDetailsResponseDto update(
             @PathVariable UUID id,
-            @Valid @RequestBody BookRequestDto bookRequestDto,
-            Locale locale
+            @Valid @RequestBody BookRequestDto bookRequestDto
     ) {
-        return bookManagementService.update(id, locale.getLanguage(), bookRequestDto);
+        return bookManagementService.update(id, bookRequestDto);
     }
 
     @DeleteMapping("/{id}")
