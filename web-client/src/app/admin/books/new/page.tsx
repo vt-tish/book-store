@@ -49,11 +49,15 @@ export default function AdminBookNewPage() {
     }
   }, [acceptLanguageHeader, hasSubmitted]);
 
-  if (role !== "ADMIN" && role !== "EMPLOYEE") {
-    router.replace("/admin/books");
+  React.useEffect(() => {
+    if (role && role !== "ADMIN" && role !== "EMPLOYEE") {
+      router.replace("/admin/books");
+    }
+  }, [role, router]);
+
+  if (!role || (role !== "ADMIN" && role !== "EMPLOYEE")) {
     return null;
   }
-
   const handleTranslation = (lang: string, field: string, value: string) => {
     setTranslations((prev) => ({
       ...prev,
