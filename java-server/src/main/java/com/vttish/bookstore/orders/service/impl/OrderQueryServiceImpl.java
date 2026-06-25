@@ -2,18 +2,14 @@ package com.vttish.bookstore.orders.service.impl;
 
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.service.BookQueryService;
-import com.vttish.bookstore.common.config.LocalizationProperties;
-import com.vttish.bookstore.orders.dto.AdminOrderCardResponseDto;
-import com.vttish.bookstore.orders.dto.AdminOrderDetailsResponseDto;
-import com.vttish.bookstore.orders.dto.OrderCardResponseDto;
-import com.vttish.bookstore.orders.dto.OrderDetailsResponseDto;
+import com.vttish.bookstore.orders.dto.*;
 import com.vttish.bookstore.orders.entity.Order;
 import com.vttish.bookstore.orders.entity.OrderItem;
-import com.vttish.bookstore.orders.entity.enums.OrderStatus;
 import com.vttish.bookstore.orders.exception.OrderNotFoundException;
 import com.vttish.bookstore.orders.mapper.OrderMapper;
 import com.vttish.bookstore.orders.repository.OrderItemRepository;
 import com.vttish.bookstore.orders.repository.OrderRepository;
+import com.vttish.bookstore.orders.repository.OrderSpecifications;
 import com.vttish.bookstore.orders.service.OrderQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,7 +27,6 @@ public class OrderQueryServiceImpl implements OrderQueryService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final BookQueryService bookQueryService;
-    private final LocalizationProperties localizationProps;
     private final OrderMapper mapper;
 
     @Override
@@ -52,8 +47,17 @@ public class OrderQueryServiceImpl implements OrderQueryService {
     }
 
     @Override
-    public Page<AdminOrderCardResponseDto> getAll(UUID employeeId, OrderStatus status, Pageable pageable) {
-        return orderRepository.findAllAdminCardsByFilter(employeeId, status, pageable);
+    public Page<AdminOrderCardResponseDto> getAll(OrderFilterRequestDto filter, Pageable pageable) {
+        Page<Order> orders = orderRepository.findAll(
+                OrderSpecifications.byFilter(filter),
+                pageable
+        );
+
+        if (orders.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        return orders.map(mapper::toAdminOrderCardDto);
     }
 
     @Override

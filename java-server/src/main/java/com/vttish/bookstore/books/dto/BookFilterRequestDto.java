@@ -8,7 +8,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
 @ValidPriceRange(message = "{error.validation.valid_price_range}")
-public record BookFilterDto(
+public record BookFilterRequestDto(
         String search,
 
         @PositiveOrZero(message = "{error.validation.positive_or_zero}")

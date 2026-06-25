@@ -3,15 +3,18 @@ package com.vttish.bookstore.orders.controller;
 import com.vttish.bookstore.common.constant.ApiRoutingConstants;
 import com.vttish.bookstore.orders.dto.AdminOrderCardResponseDto;
 import com.vttish.bookstore.orders.dto.AdminOrderDetailsResponseDto;
+import com.vttish.bookstore.orders.dto.OrderFilterRequestDto;
 import com.vttish.bookstore.orders.entity.enums.OrderStatus;
 import com.vttish.bookstore.orders.service.OrderManagementService;
 import com.vttish.bookstore.orders.service.OrderQueryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
@@ -19,6 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(ApiRoutingConstants.API_V1 + "/admin/orders")
+@Validated
 @RequiredArgsConstructor
 @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
 public class AdminOrderController {
@@ -27,11 +31,10 @@ public class AdminOrderController {
 
     @GetMapping
     public Page<AdminOrderCardResponseDto> getAll(
-            @RequestParam(required = false) UUID employeeId,
-            @RequestParam(required = false) OrderStatus status,
+            @Valid OrderFilterRequestDto filter,
             Pageable pageable
     ) {
-        return orderQueryService.getAll(employeeId, status, pageable);
+        return orderQueryService.getAll(filter, pageable);
     }
 
     @GetMapping("/{id}")

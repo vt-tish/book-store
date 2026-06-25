@@ -4,7 +4,7 @@ import com.vttish.bookstore.books.dto.AdminBookCardResponseDto;
 import com.vttish.bookstore.books.dto.AdminBookDetailsResponseDto;
 import com.vttish.bookstore.books.dto.BookCardResponseDto;
 import com.vttish.bookstore.books.dto.BookDetailsResponseDto;
-import com.vttish.bookstore.books.dto.BookFilterDto;
+import com.vttish.bookstore.books.dto.BookFilterRequestDto;
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.entity.BookTranslation;
 import com.vttish.bookstore.books.exception.BookNotFoundException;
@@ -53,7 +53,7 @@ class BookQueryServiceImplTest {
 
     @Test
     void getAvailable_WhenBooksExist_ShouldReturnPageOfDto() {
-        BookFilterDto filter = new BookFilterDto("search", BigDecimal.ZERO, BigDecimal.TEN);
+        BookFilterRequestDto filter = new BookFilterRequestDto("search", BigDecimal.ZERO, BigDecimal.TEN);
         Pageable pageable = PageRequest.of(0, 10);
         Book book = mock(Book.class);
         UUID bookId = UUID.randomUUID();
@@ -87,7 +87,7 @@ class BookQueryServiceImplTest {
         when(bookRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(Page.empty());
 
         Page<BookCardResponseDto> result = bookQueryService.getAvailable(
-                mock(BookFilterDto.class), "en", pageable
+                mock(BookFilterRequestDto.class), "en", pageable
         );
 
         assertTrue(result.isEmpty());
@@ -95,7 +95,7 @@ class BookQueryServiceImplTest {
 
     @Test
     void getAll_WhenBooksExist_ShouldReturnPageOfAdminDto() {
-        BookFilterDto filter = new BookFilterDto("search", BigDecimal.ZERO, BigDecimal.TEN);
+        BookFilterRequestDto filter = new BookFilterRequestDto("search", BigDecimal.ZERO, BigDecimal.TEN);
         Pageable pageable = PageRequest.of(0, 10);
         Book book = mock(Book.class);
         UUID bookId = UUID.randomUUID();
@@ -127,7 +127,7 @@ class BookQueryServiceImplTest {
         when(bookRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(Page.empty());
 
         Page<AdminBookCardResponseDto> result = bookQueryService.getAll(
-                mock(BookFilterDto.class), "en", pageable
+                mock(BookFilterRequestDto.class), "en", pageable
         );
 
         assertTrue(result.isEmpty());

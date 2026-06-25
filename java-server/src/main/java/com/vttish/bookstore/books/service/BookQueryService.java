@@ -9,8 +9,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.*;
 
 public interface BookQueryService {
-    Page<BookCardResponseDto> getAvailable(BookFilterDto filter, String lang, Pageable pageable);
-    Page<AdminBookCardResponseDto> getAll(BookFilterDto filter, String lang, Pageable pageable);
+    Page<BookCardResponseDto> getAvailable(BookFilterRequestDto filter, String lang, Pageable pageable);
+    Page<AdminBookCardResponseDto> getAll(BookFilterRequestDto filter, String lang, Pageable pageable);
     BookDetailsResponseDto getById(UUID id, String lang);
     AdminBookDetailsResponseDto getByIdAdmin(UUID id, String lang);
 

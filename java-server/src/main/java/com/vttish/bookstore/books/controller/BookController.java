@@ -2,7 +2,7 @@ package com.vttish.bookstore.books.controller;
 
 import com.vttish.bookstore.books.dto.BookCardResponseDto;
 import com.vttish.bookstore.books.dto.BookDetailsResponseDto;
-import com.vttish.bookstore.books.dto.BookFilterDto;
+import com.vttish.bookstore.books.dto.BookFilterRequestDto;
 import com.vttish.bookstore.books.service.BookQueryService;
 import com.vttish.bookstore.common.constant.ApiRoutingConstants;
 import jakarta.validation.Valid;
@@ -24,7 +24,7 @@ public class BookController {
 
     @GetMapping
     public Page<BookCardResponseDto> getAvailable(
-            @Valid BookFilterDto filter,
+            @Valid BookFilterRequestDto filter,
             Pageable pageable,
             Locale locale
     ) {

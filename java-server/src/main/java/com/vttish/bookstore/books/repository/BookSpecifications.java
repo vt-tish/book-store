@@ -1,6 +1,6 @@
 package com.vttish.bookstore.books.repository;
 
-import com.vttish.bookstore.books.dto.BookFilterDto;
+import com.vttish.bookstore.books.dto.BookFilterRequestDto;
 import com.vttish.bookstore.books.entity.Book;
 import com.vttish.bookstore.books.entity.BookTranslation;
 import jakarta.persistence.criteria.Predicate;
@@ -17,7 +17,7 @@ public class BookSpecifications {
         throw new UnsupportedOperationException();
     }
 
-    public static Specification<Book> byFilter(BookFilterDto filter) {
+    public static Specification<Book> byFilter(BookFilterRequestDto filter) {
         Specification<Book> spec = Specification.unrestricted();
 
         if (filter == null) {
@@ -39,7 +39,7 @@ public class BookSpecifications {
         return spec;
     }
 
-    public static Specification<Book> availableByFilter(BookFilterDto filter) {
+    public static Specification<Book> availableByFilter(BookFilterRequestDto filter) {
         return Specification.allOf(isAvailable(), byFilter(filter));
     }
 

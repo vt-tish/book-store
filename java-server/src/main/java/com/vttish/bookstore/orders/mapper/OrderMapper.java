@@ -1,6 +1,7 @@
 package com.vttish.bookstore.orders.mapper;
 
 import com.vttish.bookstore.books.entity.BookTranslation;
+import com.vttish.bookstore.orders.dto.AdminOrderCardResponseDto;
 import com.vttish.bookstore.orders.dto.AdminOrderDetailsResponseDto;
 import com.vttish.bookstore.orders.dto.OrderItemDto;
 import com.vttish.bookstore.orders.dto.OrderDetailsResponseDto;
@@ -9,6 +10,7 @@ import com.vttish.bookstore.orders.entity.Order;
 import org.mapstruct.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,6 +26,13 @@ public interface OrderMapper {
             Order order,
             @Context Map<UUID, BookTranslation> translationMap
     );
+
+    @Mapping(target = "clientId", source = "client.id")
+    @Mapping(target = "clientEmail", source = "client.email")
+    @Mapping(target = "employeeId", source = "employee.id")
+    @Mapping(target = "employeeEmail", source = "employee.email")
+    @Mapping(target = "totalItems", expression = "java(calculateTotalItems(order.getItems()))")
+    AdminOrderCardResponseDto toAdminOrderCardDto(Order order);
 
     @Mapping(target = "subtotalPrice", expression = "java(calculateSubtotal(orderItem))")
     @Mapping(target = "bookName", expression = "java(getBookName(orderItem, translationMap))")
@@ -45,5 +54,15 @@ public interface OrderMapper {
     default String getBookAuthor(OrderItem item, @Context Map<UUID, BookTranslation> translationMap) {
         BookTranslation translation = translationMap.get(item.getBook().getId());
         return translation != null ? translation.getAuthor() : null;
+    }
+
+    default Integer calculateTotalItems(List<OrderItem> items) {
+        if (items == null || items.isEmpty()) {
+            return 0;
+        }
+
+        return items.stream()
+                .mapToInt(item -> item.getQuantity() != null ? item.getQuantity() : 0)
+                .sum();
     }
 }

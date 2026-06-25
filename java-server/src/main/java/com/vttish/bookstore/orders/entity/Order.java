@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -34,6 +35,7 @@ public class Order extends BaseEntity {
     @Setter
     private BigDecimal totalPrice;
 
+    @BatchSize(size = 50)
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
