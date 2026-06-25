@@ -22,6 +22,7 @@ public interface BookMapper {
     BookTranslationDto toBookTranslationDto(BookTranslation translation);
 
     @Mapping(target = "id", source = "book.id")
+    @Mapping(target = "isArchived", source = "book.archived")
     AdminBookCardResponseDto toAdminBookCardDto(Book book, BookTranslation translation);
 
     @Mapping(target = "id", source = "book.id")

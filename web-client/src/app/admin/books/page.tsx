@@ -28,6 +28,11 @@ export default function AdminBooksPage() {
 
   const [search, setSearch] = useState("");
   const [activeSearch, setActiveSearch] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [activeMinPrice, setActiveMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [activeMaxPrice, setActiveMaxPrice] = useState("");
+  const [sort, setSort] = useState("");
 
   const [confirmAction, setConfirmAction] = useState<{ id: string; type: "delete" | "archive" | "unarchive" } | null>(null);
 
@@ -37,11 +42,16 @@ export default function AdminBooksPage() {
     setError("");
     try {
       const data = await getAllBooksAdmin(
-        { search: activeSearch || undefined },
+        { 
+          search: activeSearch || undefined,
+          minPrice: activeMinPrice ? Number(activeMinPrice) : undefined,
+          maxPrice: activeMaxPrice ? Number(activeMaxPrice) : undefined,
+        },
         page,
         PAGE_SIZE,
         fetchWithAuth,
-        acceptLanguageHeader
+        acceptLanguageHeader,
+        sort
       );
       setBooks(data.content);
       setTotalPages(data.totalPages);
@@ -51,7 +61,7 @@ export default function AdminBooksPage() {
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, page, activeSearch, locale, fetchWithAuth, acceptLanguageHeader]);
+  }, [isAuthenticated, page, activeSearch, activeMinPrice, activeMaxPrice, sort, locale, fetchWithAuth, acceptLanguageHeader]);
 
   useEffect(() => {
     if (!authLoading && (!isAuthenticated || (role !== "ADMIN" && role !== "EMPLOYEE"))) {
@@ -93,14 +103,7 @@ export default function AdminBooksPage() {
   return (
     <div className="admin-layout">
       {/* Sidebar */}
-      <nav className="admin-sidebar">
-        <Link href="/admin/books" className="admin-sidebar-link active" id="sidebar-books">{t("admin.books")}</Link>
-        <Link href="/admin/orders" className="admin-sidebar-link" id="sidebar-orders">{t("admin.orders")}</Link>
-        <Link href="/admin/clients" className="admin-sidebar-link" id="sidebar-clients">{t("admin.clients")}</Link>
-        {role === "ADMIN" && (
-          <Link href="/admin/employees" className="admin-sidebar-link" id="sidebar-employees">{t("admin.employees")}</Link>
-        )}
-      </nav>
+
 
       <div className="admin-content">
         <div className="page-header">
@@ -114,7 +117,7 @@ export default function AdminBooksPage() {
 
         {/* Search */}
         <div className="filter-bar">
-          <div className="form-group" style={{ flex: 1 }}>
+          <div className="form-group" style={{ flex: 1, minWidth: "200px" }}>
             <label className="form-label">{t("books.search")}</label>
             <input
               id="admin-books-search"
@@ -122,14 +125,46 @@ export default function AdminBooksPage() {
               placeholder={t("books.search")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") { setPage(0); setActiveSearch(search); } }}
+              onKeyDown={(e) => { if (e.key === "Enter") { setPage(0); setActiveSearch(search); setActiveMinPrice(minPrice); setActiveMaxPrice(maxPrice); } }}
             />
           </div>
+          <div className="form-group" style={{ width: "120px" }}>
+            <label className="form-label">{t("books.minPrice")}</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              className="form-input"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { setPage(0); setActiveSearch(search); setActiveMinPrice(minPrice); setActiveMaxPrice(maxPrice); } }}
+            />
+          </div>
+          <div className="form-group" style={{ width: "120px" }}>
+            <label className="form-label">{t("books.maxPrice")}</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              className="form-input"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { setPage(0); setActiveSearch(search); setActiveMinPrice(minPrice); setActiveMaxPrice(maxPrice); } }}
+            />
+          </div>
+          <div className="form-group" style={{ width: "220px" }}>
+            <label className="form-label">{t("app.sortBy")}</label>
+            <select className="form-select" value={sort} onChange={(e) => { setSort(e.target.value); setPage(0); }}>
+              <option value="">{t("app.sort.default")}</option>
+              <option value="isArchived,asc">{t("app.sort.archivedAsc")}</option>
+              <option value="isArchived,desc">{t("app.sort.archivedDesc")}</option>
+            </select>
+          </div>
           <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
-            <button className="btn btn-primary" id="admin-books-search-btn" onClick={() => { setPage(0); setActiveSearch(search); }}>
+            <button className="btn btn-primary" id="admin-books-search-btn" onClick={() => { setPage(0); setActiveSearch(search); setActiveMinPrice(minPrice); setActiveMaxPrice(maxPrice); }}>
               {t("app.search")}
             </button>
-            <button className="btn btn-ghost" id="admin-books-clear-btn" onClick={() => { setSearch(""); setActiveSearch(""); setPage(0); }}>
+            <button className="btn btn-ghost" id="admin-books-clear-btn" onClick={() => { setSearch(""); setActiveSearch(""); setMinPrice(""); setActiveMinPrice(""); setMaxPrice(""); setActiveMaxPrice(""); setSort(""); setPage(0); }}>
               {t("books.clearFilter")}
             </button>
           </div>

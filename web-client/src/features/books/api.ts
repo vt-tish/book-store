@@ -59,9 +59,10 @@ export async function getAllBooksAdmin(
   page: number,
   size: number,
   fetchFn: (url: string, opts?: RequestInit, headers?: Record<string, string>) => Promise<Response>,
-  acceptLanguage: string
+  acceptLanguage: string,
+  sort?: string
 ): Promise<Page<AdminBookCardResponseDto>> {
-  const query = buildQuery({ ...filter, page, size });
+  const query = buildQuery({ ...filter, page, size, sort });
   const res = await fetchFn(`${API_BASE}/admin/books${query}`, {}, { "Accept-Language": acceptLanguage });
   if (!res.ok) {
     const err: ApiError = await res.json();

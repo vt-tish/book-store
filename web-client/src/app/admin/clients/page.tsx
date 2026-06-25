@@ -22,6 +22,7 @@ export default function AdminClientsPage() {
   const [clients, setClients] = useState<AdminClientResponseDto[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [page, setPage] = useState(0);
+  const [sort, setSort] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -32,7 +33,7 @@ export default function AdminClientsPage() {
     setLoading(true);
     setError("");
     try {
-      const data = await getAllClients(page, PAGE_SIZE, fetchWithAuth);
+      const data = await getAllClients(page, PAGE_SIZE, fetchWithAuth, sort);
       setClients(data.content);
       setTotalPages(data.totalPages);
     } catch (err) {
@@ -41,7 +42,7 @@ export default function AdminClientsPage() {
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, page, fetchWithAuth]);
+  }, [isAuthenticated, page, fetchWithAuth, sort]);
 
   useEffect(() => {
     if (!authLoading && (!isAuthenticated || (role !== "ADMIN" && role !== "EMPLOYEE"))) {
@@ -74,12 +75,7 @@ export default function AdminClientsPage() {
 
   return (
     <div className="admin-layout">
-      <nav className="admin-sidebar">
-        <Link href="/admin/books" className="admin-sidebar-link" id="sidebar-books">{t("admin.books")}</Link>
-        <Link href="/admin/orders" className="admin-sidebar-link" id="sidebar-orders">{t("admin.orders")}</Link>
-        <Link href="/admin/clients" className="admin-sidebar-link active" id="sidebar-clients">{t("admin.clients")}</Link>
-        {role === "ADMIN" && <Link href="/admin/employees" className="admin-sidebar-link" id="sidebar-employees">{t("admin.employees")}</Link>}
-      </nav>
+
 
       <div className="admin-content">
         <div className="page-header">
@@ -88,6 +84,18 @@ export default function AdminClientsPage() {
 
         {loading ? <LoadingSpinner /> : error ? <ErrorMessage message={error} onRetry={loadClients} /> : (
           <>
+            <div className="filter-bar">
+              <div className="form-group" style={{ maxWidth: "250px" }}>
+                <label className="form-label">{t("app.sortBy")}</label>
+                <select className="form-select" value={sort} onChange={(e) => setSort(e.target.value)}>
+                  <option value="">{t("app.sort.default")}</option>
+                  <option value="user.isBlocked,asc">{t("app.sort.statusAsc")}</option>
+                  <option value="user.isBlocked,desc">{t("app.sort.statusDesc")}</option>
+                  <option value="ordersCount,desc">{t("app.sort.ordersDesc")}</option>
+                  <option value="ordersCount,asc">{t("app.sort.ordersAsc")}</option>
+                </select>
+              </div>
+            </div>
             <div className="table-wrapper">
               <table>
                 <thead>
@@ -113,25 +121,30 @@ export default function AdminClientsPage() {
                         )}
                       </td>
                       <td>
-                        {client.isBlocked ? (
-                          <button
-                            className="btn btn-success btn-sm"
-                            id={`unblock-client-${client.id}`}
-                            onClick={() => setConfirm({ id: client.id, type: "unblock" })}
-                            disabled={actionLoading === client.id}
-                          >
-                            {actionLoading === client.id ? <span className="spinner spinner-sm" /> : t("admin.clients.unblock")}
-                          </button>
-                        ) : (
-                          <button
-                            className="btn btn-danger btn-sm"
-                            id={`block-client-${client.id}`}
-                            onClick={() => setConfirm({ id: client.id, type: "block" })}
-                            disabled={actionLoading === client.id}
-                          >
-                            {actionLoading === client.id ? <span className="spinner spinner-sm" /> : t("admin.clients.block")}
-                          </button>
-                        )}
+                        <div style={{ display: "flex", gap: "6px" }}>
+                          <Link href={`/admin/orders?clientId=${client.id}`} className="btn btn-ghost btn-sm" id={`view-client-orders-${client.id}`}>
+                            {t("admin.orders")}
+                          </Link>
+                          {client.isBlocked ? (
+                            <button
+                              className="btn btn-success btn-sm"
+                              id={`unblock-client-${client.id}`}
+                              onClick={() => setConfirm({ id: client.id, type: "unblock" })}
+                              disabled={actionLoading === client.id}
+                            >
+                              {actionLoading === client.id ? <span className="spinner spinner-sm" /> : t("admin.clients.unblock")}
+                            </button>
+                          ) : (
+                            <button
+                              className="btn btn-danger btn-sm"
+                              id={`block-client-${client.id}`}
+                              onClick={() => setConfirm({ id: client.id, type: "block" })}
+                              disabled={actionLoading === client.id}
+                            >
+                              {actionLoading === client.id ? <span className="spinner spinner-sm" /> : t("admin.clients.block")}
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

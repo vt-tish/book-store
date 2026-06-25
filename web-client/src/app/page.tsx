@@ -17,6 +17,8 @@ export default function RootPage() {
       router.replace("/books");
     } else if (role === "EMPLOYEE" || role === "ADMIN") {
       router.replace("/admin/books");
+    } else {
+      router.replace("/login");
     }
   }, [isAuthenticated, isLoading, role, router]);
 

@@ -65,12 +65,28 @@ export default function AdminBookEditPage({ params }: Props) {
         setPublicationDate(b.publicationDate);
         setPages(String(b.pages));
         setLanguage(b.language);
-        // Note: Admin detail response doesn't include translations map
-        // We init empty and let user fill them
+        
+        if (b.translations) {
+          setTranslations((prev) => {
+            const next = { ...prev };
+            for (const lang of SUPPORTED_LANGS) {
+              if (b.translations[lang]) {
+                next[lang] = {
+                  name: b.translations[lang].name ?? "",
+                  genre: b.translations[lang].genre ?? "",
+                  author: b.translations[lang].author ?? "",
+                  characteristics: b.translations[lang].characteristics ?? "",
+                  description: b.translations[lang].description ?? ""
+                };
+              }
+            }
+            return next;
+          });
+        }
       })
       .catch((err: ApiError) => setGlobalError(err.message ?? t("app.error")))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, fetchWithAuth, acceptLanguageHeader, t]);
 
   const handleTranslation = (lang: string, field: string, value: string) => {
     setTranslations((prev) => ({ ...prev, [lang]: { ...prev[lang], [field]: value } }));
@@ -115,12 +131,7 @@ export default function AdminBookEditPage({ params }: Props) {
 
   return (
     <div className="admin-layout">
-      <nav className="admin-sidebar">
-        <Link href="/admin/books" className="admin-sidebar-link active" id="sidebar-books">{t("admin.books")}</Link>
-        <Link href="/admin/orders" className="admin-sidebar-link" id="sidebar-orders">{t("admin.orders")}</Link>
-        <Link href="/admin/clients" className="admin-sidebar-link" id="sidebar-clients">{t("admin.clients")}</Link>
-        {role === "ADMIN" && <Link href="/admin/employees" className="admin-sidebar-link" id="sidebar-employees">{t("admin.employees")}</Link>}
-      </nav>
+
 
       <div className="admin-content">
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>

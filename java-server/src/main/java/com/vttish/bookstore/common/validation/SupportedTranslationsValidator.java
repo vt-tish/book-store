@@ -12,13 +12,13 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 public class SupportedTranslationsValidator
-        implements ConstraintValidator<SupportedTranslations, Map<String, Object>> {
+        implements ConstraintValidator<SupportedTranslations, Map<String, ?>> {
 
     private final LocalizationProperties localizationProps;
     private final MessageSource messageSource;
 
     @Override
-    public boolean isValid(Map<String, Object> translations, ConstraintValidatorContext context) {
+    public boolean isValid(Map<String, ?> translations, ConstraintValidatorContext context) {
         if (translations == null || translations.isEmpty()) {
             return true;
         }

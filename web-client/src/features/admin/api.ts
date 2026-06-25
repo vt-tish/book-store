@@ -35,9 +35,10 @@ function buildQuery(
 export async function getAllClients(
   page: number,
   size: number,
-  fetchFn: FetchFn
+  fetchFn: FetchFn,
+  sort?: string
 ): Promise<Page<AdminClientResponseDto>> {
-  const query = buildQuery({ page, size });
+  const query = buildQuery({ page, size, sort });
   const res = await fetchFn(`${API_BASE}/admin/clients${query}`);
   if (!res.ok) {
     const err: ApiError = await res.json();
@@ -73,9 +74,10 @@ export async function unblockClient(
 export async function getAllEmployees(
   page: number,
   size: number,
-  fetchFn: FetchFn
+  fetchFn: FetchFn,
+  sort?: string
 ): Promise<Page<AdminEmployeeResponseDto>> {
-  const query = buildQuery({ page, size });
+  const query = buildQuery({ page, size, sort });
   const res = await fetchFn(`${API_BASE}/admin/employees${query}`);
   if (!res.ok) {
     const err: ApiError = await res.json();

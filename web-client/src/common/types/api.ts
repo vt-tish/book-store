@@ -112,6 +112,7 @@ export interface AdminBookDetailsResponseDto {
   createdAt: string;
   updatedAt: string;
   isArchived: boolean;
+  translations: Record<string, BookTranslationDto>;
 }
 
 export interface BookTranslationDto {
@@ -286,7 +287,8 @@ export type UserRole = "CLIENT" | "EMPLOYEE" | "ADMIN";
 
 export interface TokenPayload {
   sub: string; // userId
-  roles: UserRole[];
+  role?: UserRole;
+  roles?: UserRole[];
   exp: number;
   iat: number;
 }

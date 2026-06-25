@@ -3,19 +3,19 @@
 INSERT INTO users (id, email, password, role, is_verified, is_blocked, created_at, updated_at) VALUES ('941fa79f-121a-4529-a82a-74f1aef40410', 'admin1@example.com', '$2a$12$37U0FFuXX.lF07seLLUg5.o2MZrGXoFBweENC3Ga9/4qP.XVx9YEq', 'ADMIN', true, false, '2026-06-25 09:20:38Z', '2026-06-25 09:20:38Z');
 
 INSERT INTO users (id, email, password, role, is_verified, is_blocked, created_at, updated_at) VALUES ('7945f35a-fc3a-4df6-8404-e5923a2eb810', 'employee1@example.com', '$2a$12$HfhEjFfrbey3X4wYnCegZe/snt5U5De0hzeZNc2TncEU7xuQAtVvW', 'EMPLOYEE', true, false, '2026-06-25 09:20:38Z', '2026-06-25 09:20:38Z');
-INSERT INTO employees (user_id, phone, birth_date, created_at, updated_at) VALUES ('7945f35a-fc3a-4df6-8404-e5923a2eb810', '+380892566900', '1993-07-18', '2026-06-25 09:20:38Z', '2026-06-25 09:20:38Z');
+INSERT INTO employees (user_id, phone, birth_date, created_at, updated_at) VALUES ('7945f35a-fc3a-4df6-8404-e5923a2eb810', '089-256-6900', '1993-07-18', '2026-06-25 09:20:38Z', '2026-06-25 09:20:38Z');
 
 INSERT INTO users (id, email, password, role, is_verified, is_blocked, created_at, updated_at) VALUES ('8729cdac-4d69-4c0e-b825-f430fdef2269', 'employee2@example.com', '$2a$12$U6/XNagYQxzMuem7rJWg1.oGr9/N8lcN06YFFPn.HPblL1LRvNGQO', 'EMPLOYEE', true, false, '2026-06-25 09:20:39Z', '2026-06-25 09:20:39Z');
-INSERT INTO employees (user_id, phone, birth_date, created_at, updated_at) VALUES ('8729cdac-4d69-4c0e-b825-f430fdef2269', '+380140125450', '1992-11-02', '2026-06-25 09:20:39Z', '2026-06-25 09:20:39Z');
+INSERT INTO employees (user_id, phone, birth_date, created_at, updated_at) VALUES ('8729cdac-4d69-4c0e-b825-f430fdef2269', '014-012-5450', '1992-11-02', '2026-06-25 09:20:39Z', '2026-06-25 09:20:39Z');
 
 INSERT INTO users (id, email, password, role, is_verified, is_blocked, created_at, updated_at) VALUES ('a877e578-c8ff-481b-9fe5-d48b5a491350', 'employee3@example.com', '$2a$12$QXlEl32KSJZQOcxznQmd2.ZZPPdGO6EtvxloIpbiVs6YdjkVRk526', 'EMPLOYEE', true, false, '2026-06-25 09:20:39Z', '2026-06-25 09:20:39Z');
-INSERT INTO employees (user_id, phone, birth_date, created_at, updated_at) VALUES ('a877e578-c8ff-481b-9fe5-d48b5a491350', '+380555045121', '1987-07-08', '2026-06-25 09:20:39Z', '2026-06-25 09:20:39Z');
+INSERT INTO employees (user_id, phone, birth_date, created_at, updated_at) VALUES ('a877e578-c8ff-481b-9fe5-d48b5a491350', '055-504-5121', '1987-07-08', '2026-06-25 09:20:39Z', '2026-06-25 09:20:39Z');
 
 INSERT INTO users (id, email, password, role, is_verified, is_blocked, created_at, updated_at) VALUES ('73ac6f0c-c373-468a-b815-6b9aa82d536f', 'employee4@example.com', '$2a$12$zdkHQwwMHIu6Epl0j1Cm.ekDRuDpy7IazGxUZSwZqb7yLpBY6H3MO', 'EMPLOYEE', true, false, '2026-06-25 09:20:40Z', '2026-06-25 09:20:40Z');
-INSERT INTO employees (user_id, phone, birth_date, created_at, updated_at) VALUES ('73ac6f0c-c373-468a-b815-6b9aa82d536f', '+380795920350', '1991-01-05', '2026-06-25 09:20:40Z', '2026-06-25 09:20:40Z');
+INSERT INTO employees (user_id, phone, birth_date, created_at, updated_at) VALUES ('73ac6f0c-c373-468a-b815-6b9aa82d536f', '079-592-0350', '1991-01-05', '2026-06-25 09:20:40Z', '2026-06-25 09:20:40Z');
 
 INSERT INTO users (id, email, password, role, is_verified, is_blocked, created_at, updated_at) VALUES ('2e2c0894-4098-4d90-8856-eaa1653c4cf6', 'employee5@example.com', '$2a$12$NwAVnSIw.c0x5WQ7gsFnnOSBxqZCntRoMY2gjGod7MqHcsCjyO8/C', 'EMPLOYEE', true, false, '2026-06-25 09:20:40Z', '2026-06-25 09:20:40Z');
-INSERT INTO employees (user_id, phone, birth_date, created_at, updated_at) VALUES ('2e2c0894-4098-4d90-8856-eaa1653c4cf6', '+380435119370', '1984-04-27', '2026-06-25 09:20:40Z', '2026-06-25 09:20:40Z');
+INSERT INTO employees (user_id, phone, birth_date, created_at, updated_at) VALUES ('2e2c0894-4098-4d90-8856-eaa1653c4cf6', '043-511-9370', '1984-04-27', '2026-06-25 09:20:40Z', '2026-06-25 09:20:40Z');
 
 INSERT INTO users (id, email, password, role, is_verified, is_blocked, created_at, updated_at) VALUES ('5106740f-8002-4cc7-b28f-848f9b817b32', 'client1@example.com', '$2a$12$Lfi/FX27nvNaCN4L2AAZVum/tb/yJD9NfERaJtlZkOFC.h6Axtffa', 'CLIENT', true, false, '2026-06-25 09:20:40Z', '2026-06-25 09:20:40Z');
 INSERT INTO clients (user_id, created_at, updated_at) VALUES ('5106740f-8002-4cc7-b28f-848f9b817b32', '2026-06-25 09:20:40Z', '2026-06-25 09:20:40Z');

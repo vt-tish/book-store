@@ -16,7 +16,7 @@ spring:
   flyway:
     locations: classpath:db/migrations, classpath:db/test-data
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: validate
 

@@ -81,7 +81,7 @@ export function Navbar() {
                 className={`nav-link ${isActive("/admin/clients") ? "active" : ""}`}
                 id="nav-admin-clients"
               >
-                {t("nav.admin")}
+                {t("admin.clients")}
               </Link>
             </>
           )}

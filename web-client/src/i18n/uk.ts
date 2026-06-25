@@ -23,6 +23,14 @@ const uk = {
   "app.all": "Всі",
   "app.yes": "Так",
   "app.no": "Ні",
+  "app.sortBy": "Сортувати за",
+  "app.sort.statusAsc": "Статус (спершу активні)",
+  "app.sort.statusDesc": "Статус (спершу заблоковані)",
+  "app.sort.ordersDesc": "Замовлення (від найбільшого)",
+  "app.sort.ordersAsc": "Замовлення (від найменшого)",
+  "app.sort.archivedAsc": "Статус (спершу доступні)",
+  "app.sort.archivedDesc": "Статус (спершу в архіві)",
+  "app.sort.default": "За замовчуванням",
 
   // Auth
   "auth.login": "Увійти",

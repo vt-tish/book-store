@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/common/hooks/useAuth";
 import { useLocale } from "@/common/hooks/useLocale";
 import { useToast } from "@/common/components/Toast";
@@ -15,10 +15,19 @@ const PAGE_SIZE = 15;
 const ORDER_STATUSES: OrderStatus[] = ["PENDING", "ACCEPTED", "CANCELLED", "COMPLETED"];
 
 export default function AdminOrdersPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <AdminOrdersContent />
+    </Suspense>
+  );
+}
+
+function AdminOrdersContent() {
   const { isAuthenticated, isLoading: authLoading, fetchWithAuth, role } = useAuth();
   const { t } = useLocale();
   const { showToast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [orders, setOrders] = useState<AdminOrderCardResponseDto[]>([]);
   const [totalPages, setTotalPages] = useState(0);
@@ -30,6 +39,14 @@ export default function AdminOrdersPage() {
   const [filterStatus, setFilterStatus] = useState<OrderStatus | "">("");
   const [activeStatus, setActiveStatus] = useState<OrderStatus | "">("");
 
+  const [filterMinPrice, setFilterMinPrice] = useState("");
+  const [activeMinPrice, setActiveMinPrice] = useState("");
+  const [filterMaxPrice, setFilterMaxPrice] = useState("");
+  const [activeMaxPrice, setActiveMaxPrice] = useState("");
+
+  const [activeClientId, setActiveClientId] = useState(searchParams.get("clientId") || "");
+  const [activeEmployeeId, setActiveEmployeeId] = useState(searchParams.get("employeeId") || "");
+
   const [confirm, setConfirm] = useState<{ id: string; type: "accept" | "complete" | "cancel" } | null>(null);
 
   const loadOrders = useCallback(async () => {
@@ -38,7 +55,13 @@ export default function AdminOrdersPage() {
     setError("");
     try {
       const data = await getAllOrdersAdmin(
-        { status: activeStatus || undefined },
+        { 
+          status: activeStatus || undefined,
+          clientId: activeClientId || undefined,
+          employeeId: activeEmployeeId || undefined,
+          minPrice: activeMinPrice ? parseFloat(activeMinPrice) : undefined,
+          maxPrice: activeMaxPrice ? parseFloat(activeMaxPrice) : undefined
+        },
         page,
         PAGE_SIZE,
         fetchWithAuth
@@ -51,7 +74,7 @@ export default function AdminOrdersPage() {
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, page, activeStatus, fetchWithAuth]);
+  }, [isAuthenticated, page, activeStatus, activeClientId, activeEmployeeId, activeMinPrice, activeMaxPrice, fetchWithAuth]);
 
   useEffect(() => {
     if (!authLoading && (!isAuthenticated || (role !== "ADMIN" && role !== "EMPLOYEE"))) {
@@ -85,21 +108,15 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="admin-layout">
-      <nav className="admin-sidebar">
-        <Link href="/admin/books" className="admin-sidebar-link" id="sidebar-books">{t("admin.books")}</Link>
-        <Link href="/admin/orders" className="admin-sidebar-link active" id="sidebar-orders">{t("admin.orders")}</Link>
-        <Link href="/admin/clients" className="admin-sidebar-link" id="sidebar-clients">{t("admin.clients")}</Link>
-        {role === "ADMIN" && <Link href="/admin/employees" className="admin-sidebar-link" id="sidebar-employees">{t("admin.employees")}</Link>}
-      </nav>
+
 
       <div className="admin-content">
         <div className="page-header">
           <h1 className="page-title">{t("admin.orders.title")}</h1>
         </div>
 
-        {/* Filter */}
-        <div className="filter-bar">
-          <div className="form-group">
+        <div className="filter-bar" style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
+          <div className="form-group" style={{ minWidth: "150px" }}>
             <label className="form-label">{t("admin.orders.filterByStatus")}</label>
             <select
               id="admin-orders-status-filter"
@@ -113,11 +130,45 @@ export default function AdminOrdersPage() {
               ))}
             </select>
           </div>
-          <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
-            <button className="btn btn-primary" id="admin-orders-apply-btn" onClick={() => { setPage(0); setActiveStatus(filterStatus); }}>
+          <div className="form-group" style={{ minWidth: "100px" }}>
+            <label className="form-label">Min Price</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              className="form-input"
+              value={filterMinPrice}
+              onChange={(e) => setFilterMinPrice(e.target.value)}
+            />
+          </div>
+          <div className="form-group" style={{ minWidth: "100px" }}>
+            <label className="form-label">Max Price</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              className="form-input"
+              value={filterMaxPrice}
+              onChange={(e) => setFilterMaxPrice(e.target.value)}
+            />
+          </div>
+          <div style={{ display: "flex", gap: "8px", alignItems: "flex-end", flexGrow: 1, justifyContent: "flex-end" }}>
+            {activeClientId && (
+              <div className="badge badge-neutral" style={{ alignSelf: "center", marginRight: "auto" }}>
+                Client: {activeClientId.slice(0, 8)}
+                <button style={{ marginLeft: "8px", background: "none", border: "none", cursor: "pointer" }} onClick={() => { setActiveClientId(""); setPage(0); }}>✕</button>
+              </div>
+            )}
+            {activeEmployeeId && (
+              <div className="badge badge-neutral" style={{ alignSelf: "center", marginRight: "auto" }}>
+                Employee: {activeEmployeeId.slice(0, 8)}
+                <button style={{ marginLeft: "8px", background: "none", border: "none", cursor: "pointer" }} onClick={() => { setActiveEmployeeId(""); setPage(0); }}>✕</button>
+              </div>
+            )}
+            <button className="btn btn-primary" id="admin-orders-apply-btn" onClick={() => { setPage(0); setActiveStatus(filterStatus); setActiveMinPrice(filterMinPrice); setActiveMaxPrice(filterMaxPrice); }}>
               {t("books.applyFilter")}
             </button>
-            <button className="btn btn-ghost" id="admin-orders-clear-btn" onClick={() => { setFilterStatus(""); setActiveStatus(""); setPage(0); }}>
+            <button className="btn btn-ghost" id="admin-orders-clear-btn" onClick={() => { setFilterStatus(""); setActiveStatus(""); setFilterMinPrice(""); setActiveMinPrice(""); setFilterMaxPrice(""); setActiveMaxPrice(""); setActiveClientId(""); setActiveEmployeeId(""); router.push("/admin/orders"); setPage(0); }}>
               {t("books.clearFilter")}
             </button>
           </div>

@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const tokenPayload = accessToken ? parseToken(accessToken) : null;
   const userId = tokenPayload?.sub ?? null;
-  const role = tokenPayload?.roles?.[0] ?? null;
+  const role = tokenPayload?.role ?? tokenPayload?.roles?.[0] ?? null;
   const isAuthenticated = !!accessToken;
 
   const login = useCallback((token: string) => {

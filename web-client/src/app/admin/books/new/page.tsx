@@ -100,12 +100,7 @@ export default function AdminBookNewPage() {
 
   return (
     <div className="admin-layout">
-      <nav className="admin-sidebar">
-        <Link href="/admin/books" className="admin-sidebar-link active" id="sidebar-books">{t("admin.books")}</Link>
-        <Link href="/admin/orders" className="admin-sidebar-link" id="sidebar-orders">{t("admin.orders")}</Link>
-        <Link href="/admin/clients" className="admin-sidebar-link" id="sidebar-clients">{t("admin.clients")}</Link>
-        {role === "ADMIN" && <Link href="/admin/employees" className="admin-sidebar-link" id="sidebar-employees">{t("admin.employees")}</Link>}
-      </nav>
+
 
       <div className="admin-content">
         <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "24px" }}>
