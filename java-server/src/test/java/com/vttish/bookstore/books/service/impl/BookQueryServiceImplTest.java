@@ -160,19 +160,11 @@ class BookQueryServiceImplTest {
     void getByIdAdmin_WhenExists_ShouldReturnAdminDto() {
         UUID id = UUID.randomUUID();
         Book book = mock(Book.class);
-        when(book.getId()).thenReturn(id);
-        BookTranslation translation = mock(BookTranslation.class);
         
         AdminBookDetailsResponseDto responseDto = mock(AdminBookDetailsResponseDto.class);
 
-        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
-        when(localizationProps.resolveLanguage("en")).thenReturn("en");
-        when(localizationProps.defaultLanguage()).thenReturn("en");
-        when(bookTranslationRepository.findByBookInAndLanguageCodeIn(anyList(), anyList()))
-                .thenReturn(List.of(translation));
+        when(bookRepository.findWithTranslationsById(id)).thenReturn(Optional.of(book));
         when(mapper.toAdminBookDetailsDto(book)).thenReturn(responseDto);
-
-        when(translation.getBook()).thenReturn(book);
 
         AdminBookDetailsResponseDto result = bookQueryService.getByIdAdmin(id);
 

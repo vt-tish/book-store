@@ -30,6 +30,8 @@ const en = {
   "app.sort.ordersAsc": "Orders (Low to High)",
   "app.sort.archivedAsc": "Status (Available First)",
   "app.sort.archivedDesc": "Status (Archived First)",
+  "app.sort.createdAsc": "Oldest First",
+  "app.sort.createdDesc": "Newest First",
   "app.sort.default": "Default",
 
   "auth.login": "Login",

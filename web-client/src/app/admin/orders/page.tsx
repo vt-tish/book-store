@@ -36,6 +36,9 @@ function AdminOrdersContent() {
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  const [sortField, setSortField] = useState<string>("createdAt");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+
   const [filterStatus, setFilterStatus] = useState<OrderStatus | "">("");
   const [activeStatus, setActiveStatus] = useState<OrderStatus | "">("");
 
@@ -64,7 +67,8 @@ function AdminOrdersContent() {
         },
         page,
         PAGE_SIZE,
-        fetchWithAuth
+        fetchWithAuth,
+        `${sortField},${sortDirection}`
       );
       setOrders(data.content);
       setTotalPages(data.totalPages);
@@ -74,7 +78,7 @@ function AdminOrdersContent() {
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, page, activeStatus, activeClientId, activeEmployeeId, activeMinPrice, activeMaxPrice, fetchWithAuth]);
+  }, [isAuthenticated, page, activeStatus, activeClientId, activeEmployeeId, activeMinPrice, activeMaxPrice, fetchWithAuth, sortField, sortDirection]);
 
   useEffect(() => {
     if (!authLoading && (!isAuthenticated || (role !== "ADMIN" && role !== "EMPLOYEE"))) {
@@ -104,6 +108,16 @@ function AdminOrdersContent() {
     }
   };
 
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("desc");
+    }
+    setPage(0);
+  };
+
   if (authLoading) return <LoadingSpinner />;
 
   return (
@@ -128,6 +142,28 @@ function AdminOrdersContent() {
               {ORDER_STATUSES.map((s) => (
                 <option key={s} value={s}>{t(`orders.status.${s}` as never)}</option>
               ))}
+            </select>
+          </div>
+          <div className="form-group" style={{ minWidth: "150px" }}>
+            <label className="form-label">{t("app.sortBy")}</label>
+            <select
+              className="form-select"
+              value={`${sortField},${sortDirection}`}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (!val) {
+                  setSortField("");
+                  setSortDirection("desc");
+                } else {
+                  const [f, d] = val.split(",");
+                  setSortField(f);
+                  setSortDirection(d as "asc" | "desc");
+                }
+                setPage(0);
+              }}
+            >
+              <option value="createdAt,desc">{t("app.sort.createdDesc")}</option>
+              <option value="createdAt,asc">{t("app.sort.createdAsc")}</option>
             </select>
           </div>
           <div className="form-group" style={{ minWidth: "100px" }}>
@@ -187,7 +223,7 @@ function AdminOrdersContent() {
                     <th>{t("orders.items")}</th>
                     <th>{t("app.status")}</th>
                     <th>{t("orders.created")}</th>
-                    {role === "EMPLOYEE" && <th>{t("app.actions")}</th>}
+                    <th>{t("app.actions")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -204,49 +240,50 @@ function AdminOrdersContent() {
                       <td>{order.totalItems}</td>
                       <td><span className={`badge status-${order.status}`}>{t(`orders.status.${order.status}` as never)}</span></td>
                       <td className="text-sm text-muted">{new Date(order.createdAt).toLocaleDateString()}</td>
-                      {role === "EMPLOYEE" && (
-                        <td>
-                          <div style={{ display: "flex", gap: "6px" }}>
-                            {order.status === "PENDING" && (
+                      <td>
+                        <div style={{ display: "flex", gap: "6px" }}>
+                          <Link href={`/admin/orders/${order.id}`} className="btn btn-ghost btn-sm" title={t("orders.details")}>
+                            {t("orders.details")}
+                          </Link>
+                          {role === "EMPLOYEE" && order.status === "PENDING" && (
+                            <button
+                              className="btn btn-success btn-sm"
+                              id={`accept-order-${order.id}`}
+                              onClick={() => setConfirm({ id: order.id, type: "accept" })}
+                              disabled={actionLoading === order.id}
+                            >
+                              {t("admin.orders.accept")}
+                            </button>
+                          )}
+                          {role === "EMPLOYEE" && order.status === "ACCEPTED" && (
+                            <>
                               <button
-                                className="btn btn-success btn-sm"
-                                id={`accept-order-${order.id}`}
-                                onClick={() => setConfirm({ id: order.id, type: "accept" })}
+                                className="btn btn-primary btn-sm"
+                                id={`complete-order-${order.id}`}
+                                onClick={() => setConfirm({ id: order.id, type: "complete" })}
                                 disabled={actionLoading === order.id}
                               >
-                                {t("admin.orders.accept")}
+                                {t("admin.orders.complete")}
                               </button>
-                            )}
-                            {order.status === "ACCEPTED" && (
-                              <>
-                                <button
-                                  className="btn btn-primary btn-sm"
-                                  id={`complete-order-${order.id}`}
-                                  onClick={() => setConfirm({ id: order.id, type: "complete" })}
-                                  disabled={actionLoading === order.id}
-                                >
-                                  {t("admin.orders.complete")}
-                                </button>
-                                <button
-                                  className="btn btn-danger btn-sm"
-                                  id={`cancel-order-${order.id}`}
-                                  onClick={() => setConfirm({ id: order.id, type: "cancel" })}
-                                  disabled={actionLoading === order.id}
-                                >
-                                  {t("admin.orders.cancel")}
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      )}
+                              <button
+                                className="btn btn-danger btn-sm"
+                                id={`cancel-order-${order.id}`}
+                                onClick={() => setConfirm({ id: order.id, type: "cancel" })}
+                                disabled={actionLoading === order.id}
+                              >
+                                {t("admin.orders.cancel")}
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             {orders.length === 0 && (
-              <div className="empty-state"><div className="empty-state-icon">📭</div><h3 className="empty-state-title">{t("app.noResults")}</h3></div>
+              <div className="empty-state"><h3 className="empty-state-title">{t("app.noResults")}</h3></div>
             )}
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
           </>

@@ -30,6 +30,8 @@ const uk = {
   "app.sort.ordersAsc": "Замовлення (від найменшого)",
   "app.sort.archivedAsc": "Статус (спершу доступні)",
   "app.sort.archivedDesc": "Статус (спершу в архіві)",
+  "app.sort.createdAsc": "Спершу старі",
+  "app.sort.createdDesc": "Спершу нові",
   "app.sort.default": "За замовчуванням",
 
   // Auth

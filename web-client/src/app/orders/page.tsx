@@ -67,7 +67,6 @@ export default function OrdersPage() {
 
       {orders.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-icon">📦</div>
           <h3 className="empty-state-title">{t("orders.noOrders")}</h3>
           <button className="btn btn-primary mt-md" onClick={() => router.push("/books")} id="browse-books-btn">
             {t("nav.books")}
@@ -96,10 +95,15 @@ export default function OrdersPage() {
                         {t("orders.items")}: {order.totalItems}
                       </div>
                     </div>
-                    <div style={{ textAlign: "right" }}>
-                      <StatusBadge status={order.status} />
-                      <div style={{ fontSize: "var(--font-size-xl)", fontWeight: 700, color: "var(--color-accent-light)", marginTop: "8px" }}>
-                        ${Number(order.totalPrice).toFixed(2)}
+                    <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
+                      <div style={{ textAlign: "right" }}>
+                        <StatusBadge status={order.status} />
+                        <div style={{ fontSize: "var(--font-size-xl)", fontWeight: 700, color: "var(--color-accent-light)", marginTop: "8px" }}>
+                          ${Number(order.totalPrice).toFixed(2)}
+                        </div>
+                      </div>
+                      <div className="btn btn-ghost btn-sm">
+                        {t("orders.details")}
                       </div>
                     </div>
                   </div>

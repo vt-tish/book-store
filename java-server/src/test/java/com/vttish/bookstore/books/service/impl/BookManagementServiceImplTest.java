@@ -73,9 +73,7 @@ class BookManagementServiceImplTest {
         
         Map<String, BookTranslation> translations = new HashMap<>();
         translations.put("en", translation);
-        when(book.getTranslations()).thenReturn(translations);
         
-        when(localizationProps.resolveLanguage("en")).thenReturn("en");
         when(mapper.toAdminBookDetailsDto(book)).thenReturn(responseDto);
 
         AdminBookDetailsResponseDto result = bookManagementService.create(request);
@@ -105,7 +103,6 @@ class BookManagementServiceImplTest {
 
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
         when(bookRepository.save(book)).thenReturn(book);
-        when(localizationProps.resolveLanguage("en")).thenReturn("en");
         when(mapper.toAdminBookDetailsDto(book)).thenReturn(responseDto);
 
         AdminBookDetailsResponseDto result = bookManagementService.update(id, request);
@@ -137,7 +134,6 @@ class BookManagementServiceImplTest {
         AdminBookDetailsResponseDto responseDto = mock(AdminBookDetailsResponseDto.class);
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
         when(bookRepository.save(book)).thenReturn(book);
-        when(localizationProps.resolveLanguage("en")).thenReturn("en");
         when(mapper.toAdminBookDetailsDto(any())).thenReturn(responseDto);
 
         bookManagementService.update(id, request);

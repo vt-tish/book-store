@@ -244,7 +244,7 @@ export default function AdminBooksPage() {
               </table>
             </div>
             {books.length === 0 && (
-              <div className="empty-state"><div className="empty-state-icon">📭</div><h3 className="empty-state-title">{t("app.noResults")}</h3></div>
+              <div className="empty-state"><h3 className="empty-state-title">{t("app.noResults")}</h3></div>
             )}
             <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
           </>

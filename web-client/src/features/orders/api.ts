@@ -82,9 +82,10 @@ export async function getAllOrdersAdmin(
   filter: OrderFilterRequestDto,
   page: number,
   size: number,
-  fetchFn: FetchFn
+  fetchFn: FetchFn,
+  sort?: string
 ): Promise<Page<AdminOrderCardResponseDto>> {
-  const query = buildQuery({ ...filter, page, size });
+  const query = buildQuery({ ...filter, page, size, sort });
   const res = await fetchFn(`${API_BASE}/admin/orders${query}`);
   if (!res.ok) {
     const err: ApiError = await res.json();
