@@ -34,5 +34,22 @@ services:
       retries: 5
     restart: always
 
+  book-store-client:
+    container_name: book-store-client
+    image: book-store-client:prod
+    build:
+      context: ..
+      dockerfile: web-client/Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+    env_file:
+      - ../environments/.env
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    depends_on:
+      book-store-server:
+        condition: service_started
+    restart: always
+
 volumes:
   postgres_data:
