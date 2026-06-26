@@ -15,7 +15,9 @@ import com.vttish.bookstore.auth.repository.VerifyTokenRepository;
 import com.vttish.bookstore.auth.service.AuthService;
 import com.vttish.bookstore.auth.service.EmailService;
 import com.vttish.bookstore.auth.service.JwtService;
+import com.vttish.bookstore.common.events.UserRegisteredEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
     private final AuthProperties authProps;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
@@ -281,6 +284,7 @@ public class AuthServiceImpl implements AuthService {
                 Instant.now().plusMillis(authProps.token().verifyExpirationMs())
         );
 
+        eventPublisher.publishEvent(new UserRegisteredEvent(user.getId(), user.getRole()));
         return verifyTokenRepository.save(token);
     }
 
