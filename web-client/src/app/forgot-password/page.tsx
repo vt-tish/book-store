@@ -53,6 +53,20 @@ export default function ForgotPasswordPage() {
     }
   };
 
+  const handleResend = async () => {
+    setLoading(true);
+    setGlobalError("");
+    try {
+      const res = await forgotPassword({ email }, acceptLanguageHeader);
+      setSuccess(res.message);
+    } catch (err) {
+      const apiErr = err as ApiError;
+      setGlobalError(apiErr.message ?? t("app.error"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="auth-bg">
       <div className="auth-card">
@@ -65,6 +79,7 @@ export default function ForgotPasswordPage() {
         <h1 className="auth-title" style={{ textAlign: "center" }}>{t("auth.forgotTitle")}</h1>
         <p className="auth-subtitle" style={{ textAlign: "center" }}>{t("auth.forgotSubtitle")}</p>
 
+        {globalError && (
           <div className="badge badge-error" style={{ marginBottom: "16px", width: "100%", justifyContent: "flex-start", borderRadius: "8px", padding: "10px 14px" }}>
             {globalError}
           </div>
@@ -75,6 +90,17 @@ export default function ForgotPasswordPage() {
             <div className="badge badge-success" style={{ padding: "12px 16px", borderRadius: "10px", width: "100%", justifyContent: "center", marginBottom: "16px" }}>
               ✓ {success}
             </div>
+
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={loading}
+              className="btn btn-outline"
+              style={{ display: "block", width: "100%", marginBottom: "8px" }}
+            >
+              {loading ? <span className="spinner spinner-sm" /> : t("auth.resendLink")}
+            </button>
+
             <Link href="/reset-password" className="btn btn-primary" style={{ display: "block" }} id="go-reset-link">
               {t("auth.resetPassword")}
             </Link>

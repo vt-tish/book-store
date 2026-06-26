@@ -221,6 +221,7 @@ class AuthServiceImplTest {
     void login_WhenUnverified_ShouldThrowException() {
         User unverifiedUser = new User("test@example.com", "encoded", Role.CLIENT);
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(unverifiedUser));
+        when(passwordEncoder.matches("password123", "encoded")).thenReturn(true);
 
         assertThrows(UnverifiedUserException.class, () -> 
             authService.login(new LoginRequestDto("test@example.com", "password123"))
@@ -231,6 +232,7 @@ class AuthServiceImplTest {
     void login_WhenBlocked_ShouldThrowException() {
         testUser.setBlocked(true);
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
+        when(passwordEncoder.matches("password123", "encoded_password")).thenReturn(true);
 
         assertThrows(BlockedUserException.class, () -> 
             authService.login(new LoginRequestDto("test@example.com", "password123"))

@@ -103,16 +103,16 @@ public class AuthServiceImpl implements AuthService {
                 InvalidCredentialsException::new
         );
 
+        if (!passwordEncoder.matches(loginRequestDto.password(), user.getPassword())) {
+            throw new InvalidCredentialsException();
+        }
+
         if (!user.isVerified()) {
             throw new UnverifiedUserException();
         }
 
         if (user.isBlocked()) {
             throw new BlockedUserException();
-        }
-
-        if (!passwordEncoder.matches(loginRequestDto.password(), user.getPassword())) {
-            throw new InvalidCredentialsException();
         }
 
         return new TokensDto(generateNewRefreshToken(user), jwtService.generateAccessToken(user));

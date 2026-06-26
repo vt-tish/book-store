@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/common/hooks/useLocale";
-import { registerUser } from "@/features/auth/api";
+import { registerUser, resendVerification } from "@/features/auth/api";
 import { ApiError } from "@/common/types/api";
 import { LanguageSwitcher } from "@/common/components/LanguageSwitcher";
 
@@ -60,6 +60,20 @@ export default function RegisterPage() {
     }
   };
 
+  const handleResend = async () => {
+    setLoading(true);
+    setGlobalError("");
+    try {
+      const res = await resendVerification({ email }, acceptLanguageHeader);
+      setSuccess(res.message);
+    } catch (err) {
+      const apiErr = err as ApiError;
+      setGlobalError(apiErr.message ?? t("app.error"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="auth-bg">
       <div className="auth-card">
@@ -96,7 +110,18 @@ export default function RegisterPage() {
             >
               {success}
             </div>
+
             <div style={{ display: "flex", gap: "8px", flexDirection: "column" }}>
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={loading}
+                className="btn btn-outline"
+                style={{ display: "block", width: "100%" }}
+              >
+                {loading ? <span className="spinner spinner-sm" /> : t("auth.resendLink")}
+              </button>
+
               <Link href="/verify" className="btn btn-primary" id="go-verify-link">
                 {t("auth.verify")}
               </Link>

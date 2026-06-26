@@ -1,6 +1,6 @@
 "use client";
 
-import React, {
+import {
   createContext,
   useContext,
   useState,
@@ -8,6 +8,7 @@ import React, {
   useCallback,
   useRef,
 } from "react";
+import { useRouter } from "next/navigation";
 import { ApiError, AuthResponseDto, TokenPayload, UserRole } from "@/common/types/api";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
@@ -43,6 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const refreshPromiseRef = useRef<Promise<string | null> | null>(null);
+
+  const router = useRouter();
 
   const tokenPayload = accessToken ? parseToken(accessToken) : null;
   const userId = tokenPayload?.sub ?? null;
@@ -86,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     refreshPromiseRef.current = promise;
     return promise;
-  }, [clearAuth]);
+  }, [clearAuth, router]);
 
   // Try to restore session on mount
   useEffect(() => {
@@ -128,24 +131,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: { ...headers, ...(options.headers as Record<string, string> ?? {}) },
       });
 
+      if (res.status === 403) {
+         clearAuth();
+         router.push("/login?error=banned"); 
+         return new Promise(() => {}); // Stall forever so the component doesn't try to parse the empty 403 response
+      }
+
       // Auto-refresh on 401
-      if (res.status === 401 && accessToken) {
-        const newToken = await refreshToken();
-        if (newToken) {
-          headers["Authorization"] = `Bearer ${newToken}`;
-          res = await fetch(url, {
-            ...options,
-            credentials: "include",
-            headers: { ...headers, ...(options.headers as Record<string, string> ?? {}) },
-          });
+      if (res.status === 401) {
+        if (accessToken) {
+          const newToken = await refreshToken();
+          if (newToken) {
+            headers["Authorization"] = `Bearer ${newToken}`;
+            res = await fetch(url, {
+              ...options,
+              credentials: "include",
+              headers: { ...headers, ...(options.headers as Record<string, string> ?? {}) },
+            });
+            // If the retry ALSO gives 401 or 403, it will just fall through and return `res`, 
+            // but we really should check if the retry is ok. If it's not, we just let it return normally 
+            // so the caller can handle it, OR we could stall again. Let's just return res for the retry.
+            if (!res.ok && res.status === 401) {
+              clearAuth();
+              router.push("/login?error=session_expired");
+              return new Promise(() => {});
+            }
+          } else {
+            clearAuth();
+            router.push("/login?error=session_expired");
+            return new Promise(() => {}); // Stall forever
+          }
         } else {
           clearAuth();
+          router.push("/login?error=session_expired");
+          return new Promise(() => {}); // Stall forever
         }
       }
 
       return res;
     },
-    [accessToken, refreshToken, clearAuth]
+    [accessToken, refreshToken, clearAuth, router]
   );
 
   return (
