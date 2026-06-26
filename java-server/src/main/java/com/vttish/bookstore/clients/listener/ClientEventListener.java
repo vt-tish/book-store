@@ -1,4 +1,4 @@
-package com.vttish.bookstore.clients.service.impl;
+package com.vttish.bookstore.clients.listener;
 
 import com.vttish.bookstore.auth.entity.enums.Role;
 import com.vttish.bookstore.auth.service.UserService;
